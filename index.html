@@ -1,36 +1,56 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Coming Soon</title>
 
   <style>
     body {
       margin: 0;
-      font-family: Arial, sans-serif;
-      background: #f7f7f7;
+      height: 100vh;
       display: flex;
       justify-content: center;
       align-items: center;
-      height: 100vh;
       text-align: center;
+      font-family: Arial, sans-serif;
+      overflow: hidden;
+      background: #ffffff;
+      position: relative;
+    }
+
+    /* Logo background */
+    body::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: url('logo.png') center center no-repeat;
+      background-size: 350px;
+      opacity: 0.08;
+      z-index: 0;
+    }
+
+    .content {
+      position: relative;
+      z-index: 1;
     }
 
     h1 {
-      font-size: 48px;
+      font-size: 56px;
       margin-bottom: 10px;
+      color: #111;
     }
 
     p {
-      font-size: 20px;
+      font-size: 22px;
       color: #666;
     }
   </style>
 </head>
+
 <body>
 
-  <div>
+  <div class="content">
     <h1>Coming Soon</h1>
     <p>For patients and clinics</p>
   </div>
