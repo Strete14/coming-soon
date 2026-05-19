@@ -10,7 +10,7 @@
       margin: 0;
       height: 100vh;
       overflow: hidden;
-      background: #111; /* fundal neutru, nu mai apare alb */
+      background: #111;
       display: flex;
       justify-content: center;
       align-items: center;
@@ -23,7 +23,7 @@
       height: 100%;
     }
 
-    /* LOGO FULLSCREEN */
+    /* LOGO */
     .logo {
       position: absolute;
       top: 50%;
@@ -70,41 +70,31 @@
       }
     }
 
-    /* TEXT COMING SOON */
+    /* COMING SOON */
     .coming-soon {
       position: absolute;
       top: 50%;
       left: 50%;
       transform: translate(-50%, -50%);
       
-      font-size: 42px;
-      color: #ffffff;
+      font-size: 44px;
+      color: #00c853; /* verde clean */
       letter-spacing: 3px;
 
       opacity: 0;
-      white-space: nowrap;
-      overflow: hidden;
-      border-right: 2px solid white;
 
-      width: 0;
-
-      animation:
-        textFadeIn 2s ease 11s forwards,
-        typing 4s steps(12) 12s forwards,
-        blink 1s infinite 12s;
+      animation: textFadeIn 2.5s ease 11s forwards;
     }
 
     @keyframes textFadeIn {
-      to { opacity: 1; }
-    }
-
-    @keyframes typing {
-      from { width: 0; }
-      to { width: 12ch; }
-    }
-
-    @keyframes blink {
-      50% { border-color: transparent; }
+      from {
+        opacity: 0;
+        transform: translate(-50%, -40%);
+      }
+      to {
+        opacity: 1;
+        transform: translate(-50%, -50%);
+      }
     }
 
   </style>
