@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ro">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Coming Soon</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
   <style>
     body {
@@ -12,47 +12,46 @@
       display: flex;
       justify-content: center;
       align-items: center;
-      text-align: center;
-      font-family: Arial, sans-serif;
+      background-color: #ffffff; /* păstrăm fundalul */
       overflow: hidden;
-      background: #ffffff;
-      position: relative;
+      font-family: Arial, sans-serif;
     }
 
-    /* Logo background */
-    body::before {
-      content: "";
+    .container {
+      text-align: center;
+    }
+
+    .logo {
+      width: 200px;
+      max-width: 80%;
+      opacity: 0;
+      animation: fadeIn 1.5s ease forwards, fadeOut 1.5s ease 3s forwards;
+    }
+
+    .coming-soon {
+      font-size: 28px;
+      color: #000;
+      opacity: 0;
       position: absolute;
-      inset: 0;
-      background: url('logo.svg') center center no-repeat;
-      background-size: 900px;
-      opacity: 0.25;
-      z-index: 0;
+      animation: fadeIn 1.5s ease 4.5s forwards;
     }
 
-    .content {
-      position: relative;
-      z-index: 1;
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
     }
 
-    h1 {
-      font-size: 56px;
-      margin-bottom: 10px;
-      color: #111;
-    }
-
-    p {
-      font-size: 22px;
-      color: #666;
+    @keyframes fadeOut {
+      from { opacity: 1; }
+      to { opacity: 0; }
     }
   </style>
 </head>
-
 <body>
 
-  <div class="content">
-    <h1>Coming Soon</h1>
-    <p>For patients and clinics</p>
+  <div class="container">
+    <img src="logo.svg" alt="Logo" class="logo">
+    <div class="coming-soon">Coming Soon</div>
   </div>
 
 </body>
