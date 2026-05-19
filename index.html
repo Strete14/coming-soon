@@ -9,42 +9,104 @@
     body {
       margin: 0;
       height: 100vh;
+      overflow: hidden;
+      background: #111; /* fundal neutru, nu mai apare alb */
       display: flex;
       justify-content: center;
       align-items: center;
-      background-color: #ffffff; /* păstrăm fundalul */
-      overflow: hidden;
       font-family: Arial, sans-serif;
     }
 
     .container {
-      text-align: center;
+      position: relative;
+      width: 100%;
+      height: 100%;
     }
 
+    /* LOGO FULLSCREEN */
     .logo {
-      width: 200px;
-      max-width: 80%;
-      opacity: 0;
-      animation: fadeIn 1.5s ease forwards, fadeOut 1.5s ease 3s forwards;
-    }
-
-    .coming-soon {
-      font-size: 28px;
-      color: #000;
-      opacity: 0;
       position: absolute;
-      animation: fadeIn 1.5s ease 4.5s forwards;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%) scale(0.85);
+      width: 90vw;
+      max-height: 90vh;
+
+      opacity: 0;
+      filter: blur(12px);
+
+      animation:
+        logoFadeIn 3.5s ease forwards,
+        logoStay 4s ease 3.5s forwards,
+        logoFadeOut 3.5s ease 7.5s forwards;
     }
 
-    @keyframes fadeIn {
-      from { opacity: 0; }
+    @keyframes logoFadeIn {
+      0% {
+        opacity: 0;
+        transform: translate(-50%, -50%) scale(0.85);
+        filter: blur(12px);
+      }
+      100% {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(1);
+        filter: blur(0);
+      }
+    }
+
+    @keyframes logoStay {
+      from { opacity: 1; }
       to { opacity: 1; }
     }
 
-    @keyframes fadeOut {
-      from { opacity: 1; }
-      to { opacity: 0; }
+    @keyframes logoFadeOut {
+      0% {
+        opacity: 1;
+        filter: blur(0);
+      }
+      100% {
+        opacity: 0;
+        filter: blur(20px);
+      }
     }
+
+    /* TEXT COMING SOON */
+    .coming-soon {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      
+      font-size: 42px;
+      color: #ffffff;
+      letter-spacing: 3px;
+
+      opacity: 0;
+      white-space: nowrap;
+      overflow: hidden;
+      border-right: 2px solid white;
+
+      width: 0;
+
+      animation:
+        textFadeIn 2s ease 11s forwards,
+        typing 4s steps(12) 12s forwards,
+        blink 1s infinite 12s;
+    }
+
+    @keyframes textFadeIn {
+      to { opacity: 1; }
+    }
+
+    @keyframes typing {
+      from { width: 0; }
+      to { width: 12ch; }
+    }
+
+    @keyframes blink {
+      50% { border-color: transparent; }
+    }
+
   </style>
 </head>
 <body>
