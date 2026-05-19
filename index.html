@@ -70,7 +70,7 @@
       }
     }
 
-    /* COMING SOON */
+    /* TEXT */
     .coming-soon {
       position: absolute;
       top: 50%;
@@ -78,10 +78,13 @@
       transform: translate(-50%, -50%);
       
       font-size: 44px;
-      color: #00c853; /* verde clean */
+      color: #2ee8a0; /* verde din logo */
       letter-spacing: 3px;
 
       opacity: 0;
+      text-align: center;
+      width: 100%;
+      padding: 0 20px;
 
       animation: textFadeIn 2.5s ease 11s forwards;
     }
@@ -97,13 +100,21 @@
       }
     }
 
+    /* RESPONSIVE (mobil) */
+    @media (max-width: 600px) {
+      .coming-soon {
+        font-size: 28px;
+        letter-spacing: 2px;
+      }
+    }
+
   </style>
 </head>
 <body>
 
   <div class="container">
     <img src="logo.svg" alt="Logo" class="logo">
-    <div class="coming-soon">Coming Soon</div>
+    <div class="coming-soon">Coming Soon!</div>
   </div>
 
 </body>
