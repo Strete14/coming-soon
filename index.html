@@ -2,51 +2,57 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+
+  <!-- FONT PREMIUM -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+
   <title>Coming Soon</title>
 
   <style>
     body {
       margin: 0;
-      background: radial-gradient(circle at 30% 30%, #111 0%, #050505 60%);
+      background: radial-gradient(circle at 30% 30%, #111 0%, #050505 70%);
       color: white;
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-      display: flex;
-      align-items: center;
-      justify-content: center;
+      font-family: 'Inter', sans-serif;
       height: 100vh;
-      text-align: center;
-      padding: 20px;
       overflow: hidden;
     }
 
-    .container {
-      max-width: 650px;
+    /* FULLSCREEN CENTER */
+    .screen {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      text-align: center;
+      padding: 20px;
     }
 
-    /* LOGO */
+    /* LOGO SCREEN */
+    .logo-screen {
+      z-index: 2;
+      animation: fadeOut 1.5s ease forwards;
+      animation-delay: 4s;
+    }
+
     .logo {
-      width: 120px;
-      margin-bottom: 30px;
+      width: 220px;
+      max-width: 70vw;
       opacity: 0;
-      filter: drop-shadow(0 0 20px rgba(0,255,136,0.25));
-      animation: fadeIn 1.5s ease forwards, fadeOut 1.5s ease forwards;
-      animation-delay: 0s, 2.8s;
+      filter: drop-shadow(0 0 25px rgba(0,255,136,0.25));
+      animation: fadeIn 1.5s ease forwards;
     }
 
-    @keyframes fadeIn {
-      to { opacity: 1; transform: scale(1); }
-    }
-
-    @keyframes fadeOut {
-      to { opacity: 0; transform: scale(0.95); }
-    }
-
-    /* CONTENT */
+    /* CONTENT SCREEN */
     .content {
       opacity: 0;
       transform: translateY(20px);
       transition: all 1s ease;
+      max-width: 600px;
     }
 
     .content.show {
@@ -102,11 +108,6 @@
       text-shadow: 0 0 8px rgba(0,255,136,0.6);
     }
 
-    .features li:hover {
-      transform: translateX(5px);
-      opacity: 1;
-    }
-
     .closing {
       margin-top: 30px;
       opacity: 0.8;
@@ -115,10 +116,23 @@
 
     .highlight {
       color: #00ff88;
-      text-shadow: 0 0 8px rgba(0,255,136,0.5);
     }
 
+    /* ANIMATIONS */
+    @keyframes fadeIn {
+      to { opacity: 1; transform: scale(1); }
+    }
+
+    @keyframes fadeOut {
+      to { opacity: 0; visibility: hidden; }
+    }
+
+    /* MOBILE */
     @media (max-width: 600px) {
+      .logo {
+        width: 160px;
+      }
+
       .title {
         font-size: 1.7rem;
       }
@@ -127,17 +141,21 @@
         font-size: 0.95rem;
       }
     }
+
   </style>
 </head>
 
 <body>
-  <div class="container">
 
-    <!-- LOGO -->
-    <img src="logo.svg" alt="Logo" class="logo" />
+  <!-- LOGO FULLSCREEN -->
+  <div class="screen logo-screen">
+    <img src="logo.svg" class="logo" />
+  </div>
 
-    <!-- CONTENT -->
+  <!-- CONTENT -->
+  <div class="screen">
     <div class="content" id="content">
+
       <h2 class="title">What’s coming.</h2>
 
       <p class="description">
@@ -158,11 +176,12 @@
       <p class="closing">
         Everything in one place, designed to help you recover faster and move with confidence again.
       </p>
-    </div>
 
+    </div>
   </div>
 
   <script>
+    // apare content DUPĂ ce dispare logo
     setTimeout(() => {
       const content = document.getElementById("content");
       content.classList.add("show");
@@ -172,10 +191,11 @@
       items.forEach((item, index) => {
         setTimeout(() => {
           item.classList.add("show");
-        }, 350 * index);
+        }, 300 * index);
       });
 
-    }, 3800);
+    }, 4500); // logo stă mai mult
   </script>
+
 </body>
 </html>
