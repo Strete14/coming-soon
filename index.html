@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 
   <!-- FONT PREMIUM -->
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600&display=swap" rel="stylesheet">
 
   <title>Coming Soon</title>
 
@@ -14,16 +14,15 @@
       margin: 0;
       background: radial-gradient(circle at 30% 30%, #111 0%, #050505 70%);
       color: white;
-      font-family: 'Inter', sans-serif;
+      font-family: 'Manrope', sans-serif;
       height: 100vh;
       overflow: hidden;
     }
 
     /* FULLSCREEN CENTER */
     .screen {
-      position: absolute;
-      width: 100%;
-      height: 100%;
+      position: fixed;
+      inset: 0;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -36,18 +35,36 @@
     .logo-screen {
       z-index: 2;
       animation: fadeOut 1.5s ease forwards;
-      animation-delay: 4s;
+      animation-delay: 5.5s;
     }
 
     .logo {
-      width: 220px;
-      max-width: 70vw;
+      width: 420px;
+      max-width: 85vw;
       opacity: 0;
-      filter: drop-shadow(0 0 25px rgba(0,255,136,0.25));
-      animation: fadeIn 1.5s ease forwards;
+      transform: scale(0.9);
+      display: block;
+      margin: 0 auto;
+      filter: drop-shadow(0 0 40px rgba(0,255,136,0.25));
+      animation: logoIn 1.8s ease forwards;
     }
 
-    /* CONTENT SCREEN */
+    @keyframes logoIn {
+      to {
+        opacity: 1;
+        transform: scale(1);
+      }
+    }
+
+    @keyframes fadeOut {
+      to {
+        opacity: 0;
+        transform: scale(0.95);
+        visibility: hidden;
+      }
+    }
+
+    /* CONTENT */
     .content {
       opacity: 0;
       transform: translateY(20px);
@@ -61,10 +78,10 @@
     }
 
     .title {
-      font-size: 2.2rem;
-      font-weight: 600;
+      font-size: 2.4rem;
+      font-weight: 500;
       margin-bottom: 20px;
-      letter-spacing: -0.5px;
+      letter-spacing: -0.6px;
     }
 
     .description {
@@ -118,36 +135,26 @@
       color: #00ff88;
     }
 
-    /* ANIMATIONS */
-    @keyframes fadeIn {
-      to { opacity: 1; transform: scale(1); }
-    }
-
-    @keyframes fadeOut {
-      to { opacity: 0; visibility: hidden; }
-    }
-
     /* MOBILE */
     @media (max-width: 600px) {
       .logo {
-        width: 160px;
+        width: 260px;
       }
 
       .title {
-        font-size: 1.7rem;
+        font-size: 1.8rem;
       }
 
       .description {
         font-size: 0.95rem;
       }
     }
-
   </style>
 </head>
 
 <body>
 
-  <!-- LOGO FULLSCREEN -->
+  <!-- LOGO -->
   <div class="screen logo-screen">
     <img src="logo.svg" class="logo" />
   </div>
@@ -181,7 +188,6 @@
   </div>
 
   <script>
-    // apare content DUPĂ ce dispare logo
     setTimeout(() => {
       const content = document.getElementById("content");
       content.classList.add("show");
@@ -194,7 +200,7 @@
         }, 300 * index);
       });
 
-    }, 4500); // logo stă mai mult
+    }, 6000);
   </script>
 
 </body>
