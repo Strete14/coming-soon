@@ -4585,7 +4585,7 @@ function PlanScreen({plan,dayNum=1,subscription="standard",onReset,onCheckIn,onS
                       src={`${IMG_BASE}${imgKey}.jpg`}
                       alt={ex.name}
                       onError={e=>{e.target.style.display="none";}}
-                      style={{width:"100%",maxHeight:200,objectFit:"cover",borderRadius:8,marginTop:12,marginBottom:14,background:T.grey100,display:"block"}}
+                      style={{width:"100%",height:"auto",objectFit:"contain",borderRadius:8,marginTop:12,marginBottom:14,background:T.grey100,display:"block"}}
                     />
                   ) : null;
                 })()}
