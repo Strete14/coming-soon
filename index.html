@@ -29,7 +29,7 @@
     </svg>
     <span style="font-family: DM Sans, sans-serif; color: #0a7e6e; font-size: 14px;">Loading PhysioRoutine...</span>
   </div>
-  <script type="text/babel" data-presets="react" data-plugins="">
+  <script type="text/babel" data-presets="react">
 const { useState, useEffect, useRef, useCallback } = React;
 
 // ── Supabase config ─────────────────────────────────────────────────────────
@@ -6612,14 +6612,12 @@ ${checkIn ? `- Today's check-in: pain ${checkIn.pain}/10, energy ${checkIn.energ
 }
 
 
-// Mount the app
 const rootEl = document.getElementById('root');
 const root = ReactDOM.createRoot(rootEl);
 root.render(React.createElement(App));
 
   </script>
   <script>
-    // Hide loading screen once Babel finishes
     window.addEventListener('load', function() {
       setTimeout(function() {
         var l = document.getElementById('loading');
