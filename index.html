@@ -103,7 +103,7 @@ const sb = {
     const data = await r.json();
     return Array.isArray(data) ? data[0] : null;
   },
-  async savePlan(token, userId, planData, intakeData) {
+  async savePlan(token, userId, entry) {
     const r = await fetch(`${SUPABASE_URL}/rest/v1/plans`, {
       method: "POST",
       headers: {
@@ -114,9 +114,13 @@ const sb = {
       },
       body: JSON.stringify({
         user_id: userId,
-        plan_data: planData,
-        intake_data: intakeData,
-        created_at: new Date().toISOString(),
+        day: entry.day || 1,
+        title: entry.title || "",
+        region: entry.region || "",
+        pain: entry.pain || 0,
+        progress: entry.progress || 0,
+        plan_data: entry.plan || entry,
+        intake_data: entry.intake_data || null,
       }),
     });
     return r.json();
@@ -4490,7 +4494,7 @@ function PlanScreen({plan,dayNum=1,subscription="standard",onReset,onCheckIn,onS
   const t=useT(lang);
   const [tab,setTab]=useState("exercises");
   const [expanded,setExpanded]=useState(null);
-  const [showCI,setShowCI]=useState(true);
+  const [showCI,setShowCI]=useState(subscription !== "trial" || dayNum < 1);
   const [ci,setCi]=useState({pain:4,stiffness:3,helped:""});
   if(!plan)return null;
   const phC=[T.red,T.orange,T.teal];
@@ -5142,11 +5146,14 @@ function CheckInPanel({ plan, dayNum, onCheckIn, onStartPlan, onSaveCheckin, lan
     </div>
   );
 
+  // Check if this is a trial user on Day 1
+  const isTrial = onStartPlan && dayNum >= 1 && plan && !plan._isPaid;
+
   if (done) return (
     <div className="card" style={{textAlign:"center",padding:"40px 20px",animation:"fadeUp .3s ease"}}>
       <div style={{width:72,height:72,borderRadius:"50%",background:T.tealPale,display:"flex",alignItems:"center",justifyContent:"center",margin:"0 auto 16px"}}><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke={T.teal} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>
       <div style={{fontWeight:700,fontSize:20,color:T.navy,marginBottom:6}}>Check-in complete!</div>
-      <div style={{fontSize:14,color:T.grey500,marginBottom:16}}>Day {dayNum} logged. Your Day {(dayNum||1)+1} plan is being generated...</div>
+      <div style={{fontSize:14,color:T.grey500,marginBottom:16}}>Day {dayNum} logged.</div>
       <div style={{fontSize:12,color:T.grey400}}>Go to the Plans tab to see your updated programme.</div>
     </div>
   );
@@ -6072,6 +6079,12 @@ function App() {
       setUser(session.user);
     }).catch(() => clearSession());
     if (!session?.token) return;
+    // Clear stale localStorage plan data — Supabase is the truth
+    const _uk0 = session.user?.email?.toLowerCase().replace(/[^a-z0-9]/g,"_") || "anon";
+    try {
+      localStorage.removeItem(`physio_plan_history_${_uk0}`);
+      localStorage.removeItem("physio_plan_history");
+    } catch {}
     setUser(session.user);
     try {
       const _uk = session.user?.email?.toLowerCase().replace(/[^a-z0-9]/g,"_") || "anon";
@@ -6409,7 +6422,7 @@ ${checkIn ? `- Today's check-in: pain ${checkIn.pain}/10, energy ${checkIn.energ
         // Also save to Supabase if logged in
         const session = loadSession();
         if (session?.token && session?.userId) {
-          sb.savePlan(session.token, session.userId, parsed, intakeData).catch(() => {});
+          sb.savePlan(session.token, session.userId, entry).catch(() => {});
         }
       } catch {}
       go("plan");
@@ -6484,15 +6497,31 @@ ${checkIn ? `- Today's check-in: pain ${checkIn.pain}/10, energy ${checkIn.energ
         localStorage.setItem(`physio_trial_used_${_uk}`, "true");
       } catch {}
     }
+    // Reset plan data for fresh start
+    setPlanHistory([]);
+    setPlan(null);
+    setIntake(null);
+    setDayNum(1);
+    setCheckinHistory([]);
+    // Clear Supabase plans for fresh start
+    const _sess3 = loadSession();
+    if (_sess3?.token && _sess3?.userId) {
+      sb.deletePlans(_sess3.token, _sess3.userId).catch(() => {});
+    }
     // Go to disclaimer first, then quiz
     go("disclaimer");
   }
 
   function handleCheckIn(ci) {
-    // Hard limit: 7 days per subscription
-    const planLimit = subscription === "premium" ? 7 : 7;
+    // Trial = 1 day only — redirect to subscribe after Day 1
+    if (subscription === "trial" && dayNum >= 1) {
+      go("subscribe");
+      return;
+    }
+    // Paid plans — hard limit 7 days
+    const planLimit = 7;
     if (dayNum >= planLimit) {
-      setError(`You have completed your ${planLimit}-day programme. Subscribe to start a new one.`);
+      setError(`You have completed your ${planLimit}-day programme. Start a new plan to continue.`);
       go("dashboard");
       return;
     }
