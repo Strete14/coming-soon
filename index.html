@@ -4728,7 +4728,7 @@ function PlanScreen({plan,dayNum=1,subscription="standard",onReset,onCheckIn,onS
                   )}
                   {plan.nutrition.antiInflammatoryTip&&(
                     <div style={{background:"#FFF7ED",border:"1px solid #FED7AA",borderRadius:12,padding:"13px 16px",marginBottom:14,display:"flex",gap:10,alignItems:"flex-start"}}>
-                      <span style={{fontSize:20,flexShrink:0}}>🔥</span>
+                      <span style={{fontSize:20,flexShrink:0}}></span>
                       <div>
                         <div style={{fontSize:11,...mono,color:T.orange,textTransform:"uppercase",letterSpacing:".12em",marginBottom:4}}>{t.nutritionAntiInflam||t.nutritionAntiInflam}</div>
                         <div style={{display:"flex",flexDirection:"column",gap:5}}>
@@ -5286,8 +5286,8 @@ function DashboardScreen({user,onStartPlan,onLogout,plan,dayNum=1,onViewPlan,onE
               {plan
                 ? <div style={{background:T.navy,borderRadius:13,padding:"clamp(18px,4vw,24px) clamp(16px,4vw,26px)",marginBottom:20,position:"relative",overflow:"hidden"}}>
                     <div style={{position:"absolute",right:-30,bottom:-30,width:150,height:150,borderRadius:"50%",background:"rgba(10,126,110,.14)"}}/>
-                    <div style={{...mono,fontSize:10,color:T.teal,textTransform:"uppercase",letterSpacing:".14em",marginBottom:5}}>{t.todaysProgramme}</div>
-                    <div style={{...serif,fontWeight:600,fontSize:"clamp(16px,3vw,20px)",color:T.white,marginBottom:4}}>{plan.title} · Day {dayNum}</div>
+                    <div style={{...mono,fontSize:10,color:T.teal,textTransform:"uppercase",letterSpacing:".14em",marginBottom:5}}>{t.todaysProgramme} — Day {dayNum}</div>
+                    <div style={{...serif,fontWeight:600,fontSize:"clamp(16px,3vw,20px)",color:T.white,marginBottom:4}}>{plan.title}</div>
                     <div style={{fontSize:13,color:"rgba(255,255,255,.45)",marginBottom:14}}>
                       {plan.exercises?.length||0} exercises · {plan.electrotherapy?.length||0} electrotherapy
                     </div>
@@ -6317,8 +6317,10 @@ ${checkIn ? `- Today's check-in: pain ${checkIn.pain}/10, energy ${checkIn.energ
         }
         // Use checkin pain if available (day 2+), otherwise use intake pain (day 1)
         const entryPain = (checkIn && typeof checkIn.pain === "number") ? checkIn.pain : (Number(intakeData?.pain)||0);
+        // Clean title — remove AI-added day/phase suffixes
+        const cleanTitle = (parsed.title||"").replace(/[\s\-–—]+day\s*\d+/gi,"").replace(/[\s\-–—]+phase\s*\d+/gi,"").trim();
         const entry = {
-          id: Date.now(), title: parsed.title, region: parsed.region,
+          id: Date.now(), title: cleanTitle, region: parsed.region,
           day: currentDay, date: new Date().toLocaleDateString("en-GB",{day:"numeric",month:"short",year:"numeric"}),
           pain: entryPain, progress: Math.min(100, Math.round((currentDay/7)*100)),
           plan: parsed, intake_data: intakeData,
@@ -6331,11 +6333,20 @@ ${checkIn ? `- Today's check-in: pain ${checkIn.pain}/10, energy ${checkIn.energ
         localStorage.setItem(`physio_plan_history_${_userKey}`, JSON.stringify(trimmed));
         localStorage.setItem("physio_plan_history", JSON.stringify(trimmed)); // legacy fallback
         setPlanHistory(trimmed);
-        // Save to Supabase for cross-device sync
+        // Save to Supabase — only if this day not already saved
         try {
           const _sess = loadSession();
           if (_sess?.token && _sess?.userId) {
-            sb.savePlan(_sess.token, _sess.userId, entry).catch(e => console.warn('Supabase save failed:', e));
+            // Check if day already exists to prevent duplicates
+            sb.getPlans(_sess.token, _sess.userId).then(existing => {
+              const alreadySaved = Array.isArray(existing) && existing.some(p => p.day === currentDay);
+              if (!alreadySaved) {
+                sb.savePlan(_sess.token, _sess.userId, entry).catch(e => console.warn('Supabase save failed:', e));
+              }
+            }).catch(() => {
+              // Can't check, save anyway
+              sb.savePlan(_sess.token, _sess.userId, entry).catch(() => {});
+            });
           }
         } catch(e) { console.warn('Supabase save error:', e); }
         // Auto-add intake pain as Day 1 check-in if this is Day 1 (no real check-in yet)
