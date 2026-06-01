@@ -6077,10 +6077,31 @@ function App() {
       const _uk = session.user?.email?.toLowerCase().replace(/[^a-z0-9]/g,"_") || "anon";
       const history = JSON.parse(localStorage.getItem(`physio_plan_history_${_uk}`) || localStorage.getItem("physio_plan_history") || "[]");
       setPlanHistory(history);
-      setPlan(history.length > 0 ? (history[0]?.plan || null) : null);
+      // Load from Supabase first (cross-device)
+      let finalHistory = history;
+      try {
+        const _sess = loadSession();
+        if (_sess?.token && _sess?.userId) {
+          const cp = await sb.getPlans(_sess.token, _sess.userId);
+          if (Array.isArray(cp) && cp.length > 0) {
+            finalHistory = cp.map(p => ({
+              id: p.id, title: p.title, region: p.region,
+              day: p.day, date: (p.created_at||"").split("T")[0],
+              pain: p.pain, progress: p.progress,
+              plan: p.plan_data, intake_data: p.intake_data,
+            })).sort((a,b) => (b.day||0) - (a.day||0));
+            setPlanHistory(finalHistory);
+            // Restore dayNum from max day in Supabase
+            const maxDay = Math.max(...finalHistory.map(p => p.day||1));
+            localStorage.setItem(`physio_daynum_${_uk}`, String(maxDay));
+            setDayNum(maxDay);
+          }
+        }
+      } catch(e) { console.warn('Supabase load error:', e); }
+      setPlan(finalHistory.length > 0 ? (finalHistory[0]?.plan || null) : null);
       // Restore intake from most recent plan history entry
-      if (history.length > 0 && history[0]?.intake_data) {
-        setIntake(history[0].intake_data);
+      if (finalHistory.length > 0 && finalHistory[0]?.intake_data) {
+        setIntake(finalHistory[0].intake_data);
       }
       // Seed checkinHistory from planHistory (deduplicated)
       const _seeded = history
@@ -6175,7 +6196,7 @@ CORE/STABILITY: plank, forearm_plank, reverse_plank, hollow_body_hold, pallof_pr
 SAFETY: surgery=gentle post-surgical only, cardiac=no high-intensity, pregnancy=safe modifications, osteoporosis=no spinal flexion.
 EQUIPMENT: Never prescribe gym machines to a home-only patient.
 DAY ${effectiveDayNum} OF 7 — PHASE ${dayPhase}: ${dayApproach}.
-VARIETY RULES (CRITICAL):
+VARIETY RULES (CRITICAL — this is Day ${effectiveDayNum} of 7, generate UNIQUE content different from all previous days):
 - Day 1: assessment-based, gentlest exercises, establish baseline
 - Day 2: same muscle groups, slightly different exercises, add 1 new movement  
 - Day 3: introduce new exercise variations, adjust sets/reps from Day 1
@@ -6183,7 +6204,7 @@ VARIETY RULES (CRITICAL):
 - Day 5: functional focus, more complex movements than Day 1-2
 - Day 6: near-maximal within safe range, sport/activity-specific
 - Day 7: consolidation — best exercises from the week, test progress
-FORBIDDEN: Never use the exact same 7 exercises as any previous day. The variety seed for today is ${daySeed} — use this to choose different exercises.
+FORBIDDEN: Never repeat the same exercise combination. You MUST select different exercises from the list. The combination must be unique for Day ${effectiveDayNum}. The variety seed for today is ${daySeed} — use this to choose different exercises.
 NUTRITION: Each day must have different meals. Day ${effectiveDayNum} seed: focus on ${effectiveDayNum % 3 === 0 ? "anti-inflammatory omega-3 foods" : effectiveDayNum % 3 === 1 ? "high-protein muscle recovery foods" : "complex carbs and energy foods"}.
 ELECTROTHERAPY: Day ${effectiveDayNum} — ${effectiveDayNum <= 2 ? "prioritise pain relief (TENS/IFC)" : effectiveDayNum <= 5 ? "prioritise tissue healing (Ultrasound/PEMF)" : "prioritise strengthening (NMES/Russian)"}.
 NUTRITION: Tailor to injury and pain. Exact quantities for each meal. Avoid allergens: ${(intakeData.allergies||[]).filter(x=>x!=="none").join(", ")||"none"}. High pain=anti-inflammatory focus. Sleep issues=magnesium+tryptophan at dinner. joints=omega-3/collagen, muscles=protein, spine=calcium/vitamin D.
@@ -6367,6 +6388,13 @@ ${checkIn ? `- Today's check-in: pain ${checkIn.pain}/10, energy ${checkIn.energ
         localStorage.setItem(`physio_plan_history_${_userKey}`, JSON.stringify(trimmed));
         localStorage.setItem("physio_plan_history", JSON.stringify(trimmed)); // legacy fallback
         setPlanHistory(trimmed);
+        // Save to Supabase for cross-device sync
+        try {
+          const _sess = loadSession();
+          if (_sess?.token && _sess?.userId) {
+            sb.savePlan(_sess.token, _sess.userId, entry).catch(e => console.warn('Supabase save failed:', e));
+          }
+        } catch(e) { console.warn('Supabase save error:', e); }
         // Auto-add intake pain as Day 1 check-in if this is Day 1 (no real check-in yet)
         if (currentDay === 1 || !checkIn) {
           const intakePainVal = Number(intakeData?.pain) || 0;
