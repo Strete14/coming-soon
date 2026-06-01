@@ -6075,9 +6075,7 @@ function App() {
     setUser(session.user);
     try {
       const _uk = session.user?.email?.toLowerCase().replace(/[^a-z0-9]/g,"_") || "anon";
-      const history = JSON.parse(localStorage.getItem(`physio_plan_history_${_uk}`) || localStorage.getItem("physio_plan_history") || "[]");
-      setPlanHistory(history);
-      // Load from Supabase async (cross-device sync)
+      // ONLY load from Supabase — ignore localStorage for plan data
       const _sessForCloud = loadSession();
       if (_sessForCloud?.token && _sessForCloud?.userId) {
         sb.getPlans(_sessForCloud.token, _sessForCloud.userId).then(cp => {
@@ -6092,7 +6090,6 @@ function App() {
             setPlan(cloudH[0]?.plan || null);
             if (cloudH[0]?.intake_data) setIntake(cloudH[0].intake_data);
             const maxDay = Math.max(...cloudH.map(p => p.day||1));
-            localStorage.setItem(`physio_daynum_${_uk}`, String(maxDay));
             setDayNum(maxDay);
             const cloudCheckins = cloudH
               .filter(p => p.day && typeof p.pain === "number")
@@ -6100,12 +6097,8 @@ function App() {
               .sort((a,b) => a.day - b.day);
             if (cloudCheckins.length > 0) setCheckinHistory(cloudCheckins);
           }
+          // If Supabase is empty — show clean dashboard
         }).catch(e => console.warn('Supabase load error:', e));
-      }
-      setPlan(history.length > 0 ? (history[0]?.plan || null) : null);
-      // Restore intake from most recent plan history entry
-      if (history.length > 0 && history[0]?.intake_data) {
-        setIntake(history[0].intake_data);
       }
       // Seed checkinHistory from planHistory (deduplicated)
       const _seeded = history
