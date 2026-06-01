@@ -1,207 +1,31 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
+  <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>PhysioRoutine — AI Physiotherapy Plans</title>
+  <meta name="description" content="Get a personalised physiotherapy rehabilitation plan in under 3 minutes. AI-powered, clinically structured, available in 6 languages."/>
+  <meta name="theme-color" content="#0a7e6e"/>
 
-  <!-- FONT PREMIUM -->
-  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@400;600;700&family=DM+Sans:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet"/>
 
-  <title>Coming Soon</title>
+  <!-- React & Babel -->
+  <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
 
   <style>
-    body {
-      margin: 0;
-      background: radial-gradient(circle at 30% 30%, #111 0%, #050505 70%);
-      color: white;
-      font-family: 'Manrope', sans-serif;
-      height: 100vh;
-      overflow: hidden;
-    }
-
-    /* FULLSCREEN CENTER */
-    .screen {
-      position: fixed;
-      inset: 0;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      flex-direction: column;
-      text-align: center;
-      padding: 20px;
-    }
-
-    /* LOGO SCREEN */
-    .logo-screen {
-      z-index: 2;
-      animation: fadeOut 1.5s ease forwards;
-      animation-delay: 5.5s;
-    }
-
-    .logo {
-      width: 420px;
-      max-width: 85vw;
-      opacity: 0;
-      transform: scale(0.9);
-      display: block;
-      margin: 0 auto;
-      filter: drop-shadow(0 0 40px rgba(0,255,136,0.25));
-      animation: logoIn 1.8s ease forwards;
-    }
-
-    @keyframes logoIn {
-      to {
-        opacity: 1;
-        transform: scale(1);
-      }
-    }
-
-    @keyframes fadeOut {
-      to {
-        opacity: 0;
-        transform: scale(0.95);
-        visibility: hidden;
-      }
-    }
-
-    /* CONTENT */
-    .content {
-      opacity: 0;
-      transform: translateY(20px);
-      transition: all 1s ease;
-      max-width: 600px;
-    }
-
-    .content.show {
-      opacity: 1;
-      transform: translateY(0);
-    }
-
-    .title {
-      font-size: 2.4rem;
-      font-weight: 500;
-      margin-bottom: 20px;
-      letter-spacing: -0.6px;
-    }
-
-    .description {
-      font-size: 1.05rem;
-      opacity: 0.75;
-      margin-bottom: 20px;
-      line-height: 1.6;
-    }
-
-    .subtitle {
-      margin-top: 25px;
-      font-weight: 500;
-      opacity: 0.9;
-    }
-
-    .features {
-      list-style: none;
-      padding: 0;
-      margin-top: 20px;
-    }
-
-    .features li {
-      opacity: 0;
-      transform: translateY(15px);
-      filter: blur(4px);
-      margin-bottom: 12px;
-      font-size: 1rem;
-      transition: all 0.6s ease;
-    }
-
-    .features li.show {
-      opacity: 1;
-      transform: translateY(0);
-      filter: blur(0);
-    }
-
-    .features li::before {
-      content: "•";
-      color: #00ff88;
-      margin-right: 10px;
-      text-shadow: 0 0 8px rgba(0,255,136,0.6);
-    }
-
-    .closing {
-      margin-top: 30px;
-      opacity: 0.8;
-      line-height: 1.6;
-    }
-
-    .highlight {
-      color: #00ff88;
-    }
-
-    /* MOBILE */
-    @media (max-width: 600px) {
-      .logo {
-        width: 260px;
-      }
-
-      .title {
-        font-size: 1.8rem;
-      }
-
-      .description {
-        font-size: 0.95rem;
-      }
-    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { height: 100%; }
+    body { font-family: 'DM Sans', sans-serif; -webkit-font-smoothing: antialiased; }
+    #root { height: 100%; }
   </style>
 </head>
-
 <body>
-
-  <!-- LOGO -->
-  <div class="screen logo-screen">
-    <img src="logo.svg" class="logo" />
-  </div>
-
-  <!-- CONTENT -->
-  <div class="screen">
-    <div class="content" id="content">
-
-      <h2 class="title">What’s coming.</h2>
-
-      <p class="description">
-        This app is built for people who want a <span class="highlight">clear</span> and 
-        <span class="highlight">effective</span> way to recover.<br>
-        No more random exercises, no more confusion.
-      </p>
-
-      <p class="subtitle">You’ll get:</p>
-
-      <ul class="features">
-        <li>personalized recovery plans</li>
-        <li>guided exercise routines</li>
-        <li>step-by-step progression</li>
-        <li>a simple system that keeps you on track</li>
-      </ul>
-
-      <p class="closing">
-        Everything in one place, designed to help you recover faster and move with confidence again.
-      </p>
-
-    </div>
-  </div>
-
-  <script>
-    setTimeout(() => {
-      const content = document.getElementById("content");
-      content.classList.add("show");
-
-      const items = document.querySelectorAll('.features li');
-
-      items.forEach((item, index) => {
-        setTimeout(() => {
-          item.classList.add("show");
-        }, 300 * index);
-      });
-
-    }, 6000);
-  </script>
-
+  <div id="root"></div>
+  <script type="text/babel" src="./app.jsx" data-presets="react"></script>
 </body>
 </html>
