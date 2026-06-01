@@ -6017,6 +6017,14 @@ function App() {
   useEffect(() => {
     const session = loadSession();
     if (!session?.token || !session?.user) return; // no saved session — start fresh
+    // Validate token with Supabase before restoring
+    fetch(`${SUPABASE_URL}/auth/v1/user`, {
+      headers: { apikey: SUPABASE_ANON, Authorization: `Bearer ${session.token}` }
+    }).then(r => {
+      if (!r.ok) { clearSession(); return; } // invalid token — clear and stay logged out
+      setUser(session.user);
+    }).catch(() => clearSession());
+    if (!session?.token) return;
     setUser(session.user);
     try {
       const _uk = session.user?.email?.toLowerCase().replace(/[^a-z0-9]/g,"_") || "anon";
