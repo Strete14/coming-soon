@@ -1,35 +1,23 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>PhysioRoutine — AI Physiotherapy Plans</title>
-  <meta name="description" content="Get a personalised physiotherapy rehabilitation plan in under 3 minutes. AI-powered, clinically structured, available in 6 languages."/>
-  <meta name="theme-color" content="#0a7e6e"/>
-  <link rel="preconnect" href="https://fonts.googleapis.com"/>
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
-  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;0,9..144,700;1,9..144,400&family=DM+Sans:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet"/>
-  <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
-  <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
-  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-  <style>
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    html, body, #root { height: 100%; }
-    body { font-family: 'DM Sans', sans-serif; -webkit-font-smoothing: antialiased; background: #f8f7f4; }
-    #loading { position: fixed; inset: 0; display: flex; align-items: center; justify-content: center; background: #f8f7f4; z-index: 9999; flex-direction: column; gap: 16px; }
-    #loading svg { animation: spin 1s linear infinite; }
-    @keyframes spin { to { transform: rotate(360deg); } }
-  </style>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>PhysioRoutine — AI Physiotherapy Plans</title>
+<meta name="description" content="Get a personalised physiotherapy rehabilitation plan in under 3 minutes."/>
+<meta name="theme-color" content="#0a7e6e"/>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;0,9..144,700;1,9..144,400&family=DM+Sans:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
+<script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
+<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+<style>*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}html,body,#root{height:100%}body{font-family:'DM Sans',sans-serif;-webkit-font-smoothing:antialiased;background:#f8f7f4}#loading{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:#f8f7f4;z-index:9999;flex-direction:column;gap:16px}#loading svg{animation:spin 1s linear infinite}@keyframes spin{to{transform:rotate(360deg)}}</style>
 </head>
 <body>
-  <div id="root"></div>
-  <div id="loading">
-    <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#0a7e6e" stroke-width="2.5" stroke-linecap="round">
-      <path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/>
-    </svg>
-    <span style="font-family: DM Sans, sans-serif; color: #0a7e6e; font-size: 14px;">Loading PhysioRoutine...</span>
-  </div>
-  <script type="text/babel" data-presets="react">
+<div id="root"></div>
+<div id="loading"><svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#0a7e6e" stroke-width="2.5" stroke-linecap="round"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg><span style="font-family:DM Sans,sans-serif;color:#0a7e6e;font-size:14px">Loading PhysioRoutine...</span></div>
+<script type="text/babel" data-presets="react">
 const { useState, useEffect, useRef, useCallback } = React;
 
 // ── Supabase config ─────────────────────────────────────────────────────────
@@ -6231,54 +6219,13 @@ ANKLE/FOOT: TENS, Ultrasound, Shockwave, IFC, LLLT, NMES, Cryotherapy
 ELBOW/WRIST: Iontophoresis, Shockwave, Ultrasound, TENS, LLLT, Phonophoresis
 Phase: Acute=TENS/IFC/Cryo, Sub-acute=US/Shockwave/PEMF, Chronic=NMES/Traction
 
-Return this JSON (all text in ${targetLang}):
-{
-  "title": "clinical diagnosis in ${targetLang}",
-  "region": "anatomical region",
-  "totalDuration": "e.g. 4-6 weeks",
-  "tags": ["tag1","tag2","tag3"],
-  "phases": [
-    {"name":"phase name","duration":"e.g. Week 1-2","goal":"goal description","milestones":"what patient achieves"}
-  ],
-  "exercises": [
-    {
-      "exerciseKey": "exact_english_key",
-      "name": "exercise name in ${targetLang}",
-      "sets": "number",
-      "reps": "number or description",
-      "rest": "duration",
-      "startPosition": "starting position",
-      "description": "step by step instructions",
-      "progressionTip": "when/how to progress",
-      "precautions": "safety note if needed"
-    }
-  ],
-  "electrotherapy": [
-    {
-      "name": "modality name",
-      "icon": "⚡",
-      "duration": "duration",
-      "frequency": "frequency",
-      "protocol": "application instructions",
-      "placement": "electrode placement",
-      "parameters": "technical parameters"
-    }
-  ],
-  "nutrition": {
-    "dailySummary": "string",
-    "antiInflammatoryTip": "string",
-    "breakfast": {"meal":"string","calories":0,"protein":0,"carbs":0,"fat":0},
-    "morningSnack": {"meal":"string","calories":0,"protein":0,"carbs":0,"fat":0},
-    "lunch": {"meal":"string","calories":0,"protein":0,"carbs":0,"fat":0},
-    "afternoonSnack": {"meal":"string","calories":0,"protein":0,"carbs":0,"fat":0},
-    "dinner": {"meal":"string","calories":0,"protein":0,"carbs":0,"fat":0},
-    "sleepTip": "string",
-    "hydration": "string",
-    "supplements": ["string"],
-    "foodsToAvoid": "string"
-  }
-}
-Include exactly 7 exercises and 2 electrotherapy procedures. Keep each text field concise (under 60 words) to fit within token limits.`;
+Return ONLY valid JSON (all text in ${targetLang}, exerciseKey always English):
+{"title":"","region":"","totalDuration":"","tags":["","",""],
+"phases":[{"name":"","duration":"","goal":"","milestones":""}],
+"exercises":[{"exerciseKey":"","name":"","sets":"","reps":"","rest":"","startPosition":"","description":"","progressionTip":"","precautions":""}],
+"electrotherapy":[{"name":"","icon":"⚡","duration":"","frequency":"","protocol":"","placement":"","parameters":""}],
+"nutrition":{"dailySummary":"","antiInflammatoryTip":"","breakfast":{"meal":"","calories":0,"protein":0,"carbs":0,"fat":0},"morningSnack":{"meal":"","calories":0,"protein":0,"carbs":0,"fat":0},"lunch":{"meal":"","calories":0,"protein":0,"carbs":0,"fat":0},"afternoonSnack":{"meal":"","calories":0,"protein":0,"carbs":0,"fat":0},"dinner":{"meal":"","calories":0,"protein":0,"carbs":0,"fat":0},"sleepTip":"","hydration":"","supplements":[""],"foodsToAvoid":""}}
+Exactly 7 exercises, 2 electrotherapy. Keep each text field under 40 words.`;
 
     const userPrompt = `Generate a rehabilitation plan for this patient:
 - Body area: ${intakeData.area}
@@ -6713,15 +6660,11 @@ ${checkIn ? `- Today's check-in: pain ${checkIn.pain}/10, energy ${checkIn.energ
   );
 }
 
-const rootEl = document.getElementById("root");
-const root = ReactDOM.createRoot(rootEl);
+const rootEl=document.getElementById("root");
+const root=ReactDOM.createRoot(rootEl);
 root.render(React.createElement(App));
 
-  </script>
-  <script>
-    window.addEventListener('load', function() {
-      setTimeout(function() { var l = document.getElementById('loading'); if (l) l.style.display = 'none'; }, 500);
-    });
-  </script>
+</script>
+<script>window.addEventListener("load",function(){setTimeout(function(){var l=document.getElementById("loading");if(l)l.style.display="none";},500);});</script>
 </body>
 </html>
