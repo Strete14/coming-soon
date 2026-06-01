@@ -15,12 +15,21 @@
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     html, body, #root { height: 100%; }
-    body { font-family: 'DM Sans', sans-serif; -webkit-font-smoothing: antialiased; }
+    body { font-family: 'DM Sans', sans-serif; -webkit-font-smoothing: antialiased; background: #f8f7f4; }
+    #loading { position: fixed; inset: 0; display: flex; align-items: center; justify-content: center; background: #f8f7f4; z-index: 9999; flex-direction: column; gap: 16px; }
+    #loading svg { animation: spin 1s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
   </style>
 </head>
 <body>
   <div id="root"></div>
-  <script type="text/babel" data-presets="react">
+  <div id="loading">
+    <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#0a7e6e" stroke-width="2.5" stroke-linecap="round">
+      <path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/>
+    </svg>
+    <span style="font-family: DM Sans, sans-serif; color: #0a7e6e; font-size: 14px;">Loading PhysioRoutine...</span>
+  </div>
+  <script type="text/babel" data-presets="react" data-plugins="">
 const { useState, useEffect, useRef, useCallback } = React;
 
 // ── Supabase config ─────────────────────────────────────────────────────────
@@ -5637,7 +5646,7 @@ const DEFAULT_SCHEDULE = [
   { id:"streak_reminder",  type:"streak",          time:"20:00", label:"Streak motivation nudge",     enabled:true },
 ];
 
-export function useNotifications() {
+function useNotifications() {
   const [permission, setPermission] = useState(
     typeof Notification !== "undefined" ? Notification.permission : "default"
   );
@@ -5764,7 +5773,7 @@ export function useNotifications() {
 }
 
 // Notification Bell + Dropdown
-export function NotificationBell({ notifSystem }) {
+function NotificationBell({ notifSystem }) {
   const [open, setOpen] = useState(false);
   const { unread, inAppNotifs, markRead, markAllRead, clearAll } = notifSystem;
   const ref = useRef();
@@ -5830,7 +5839,7 @@ export function NotificationBell({ notifSystem }) {
 }
 
 // Notification Settings Panel
-export function NotificationSettings({ notifSystem }) {
+function NotificationSettings({ notifSystem }) {
   const { permission, requestPermission, schedule, toggleSchedule, updateTime, fireDemo } = notifSystem;
   const [testing, setTesting] = useState(null);
 
@@ -5908,7 +5917,7 @@ export function NotificationSettings({ notifSystem }) {
 }
 
 // In-app toast (auto-dismiss)
-export function NotifToast({ notif, onDismiss }) {
+function NotifToast({ notif, onDismiss }) {
   useEffect(()=>{
     if(!notif)return;
     const t=setTimeout(onDismiss,5000);
@@ -5963,7 +5972,7 @@ const DEMO_PLAN = {
 // ROOT APP — Everything wired together
 // PhysioRoutine v1.0 — Launch Ready
 // ═══════════════════════════════════════════════════════════════
-export default function App() {
+function App() {
   const [screen, setScreen]             = useState("home");
   const [lang, setLang] = useState(() => {
     try { return localStorage.getItem("physio_lang") || "en"; } catch { return "en"; }
@@ -6602,6 +6611,21 @@ ${checkIn ? `- Today's check-in: pain ${checkIn.pain}/10, energy ${checkIn.energ
   );
 }
 
+
+// Mount the app
+const rootEl = document.getElementById('root');
+const root = ReactDOM.createRoot(rootEl);
+root.render(React.createElement(App));
+
+  </script>
+  <script>
+    // Hide loading screen once Babel finishes
+    window.addEventListener('load', function() {
+      setTimeout(function() {
+        var l = document.getElementById('loading');
+        if (l) l.style.display = 'none';
+      }, 500);
+    });
   </script>
 </body>
 </html>
