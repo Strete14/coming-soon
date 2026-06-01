@@ -6175,6 +6175,14 @@ function App() {
     const daySeed = effectiveDayNum * 7 + (intakeData.pain || 5) * 3;
     const dayVariety = `Day ${effectiveDayNum} variety seed: ${daySeed}`;
 
+    // Build previously used exercise keys for variety — must be before systemPrompt
+    const prevUsed = planHistory
+      .filter(p => p.plan?.exercises)
+      .flatMap(p => (p.plan.exercises || []).map(e => e.exerciseKey))
+      .filter(Boolean)
+      .join(", ") || "none yet";
+    const allergies = (intakeData.allergies||[]).filter(x=>x!=="none").join(", ") || "none";
+
     const systemPrompt = `You are a senior physiotherapist. Respond ONLY with valid JSON — no markdown, no extra text, no explanations.
 All string values in ${targetLang} EXCEPT exerciseKey (always English).
 
@@ -6204,14 +6212,6 @@ Return this exact JSON structure:
 "electrotherapy":[{"name":"","icon":"⚡","duration":"","frequency":"","protocol":"","placement":"","parameters":""}],
 "nutrition":{"dailySummary":"","antiInflammatoryTip":"","breakfast":{"meal":"","calories":0,"protein":0,"carbs":0,"fat":0},"morningSnack":{"meal":"","calories":0,"protein":0,"carbs":0,"fat":0},"lunch":{"meal":"","calories":0,"protein":0,"carbs":0,"fat":0},"afternoonSnack":{"meal":"","calories":0,"protein":0,"carbs":0,"fat":0},"dinner":{"meal":"","calories":0,"protein":0,"carbs":0,"fat":0},"sleepTip":"","hydration":"","supplements":[""],"foodsToAvoid":""}}
 IMPORTANT: Include exactly 7 exercises and exactly 2 electrotherapy procedures. Complete the entire JSON before stopping.`;
-
-    // Build previously used exercise keys for variety
-    const prevUsed = planHistory
-      .filter(p => p.plan?.exercises)
-      .flatMap(p => (p.plan.exercises || []).map(e => e.exerciseKey))
-      .filter(Boolean)
-      .join(", ") || "none yet";
-    const allergies = (intakeData.allergies||[]).filter(x=>x!=="none").join(", ") || "none";
 
     const userPrompt = `Generate a rehabilitation plan for this patient:
 - Body area: ${intakeData.area}
