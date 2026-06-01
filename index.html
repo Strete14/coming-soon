@@ -3600,24 +3600,10 @@ function AuthScreen({mode:init="login",onSuccess,lang}) {
     if (mode === "signup" && f.password.length < 8) { setErr(t.errPassword8); return; }
     setLoading(true);
 
-    // ── Dev/preview mode — test account bypass ──────────────────────────────
+    // ── Supabase not configured ───────────────────────────────────────────────
     if (!supabaseReady) {
-      const TEST_EMAIL = "test@physioroutine.com";
-      const TEST_PASS  = "test1234";
-      if (f.email.toLowerCase() === TEST_EMAIL && f.password === TEST_PASS) {
-        await new Promise(r => setTimeout(r, 600));
-        setLoading(false);
-        // Wipe ALL stored data for a clean fresh start every login
-        try {
-          Object.keys(localStorage)
-            .filter(k => k.startsWith("physio"))
-            .forEach(k => localStorage.removeItem(k));
-        } catch {}
-        onSuccess({ name: "Test User", email: TEST_EMAIL, role: f.role || "patient" });
-        return;
-      }
       setLoading(false);
-      setErr("Authentication service not configured. Use test@physioroutine.com / test1234 for testing.");
+      setErr("Authentication service not configured. Please contact support.");
       return;
     }
 
@@ -3639,8 +3625,12 @@ function AuthScreen({mode:init="login",onSuccess,lang}) {
         setLoading(false);
         // Email confirmation required — show confirmation screen
         if (!token) {
-          setLoading(false);
           setConfirmed(true);
+          return;
+        }
+        // STRICT: must have token to proceed
+        if (!userId) {
+          setErr(t.errSignUpFailed || "Sign up failed. Please try again.");
           return;
         }
         onSuccess({ id: userId, name: f.name, email: f.email, role: f.role, token });
@@ -3648,10 +3638,15 @@ function AuthScreen({mode:init="login",onSuccess,lang}) {
         // Login
         const res = await sb.signIn(f.email, f.password);
         if (res.error) { setErr(res.error.message || t.errLoginFailed); setLoading(false); return; }
-        const token     = res.access_token;
-        const userId    = res.user?.id;
-        const userMeta  = res.user?.user_metadata || {};
-        // Fetch full profile from DB
+        const token  = res.access_token;
+        const userId = res.user?.id;
+        // STRICT: must have a valid token and userId to proceed
+        if (!token || !userId) {
+          setErr(t.errLoginFailed || "Login failed. Please check your credentials.");
+          setLoading(false);
+          return;
+        }
+        const userMeta = res.user?.user_metadata || {};
         let profile = null;
         try { profile = await sb.getProfile(token, userId); } catch {}
         const userData = {
@@ -6611,18 +6606,14 @@ ${checkIn ? `- Today's check-in: pain ${checkIn.pain}/10, energy ${checkIn.energ
   );
 }
 
-
-const rootEl = document.getElementById('root');
+const rootEl = document.getElementById("root");
 const root = ReactDOM.createRoot(rootEl);
 root.render(React.createElement(App));
 
   </script>
   <script>
     window.addEventListener('load', function() {
-      setTimeout(function() {
-        var l = document.getElementById('loading');
-        if (l) l.style.display = 'none';
-      }, 500);
+      setTimeout(function() { var l = document.getElementById('loading'); if (l) l.style.display = 'none'; }, 500);
     });
   </script>
 </body>
