@@ -6217,9 +6217,9 @@ ${checkIn ? `- Today's check-in: pain ${checkIn.pain}/10, energy ${checkIn.energ
       let lastErr = null;
       for (let attempt = 1; attempt <= 3; attempt++) {
         try {
-          res = await fetch("https://api.anthropic.com/v1/messages", {
+          res = await fetch("/api/generate", {
             method: "POST",
-            headers: { "Content-Type": "application/json", ...(loadSession()?.token ? {"X-User-Token": loadSession().token} : {}) },
+            headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
               model: "claude-haiku-4-5-20251001",
               max_tokens: 7000,
