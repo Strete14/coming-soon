@@ -6175,57 +6175,29 @@ function App() {
     const daySeed = effectiveDayNum * 7 + (intakeData.pain || 5) * 3;
     const dayVariety = `Day ${effectiveDayNum} variety seed: ${daySeed}`;
 
-    const systemPrompt = `You are a senior physiotherapist. Respond with ONLY valid JSON — no text, no markdown.
-ALL string values in the JSON must be in ${targetLang}, EXCEPT exerciseKey (always English).
-Every field — exercise names, descriptions, startPosition, progressionTip, precautions, phase names, electrotherapy, nutrition — must be in ${targetLang}.
+    const systemPrompt = `You are a physiotherapist. Respond ONLY with valid JSON, no markdown, no extra text.
+All string values in ${targetLang} EXCEPT exerciseKey (always English).
 
-EXERCISE SELECTION: Choose exercises anatomically correct for the body area. Match equipment: home_none=bodyweight only, home_basic=bands/foam roller, home_full=dumbbells/bench, gym=machines/cables.
-Use ONLY these exerciseKey values (exact English spelling):
-NECK: chin_tuck, neck_side_bend, neck_rotation, upper_trap_stretch, t_spine_rotation, thoracic_extension, cervical_retraction_extension, levator_scapulae_stretch, scalene_stretch, neck_flexion_stretch, cervical_rotation_stretch, isometric_neck_flexion, isometric_neck_extension, isometric_neck_side
-SHOULDER: pendulum_swing, shoulder_shrug, wall_crawl, external_rotation, internal_rotation, scapular_retraction, lateral_raise, front_raise, doorway_stretch, cross_body_stretch, resistance_band_row, shoulder_circles, wall_push_up, sleeper_stretch, pec_minor_stretch, shoulder_flexion_stretch, empty_can, full_can, inferior_capsule_stretch, serratus_punch, overhead_press, prone_w_raise, rotator_cuff_side_lying, shoulder_horizontal_abduction, wall_slide
-UPPER BACK: seated_row, lat_pulldown, wall_angel, band_pull_apart, face_pull, prone_y_raise, prone_t_raise, thoracic_rotation_stretch, foam_roller_thoracic, corner_chest_stretch, prone_cobra, seated_thoracic_extension, rhomboid_stretch, middle_trap_exercise, lower_trap_exercise, chin_tuck_with_extension, rib_grab_stretch, open_book_rotation
-LOWER BACK: pelvic_tilt, dead_bug, superman, childs_pose, knee_to_chest, mcgill_curl_up, side_plank, lumbar_rotation_stretch, mckenzie_extension, bird_dog, cat_cow, hip_flexor_stretch, prone_press_up, standing_back_extension, seated_forward_fold, double_knee_to_chest, book_opener_stretch, seated_lumbar_rotation, quadruped_hip_circles, pallof_press, back_extension_bench, reverse_hyper, standing_hip_circle
-HIP: hip_abduction, hip_adduction, standing_hip_hinge, pigeon_stretch, hip_circles, side_lying_abduction, prone_hip_extension, figure_4_stretch, side_lying_hip_rotation, seated_hip_abduction, standing_hip_extension, prone_frog_stretch, ninety_ninety_hip_stretch, adductor_squeeze, hip_hike, lateral_band_walk, monster_walk, seated_piriformis_stretch, hip_90_90_rotation, clam_with_band
-KNEE: straight_leg_raise, short_arc_quad, terminal_knee_extension, quad_sets, hamstring_curl, heel_slide, mini_squat, wall_sit, step_up, step_down, single_leg_balance, lateral_step, knee_flexion_stretch, piriformis_stretch, glute_bridge, clamshell, nordic_hamstring_curl, leg_press, box_squat, reverse_lunge, lateral_lunge, bulgarian_split_squat, seated_knee_extension, it_band_stretch, vastus_medialis_squeeze
-ANKLE/FOOT: heel_raise, ankle_circles, tibialis_raise, achilles_stretch, towel_scrunch, heel_walk, toe_walk, peroneal_stretch, single_leg_heel_raise, star_excursion_balance, ankle_alphabet, plantar_fascia_stretch, toe_extension_stretch, foot_doming, calf_stretch_straight, calf_stretch_bent, lateral_ankle_hops, bosu_balance
-ELBOW/WRIST: wrist_flexion, wrist_extension, forearm_rotation, eccentric_wrist_curl, elbow_flexion, elbow_extension, tennis_elbow_stretch, golfers_elbow_stretch, wrist_circles, grip_strengthening, finger_extension_band, pronator_stretch, supinator_stretch, radial_deviation, ulnar_deviation, elbow_flexor_stretch
-CORE/STABILITY: plank, forearm_plank, reverse_plank, hollow_body_hold, pallof_press_rotation, copenhagen_plank, ab_wheel_rollout, single_leg_deadlift, romanian_deadlift, glute_kickback, fire_hydrant, transverse_abdominis_activation, diaphragmatic_breathing, seated_abdominal_brace
+EXERCISES for ${intakeData.bodyArea}:
+NECK: chin_tuck,neck_side_bend,neck_rotation,upper_trap_stretch,levator_scapulae_stretch,scalene_stretch,neck_flexion_stretch,cervical_rotation_stretch,isometric_neck_flexion,isometric_neck_extension,isometric_neck_side,thoracic_extension,t_spine_rotation,chin_tuck_with_extension
+SHOULDER: pendulum_swing,shoulder_shrug,wall_crawl,external_rotation,internal_rotation,scapular_retraction,lateral_raise,front_raise,doorway_stretch,cross_body_stretch,resistance_band_row,shoulder_circles,wall_push_up,sleeper_stretch,pec_minor_stretch,empty_can,full_can,serratus_punch,overhead_press,prone_w_raise,rotator_cuff_side_lying,wall_slide,shoulder_horizontal_abduction
+UPPER BACK: seated_row,lat_pulldown,wall_angel,band_pull_apart,face_pull,prone_y_raise,prone_t_raise,foam_roller_thoracic,rhomboid_stretch,open_book_rotation,prone_cobra,middle_trap_exercise,lower_trap_exercise,rib_grab_stretch,thoracic_rotation_stretch
+LOWER BACK: pelvic_tilt,dead_bug,superman,childs_pose,knee_to_chest,mcgill_curl_up,side_plank,bird_dog,cat_cow,hip_flexor_stretch,prone_press_up,standing_back_extension,double_knee_to_chest,seated_lumbar_rotation,pallof_press,back_extension_bench,mckenzie_extension
+HIP: hip_abduction,hip_adduction,pigeon_stretch,side_lying_abduction,prone_hip_extension,figure_4_stretch,seated_hip_abduction,lateral_band_walk,monster_walk,seated_piriformis_stretch,hip_90_90_rotation,clam_with_band,adductor_squeeze,hip_hike,glute_bridge
+KNEE: straight_leg_raise,short_arc_quad,terminal_knee_extension,quad_sets,hamstring_curl,heel_slide,mini_squat,wall_sit,step_up,step_down,single_leg_balance,knee_flexion_stretch,nordic_hamstring_curl,box_squat,reverse_lunge,lateral_lunge,it_band_stretch,vastus_medialis_squeeze
+ANKLE/FOOT: heel_raise,ankle_circles,tibialis_raise,achilles_stretch,towel_scrunch,heel_walk,toe_walk,single_leg_heel_raise,star_excursion_balance,ankle_alphabet,plantar_fascia_stretch,foot_doming,calf_stretch_straight,calf_stretch_bent,lateral_ankle_hops
+ELBOW/WRIST: wrist_flexion,wrist_extension,forearm_rotation,eccentric_wrist_curl,elbow_flexion,elbow_extension,tennis_elbow_stretch,golfers_elbow_stretch,grip_strengthening,finger_extension_band,pronator_stretch,supinator_stretch,radial_deviation,ulnar_deviation
+CORE: plank,forearm_plank,dead_bug,pallof_press_rotation,single_leg_deadlift,glute_kickback,fire_hydrant,transverse_abdominis_activation,diaphragmatic_breathing
 
-SAFETY: surgery=gentle post-surgical only, cardiac=no high-intensity, pregnancy=safe modifications, osteoporosis=no spinal flexion.
-EQUIPMENT: Never prescribe gym machines to a home-only patient.
-DAY ${effectiveDayNum} OF 7 — PHASE ${dayPhase}: ${dayApproach}.
-VARIETY RULES (CRITICAL — this is Day ${effectiveDayNum} of 7, generate UNIQUE content different from all previous days):
-- Day 1: assessment-based, gentlest exercises, establish baseline
-- Day 2: same muscle groups, slightly different exercises, add 1 new movement  
-- Day 3: introduce new exercise variations, adjust sets/reps from Day 1
-- Day 4: midpoint — different exercise order, add progressive load
-- Day 5: functional focus, more complex movements than Day 1-2
-- Day 6: near-maximal within safe range, sport/activity-specific
-- Day 7: consolidation — best exercises from the week, test progress
-FORBIDDEN: Never repeat the same exercise combination. You MUST select different exercises from the list. The combination must be unique for Day ${effectiveDayNum}. The variety seed for today is ${daySeed} — use this to choose different exercises.
-NUTRITION: Each day must have different meals. Day ${effectiveDayNum} seed: focus on ${effectiveDayNum % 3 === 0 ? "anti-inflammatory omega-3 foods" : effectiveDayNum % 3 === 1 ? "high-protein muscle recovery foods" : "complex carbs and energy foods"}.
-ELECTROTHERAPY: Day ${effectiveDayNum} — ${effectiveDayNum <= 2 ? "prioritise pain relief (TENS/IFC)" : effectiveDayNum <= 5 ? "prioritise tissue healing (Ultrasound/PEMF)" : "prioritise strengthening (NMES/Russian)"}.
-NUTRITION: Tailor to injury and pain. Exact quantities for each meal. Avoid allergens: ${(intakeData.allergies||[]).filter(x=>x!=="none").join(", ")||"none"}. High pain=anti-inflammatory focus. Sleep issues=magnesium+tryptophan at dinner. joints=omega-3/collagen, muscles=protein, spine=calcium/vitamin D.
-ALLERGY RULE: NEVER include restricted ingredients. gluten-free=no wheat/bread/pasta, dairy-free=no milk/cheese/butter, nut allergy=no nuts, vegetarian=no meat/fish, vegan=no animal products.
+RULES: Match exercises to body area. Equipment: home_none=bodyweight, home_basic=bands/foam roller, home_full=dumbbells, gym=machines. Day ${effectiveDayNum}/7: use DIFFERENT exercises from previous days. Avoid: ${prevUsed||"none"}.
 
-ELECTROTHERAPY (pick 2 best for body area and phase):
-NECK: Cervical Traction, IFC, TENS, Ultrasound, LLLT, Hot Pack
-SHOULDER: Iontophoresis, Shockwave, IFC, TENS, LLLT, PEMF, Cryotherapy
-UPPER BACK: IFC, TENS, Ultrasound, Hot Pack, Shockwave, PEMF
-LOWER BACK: Lumbar Traction, IFC, TENS, LLLT, PEMF, Shockwave, Russian Stimulation
-HIP: IFC, Shockwave, TENS, LLLT, PEMF, Cryotherapy, NMES
-KNEE: NMES, IFC, Shockwave, TENS, LLLT, PEMF, Russian Stimulation, Cryotherapy
-ANKLE/FOOT: TENS, Ultrasound, Shockwave, IFC, LLLT, NMES, Cryotherapy
-ELBOW/WRIST: Iontophoresis, Shockwave, Ultrasound, TENS, LLLT, Phonophoresis
-Phase: Acute=TENS/IFC/Cryo, Sub-acute=US/Shockwave/PEMF, Chronic=NMES/Traction
-
-Return ONLY valid JSON (all text in ${targetLang}, exerciseKey always English):
+Return this JSON:
 {"title":"","region":"","totalDuration":"","tags":["","",""],
 "phases":[{"name":"","duration":"","goal":"","milestones":""}],
 "exercises":[{"exerciseKey":"","name":"","sets":"","reps":"","rest":"","startPosition":"","description":"","progressionTip":"","precautions":""}],
 "electrotherapy":[{"name":"","icon":"⚡","duration":"","frequency":"","protocol":"","placement":"","parameters":""}],
 "nutrition":{"dailySummary":"","antiInflammatoryTip":"","breakfast":{"meal":"","calories":0,"protein":0,"carbs":0,"fat":0},"morningSnack":{"meal":"","calories":0,"protein":0,"carbs":0,"fat":0},"lunch":{"meal":"","calories":0,"protein":0,"carbs":0,"fat":0},"afternoonSnack":{"meal":"","calories":0,"protein":0,"carbs":0,"fat":0},"dinner":{"meal":"","calories":0,"protein":0,"carbs":0,"fat":0},"sleepTip":"","hydration":"","supplements":[""],"foodsToAvoid":""}}
-Exactly 7 exercises, 2 electrotherapy. Keep each text field under 40 words.`;
+Exactly 7 exercises, 2 electrotherapy. Max 30 words per description field.`;
 
     const userPrompt = `Generate a rehabilitation plan for this patient:
 - Body area: ${intakeData.area}
