@@ -6419,17 +6419,13 @@ ${checkIn ? `- Today's check-in: pain ${checkIn.pain}/10, energy ${checkIn.energ
         }
         setDashboardTab("plans");
         if (!localStorage.getItem(`physio_tour_done_${_userKey}`)) setShowTour(true);
-        // Also save to Supabase if logged in
-        const session = loadSession();
-        if (session?.token && session?.userId) {
-          sb.savePlan(session.token, session.userId, entry).catch(() => {});
-        }
       } catch {}
       go("plan");
       notifSystem.addInApp("new_plan", `${parsed.title || "Plan"} — Day ${dayNum}`);
     } catch (e) {
-      setError(`Could not generate plan: ${e.message}. Please check your API key and try again.`);
-      go("quiz");
+      // Roll back — don't change dayNum on failure
+      setError(`Could not generate plan: ${e.message}. Please try again.`);
+      go("dashboard");
     }
   }
 
@@ -6526,15 +6522,7 @@ ${checkIn ? `- Today's check-in: pain ${checkIn.pain}/10, energy ${checkIn.energ
       return;
     }
     const nextDay = dayNum + 1;
-    setDayNum(nextDay);
-    // Persist dayNum
-    try {
-      const _uk = user?.email?.toLowerCase().replace(/[^a-z0-9]/g,"_") || "anon";
-      localStorage.setItem(`physio_daynum_${_uk}`, String(nextDay));
-    } catch {}
-    // Regenerate plan for the new day
-    // Use stored intake from localStorage if not in state
-    // Use intake state, or fall back to planHistory (in-memory, always available)
+    // NOTE: Do NOT increment dayNum here — only increment after successful generation
     const activeIntake = intake ||
       (planHistory.length > 0 ? planHistory[0]?.intake_data || planHistory[planHistory.length-1]?.intake_data : null) ||
       (() => {
@@ -6545,7 +6533,7 @@ ${checkIn ? `- Today's check-in: pain ${checkIn.pain}/10, energy ${checkIn.energ
         } catch { return null; }
       })();
     if (activeIntake) {
-      // Save check-in pain to checkinHistory immediately (before plan generates)
+      // Save check-in pain to checkinHistory immediately
       if (ci && typeof ci.pain === "number") {
         const todayKey = new Date().toISOString().split("T")[0];
         const entry = {day: dayNum, pain: Number(ci.pain), energy: Number(ci.energy||5), date: todayKey};
@@ -6553,11 +6541,16 @@ ${checkIn ? `- Today's check-in: pain ${checkIn.pain}/10, energy ${checkIn.energ
           const filtered = prev.filter(p => p.day !== dayNum);
           return [...filtered, entry].sort((a,b) => a.day - b.day);
         });
+        // Save checkin to Supabase
+        try {
+          const _sess = loadSession();
+          if (_sess?.token && _sess?.userId) {
+            sb.saveCheckin(_sess.token, _sess.userId, entry).catch(()=>{});
+          }
+        } catch {}
       }
-      // Pass updated dayNum directly since state update is async
       generatePlan({ ...activeIntake, _dayOverride: nextDay }, ci);
     } else {
-      // No intake data — send to quiz to do a new assessment
       go("quiz");
     }
   }
