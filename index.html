@@ -128,6 +128,46 @@ const sb = {
     );
     return r.json();
   },
+  async savePlan(token, userId, entry) {
+    const r = await fetch(`${SUPABASE_URL}/rest/v1/plans`, {
+      method: "POST",
+      headers: {
+        apikey: SUPABASE_ANON, Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json", Prefer: "return=representation"
+      },
+      body: JSON.stringify({
+        user_id: userId,
+        day: entry.day,
+        title: entry.title,
+        region: entry.region,
+        pain: entry.pain,
+        progress: entry.progress,
+        plan_data: entry.plan,
+        intake_data: entry.intake_data,
+      })
+    });
+    return r.json();
+  },
+  async saveCheckin(token, userId, entry) {
+    const r = await fetch(`${SUPABASE_URL}/rest/v1/checkins`, {
+      method: "POST",
+      headers: {
+        apikey: SUPABASE_ANON, Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        user_id: userId, day: entry.day, pain: entry.pain,
+        energy: entry.energy, notes: entry.notes||"", check_date: entry.date
+      })
+    });
+    return r.json();
+  },
+  async deletePlans(token, userId) {
+    await fetch(`${SUPABASE_URL}/rest/v1/plans?user_id=eq.${userId}`, {
+      method: "DELETE",
+      headers: { apikey: SUPABASE_ANON, Authorization: `Bearer ${token}` }
+    });
+  },
 };
 
 // ── Session helpers ──────────────────────────────────────────────────────────
@@ -5069,6 +5109,13 @@ function CheckInPanel({ plan, dayNum, onCheckIn, onStartPlan, onSaveCheckin, lan
     // Save to React state for immediate chart/avg update
     const _entry = { date: todayKey, pain: Number(pain), energy: Number(energy), day: dayNum||1 };
     onSaveCheckin && onSaveCheckin(_entry);
+    // Save checkin to Supabase
+    try {
+      const _sess = loadSession();
+      if (_sess?.token && _sess?.userId) {
+        sb.saveCheckin(_sess.token, _sess.userId, _entry).catch(()=>{});
+      }
+    } catch {}
     setDone(true);
     onCheckIn && onCheckIn({ pain, energy, notes, date: todayKey });
   }
@@ -6575,6 +6622,11 @@ ${checkIn ? `- Today's check-in: pain ${checkIn.pain}/10, energy ${checkIn.energ
             localStorage.removeItem("physio_checkin_history");
             localStorage.removeItem("physio_pain_history");
             localStorage.removeItem("physio_last_checkin");
+            // Clear from Supabase too
+            const _sess = loadSession();
+            if (_sess?.token && _sess?.userId) {
+              sb.deletePlans(_sess.token, _sess.userId).catch(()=>{});
+            }
           } catch {}
           go("subscribe");
         }}
