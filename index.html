@@ -29,6 +29,17 @@
     <span style="font-family:DM Sans,sans-serif;color:#0a7e6e;font-size:14px">Loading PhysioRoutine...</span>
   </div>
   <script>
+  window.__appReady = function() {
+    var l=document.getElementById("loading");
+    if(l){l.style.opacity="0";l.style.transition="opacity .3s";setTimeout(function(){l.style.display="none";},300);}
+  };
+  window.onerror = function(msg,src,line,col,err) {
+    var l=document.getElementById("loading");
+    if(l)l.innerHTML='<div style="text-align:center;padding:40px 20px;font-family:DM Sans,sans-serif"><div style="color:#dc2626;font-size:18px;font-weight:600;margin-bottom:8px">Something went wrong</div><div style="color:#666;font-size:14px;margin-bottom:4px">'+msg+'</div><div style="color:#999;font-size:12px;margin-bottom:16px">Line '+line+'</div><button onclick="location.reload()" style="padding:10px 24px;background:#0a7e6e;color:white;border:none;border-radius:8px;cursor:pointer;font-size:14px">Refresh Page</button></div>';
+    return false;
+  };
+  </script>
+  <script>
 var __defProp = Object.defineProperty;
 var __defProps = Object.defineProperties;
 var __getOwnPropDescs = Object.getOwnPropertyDescriptors;
@@ -112,28 +123,6 @@ const sb = {
     });
     const data = await r.json();
     return Array.isArray(data) ? data[0] : null;
-  },
-  async savePlan(token, userId, entry) {
-    const r = await fetch(`${SUPABASE_URL}/rest/v1/plans`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        apikey: SUPABASE_ANON,
-        Authorization: `Bearer ${token}`,
-        Prefer: "return=representation"
-      },
-      body: JSON.stringify({
-        user_id: userId,
-        day: entry.day || 1,
-        title: entry.title || "",
-        region: entry.region || "",
-        pain: entry.pain || 0,
-        progress: entry.progress || 0,
-        plan_data: entry.plan || entry,
-        intake_data: entry.intake_data || null
-      })
-    });
-    return r.json();
   },
   async getPlans(token, userId) {
     const r = await fetch(
@@ -4294,7 +4283,13 @@ function App() {
     if (!(session == null ? void 0 : session.token) || !(session == null ? void 0 : session.user)) return;
     fetch(`${SUPABASE_URL}/auth/v1/user`, {
       headers: { apikey: SUPABASE_ANON, Authorization: `Bearer ${session.token}` }
-    }).then((r) => r.json()).then((userData) => {
+    }).then((r) => {
+      if (!r.ok) {
+        clearSession();
+        return Promise.reject("invalid token");
+      }
+      return r.json();
+    }).then((userData) => {
       if (!(userData == null ? void 0 : userData.id)) {
         clearSession();
         return;
@@ -4606,42 +4601,57 @@ ${checkIn ? `- Today's check-in: pain ${checkIn.pain}/10, energy ${checkIn.energ
     go("subscribe");
   }
   function handleAuthSuccess(u) {
-    var _a2, _b2, _c;
+    var _a2;
     setUser(u);
     notifSystem.requestPermission();
     const adminUser = ADMIN_EMAILS.includes((u.email || "").toLowerCase().trim());
     if (adminUser) setSubscription("admin");
     const userKey = ((_a2 = u.email) == null ? void 0 : _a2.toLowerCase().replace(/[^a-z0-9]/g, "_")) || "anon";
-    let history2 = [];
-    try {
-      history2 = JSON.parse(localStorage.getItem(`physio_plan_history_${userKey}`) || localStorage.getItem("physio_plan_history") || "[]");
-      if (!Array.isArray(history2)) history2 = [];
-    } catch (e) {
-      history2 = [];
-    }
-    setPlanHistory(history2);
-    setPlan(history2.length > 0 ? ((_b2 = history2[0]) == null ? void 0 : _b2.plan) || null : null);
     const sub = localStorage.getItem(`physio_subscription_${userKey}`);
     if (sub && !adminUser) setSubscription(sub);
-    else if (!adminUser) setSubscription(null);
     const trial = localStorage.getItem(`physio_trial_used_${userKey}`);
     setTrialUsed(trial === "true");
     try {
       localStorage.setItem("physio_current_user", userKey);
     } catch (e) {
     }
-    if (history2.length > 0 && ((_c = history2[0]) == null ? void 0 : _c.intake_data)) {
-      setIntake(history2[0].intake_data);
-    }
-    const seededCheckins = history2.filter((p) => p.day && typeof p.pain === "number").map((p) => ({ day: p.day, pain: p.pain, energy: 5, date: p.date || "" })).sort((a, b) => a.day - b.day);
-    if (seededCheckins.length > 0) setCheckinHistory2(seededCheckins);
-    const savedDay = parseInt(localStorage.getItem(`physio_daynum_${userKey}`) || "1", 10);
-    const restoredDay = isNaN(savedDay) ? 1 : savedDay;
-    setDayNum(restoredDay);
-    if (restoredDay <= 1) {
-      localStorage.removeItem("physio_checkin_history");
-      localStorage.removeItem("physio_pain_history");
-      localStorage.removeItem("physio_last_checkin");
+    const sess = loadSession();
+    if ((sess == null ? void 0 : sess.token) && (u == null ? void 0 : u.id)) {
+      sb.getPlans(sess.token, u.id).then((cp) => {
+        var _a3, _b2;
+        if (Array.isArray(cp) && cp.length > 0) {
+          const cloudH = cp.map((p) => ({
+            id: p.id,
+            title: p.title,
+            region: p.region,
+            day: p.day,
+            date: (p.created_at || "").split("T")[0],
+            pain: p.pain,
+            progress: p.progress,
+            plan: p.plan_data,
+            intake_data: p.intake_data
+          })).sort((a, b) => (b.day || 0) - (a.day || 0));
+          setPlanHistory(cloudH);
+          setPlan(((_a3 = cloudH[0]) == null ? void 0 : _a3.plan) || null);
+          if ((_b2 = cloudH[0]) == null ? void 0 : _b2.intake_data) setIntake(cloudH[0].intake_data);
+          const maxDay = Math.max(...cloudH.map((p) => p.day || 1));
+          setDayNum(maxDay);
+          const checkins = cloudH.filter((p) => p.day && typeof p.pain === "number").map((p) => ({ day: p.day, pain: p.pain, energy: 5, date: p.date || "" })).sort((a, b) => a.day - b.day);
+          if (checkins.length > 0) setCheckinHistory2(checkins);
+        } else {
+          setPlanHistory([]);
+          setPlan(null);
+          setDayNum(1);
+        }
+      }).catch(() => {
+        setPlanHistory([]);
+        setPlan(null);
+        setDayNum(1);
+      });
+    } else {
+      setPlanHistory([]);
+      setPlan(null);
+      setDayNum(1);
     }
     if (u.role === "physiotherapist" || u.role === "clinic_admin") go("clinic");
     else go("dashboard");
@@ -4912,11 +4922,8 @@ ${checkIn ? `- Today's check-in: pain ${checkIn.pain}/10, energy ${checkIn.energ
 const rootEl=document.getElementById("root");
 const root=ReactDOM.createRoot(rootEl);
 root.render(React.createElement(App));
+if(window.__appReady)window.__appReady();
 
-  </script>
-  <script>
-    var l=document.getElementById("loading");
-    if(l){l.style.opacity="0";l.style.transition="opacity .3s";setTimeout(function(){l.style.display="none";},300);}
   </script>
 </body>
 </html>
