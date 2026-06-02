@@ -1,0 +1,63 @@
+<svg width="680" height="560" viewBox="0 0 680 560" role="img" xmlns="http://www.w3.org/2000/svg">
+  <title>PhysioRoutine Logo</title>
+  <desc>PhysioRoutine app logo with a clean accurate stethoscope and a full repeating ECG heartbeat pulse line overlaid, on a teal rounded square, with wordmark below.</desc>
+
+  <defs>
+    <clipPath id="ic">
+      <rect x="215" y="40" width="250" height="250" rx="52"/>
+    </clipPath>
+  </defs>
+
+  <rect x="215" y="40" width="250" height="250" rx="52" fill="#0b7a8a"/>
+
+  <g clip-path="url(#ic)" fill="none" stroke="#ffffff" stroke-linecap="round" stroke-linejoin="round" opacity="0.30">
+    <rect x="291" y="60" width="13" height="17" rx="3" fill="#ffffff" stroke="none" opacity="1"/>
+    <rect x="376" y="60" width="13" height="17" rx="3" fill="#ffffff" stroke="none" opacity="1"/>
+    <path d="M297 77 L297 105" stroke="#ffffff" stroke-width="6.5"/>
+    <path d="M383 77 L383 105" stroke="#ffffff" stroke-width="6.5"/>
+    <path d="M297 105 Q297 150 340 155 Q383 150 383 105" stroke="#ffffff" stroke-width="6.5"/>
+    <rect x="321" y="152" width="12" height="10" rx="2.5" fill="#ffffff" stroke="none" opacity="1"/>
+    <rect x="347" y="152" width="12" height="10" rx="2.5" fill="#ffffff" stroke="none" opacity="1"/>
+    <path d="M327 162 L333 175" stroke="#ffffff" stroke-width="5.5"/>
+    <path d="M353 162 L347 175" stroke="#ffffff" stroke-width="5.5"/>
+    <path d="M333 175 Q340 178 347 175 L340 178 L340 215" stroke="#ffffff" stroke-width="5.5"/>
+    <path d="M340 215 Q340 238 352 244 Q364 250 370 240 Q376 228 368 220" stroke="#ffffff" stroke-width="5.5"/>
+    <circle cx="357" cy="224" r="21" stroke="#ffffff" stroke-width="5.5"/>
+    <circle cx="357" cy="224" r="11" stroke="#ffffff" stroke-width="3"/>
+    <path d="M354 220 Q360 220 360 226 Q360 230 356 230" stroke="#ffffff" stroke-width="2.5"/>
+  </g>
+
+  <polyline points="215,163 228,163 232,163 234,159 236,155 238,163 240,163" fill="none" stroke="#2ee8a0" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round" clip-path="url(#ic)"/>
+  <polyline points="240,163 242,167 244,150 247,110 250,196 253,155 255,163 260,163" fill="none" stroke="#2ee8a0" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round" clip-path="url(#ic)"/>
+  <polyline points="260,163 263,163 266,157 270,151 274,157 277,163 285,163" fill="none" stroke="#2ee8a0" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round" clip-path="url(#ic)"/>
+
+  <polyline points="285,163 287,159 289,155 291,163 293,163" fill="none" stroke="#2ee8a0" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round" clip-path="url(#ic)"/>
+  <polyline points="293,163 295,167 297,150 300,110 303,196 306,155 308,163 314,163" fill="none" stroke="#2ee8a0" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round" clip-path="url(#ic)"/>
+  <polyline points="314,163 317,157 321,151 325,157 328,163 338,163" fill="none" stroke="#2ee8a0" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round" clip-path="url(#ic)"/>
+
+  <polyline points="338,163 340,159 342,155 344,163 346,163" fill="none" stroke="#2ee8a0" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round" clip-path="url(#ic)"/>
+  <polyline points="346,163 348,167 350,150 353,110 356,196 359,155 361,163 367,163" fill="none" stroke="#2ee8a0" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round" clip-path="url(#ic)"/>
+  <polyline points="367,163 370,157 374,151 378,157 381,163 391,163" fill="none" stroke="#2ee8a0" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round" clip-path="url(#ic)"/>
+
+  <polyline points="391,163 393,159 395,155 397,163 399,163" fill="none" stroke="#2ee8a0" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round" clip-path="url(#ic)"/>
+  <polyline points="399,163 401,167 403,150 406,110 409,196 412,155 414,163 420,163" fill="none" stroke="#2ee8a0" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round" clip-path="url(#ic)"/>
+  <polyline points="420,163 423,157 427,151 431,157 434,163 465,163" fill="none" stroke="#2ee8a0" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round" clip-path="url(#ic)"/>
+
+  <rect x="393" y="53" width="24" height="7" rx="3.5" fill="#2ee8a0"/>
+  <rect x="397.5" y="48" width="7" height="24" rx="3.5" fill="#2ee8a0"/>
+
+  <text x="340" y="350"
+    text-anchor="middle"
+    font-family="system-ui, -apple-system, sans-serif"
+    font-size="42" font-weight="700" letter-spacing="-1"
+    fill="#0b7a8a">Physio<tspan fill="#0d9e76">Routine</tspan></text>
+
+  <text x="340" y="380"
+    text-anchor="middle"
+    font-family="system-ui, -apple-system, sans-serif"
+    font-size="12" font-weight="400" letter-spacing="3"
+    fill="#6aacb8">YOUR DAILY RECOVERY ROUTINE</text>
+
+  <line x1="215" y1="398" x2="465" y2="398" stroke="#2ee8a0" stroke-width="1.5" opacity="0.4"/>
+
+</svg>
