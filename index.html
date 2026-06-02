@@ -1,23 +1,35 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
-<title>PhysioRoutine — AI Physiotherapy Plans</title>
-<meta name="description" content="Get a personalised physiotherapy rehabilitation plan in under 3 minutes."/>
-<meta name="theme-color" content="#0a7e6e"/>
-<link rel="preconnect" href="https://fonts.googleapis.com"/>
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;0,9..144,700;1,9..144,400&family=DM+Sans:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet"/>
-<script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
-<script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
-<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-<style>*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}html,body,#root{height:100%}body{font-family:'DM Sans',sans-serif;-webkit-font-smoothing:antialiased;background:#f8f7f4}#loading{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:#f8f7f4;z-index:9999;flex-direction:column;gap:16px}#loading svg{animation:spin 1s linear infinite}@keyframes spin{to{transform:rotate(360deg)}}</style>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>PhysioRoutine — AI Physiotherapy Plans</title>
+  <meta name="description" content="Get a personalised physiotherapy rehabilitation plan in under 3 minutes."/>
+  <meta name="theme-color" content="#0a7e6e"/>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;0,9..144,700;1,9..144,400&family=DM+Sans:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+  <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <style>
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    html,body,#root{height:100%}
+    body{font-family:'DM Sans',sans-serif;-webkit-font-smoothing:antialiased;background:#f8f7f4}
+    #loading{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:#f8f7f4;z-index:9999;flex-direction:column;gap:16px}
+    #loading svg{animation:spin 1s linear infinite}
+    @keyframes spin{to{transform:rotate(360deg)}}
+  </style>
 </head>
 <body>
-<div id="root"></div>
-<div id="loading"><svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#0a7e6e" stroke-width="2.5" stroke-linecap="round"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg><span style="font-family:DM Sans,sans-serif;color:#0a7e6e;font-size:14px">Loading PhysioRoutine...</span></div>
-<script type="text/babel" data-presets="react">
+  <div id="root"></div>
+  <div id="loading">
+    <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#0a7e6e" stroke-width="2.5" stroke-linecap="round">
+      <path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/>
+    </svg>
+    <span style="font-family:DM Sans,sans-serif;color:#0a7e6e;font-size:14px">Loading PhysioRoutine...</span>
+  </div>
+  <script type="text/babel" data-presets="react">
 const { useState, useEffect, useRef, useCallback } = React;
 
 // ── Supabase config ─────────────────────────────────────────────────────────
@@ -6083,9 +6095,6 @@ function App() {
     }
   }, [notifSystem.inAppNotifs.length]);
 
-  // Signal app is ready to hide loading screen
-  useEffect(()=>{ if(window.__appReady) window.__appReady(); },[]);
-
   // ── Session restore on startup ─────────────────────────────────────────────
   useEffect(() => {
     const session = loadSession();
@@ -6093,7 +6102,10 @@ function App() {
     // Validate token with Supabase
     fetch(`${SUPABASE_URL}/auth/v1/user`, {
       headers: { apikey: SUPABASE_ANON, Authorization: `Bearer ${session.token}` }
-    }).then(r => r.json()).then(userData => {
+    }).then(r => {
+      if (!r.ok) { clearSession(); return Promise.reject('invalid token'); }
+      return r.json();
+    }).then(userData => {
       if (!userData?.id) { clearSession(); return; }
       setUser(session.user);
       // Load plans from Supabase
@@ -6428,39 +6440,44 @@ ${checkIn ? `- Today's check-in: pain ${checkIn.pain}/10, energy ${checkIn.energ
     notifSystem.requestPermission();
     const adminUser = ADMIN_EMAILS.includes((u.email||"").toLowerCase().trim());
     if (adminUser) setSubscription("admin");
-    // Load this user's saved data (keyed by email so different users get different data)
     const userKey = u.email?.toLowerCase().replace(/[^a-z0-9]/g,"_") || "anon";
-    let history = [];
-    try {
-      history = JSON.parse(localStorage.getItem(`physio_plan_history_${userKey}`) || localStorage.getItem("physio_plan_history") || "[]");
-      if (!Array.isArray(history)) history = [];
-    } catch { history = []; }
-    setPlanHistory(history);
-    setPlan(history.length > 0 ? (history[0]?.plan || null) : null);
+    // Restore subscription from localStorage
     const sub = localStorage.getItem(`physio_subscription_${userKey}`);
-    if (sub && !adminUser) setSubscription(sub); else if (!adminUser) setSubscription(null);
+    if (sub && !adminUser) setSubscription(sub);
     const trial = localStorage.getItem(`physio_trial_used_${userKey}`);
     setTrialUsed(trial === "true");
     try { localStorage.setItem("physio_current_user", userKey); } catch {}
-    // Restore intake from most recent plan
-    if (history.length > 0 && history[0]?.intake_data) {
-      setIntake(history[0].intake_data);
+    // Load plans from Supabase (source of truth — cross device)
+    const sess = loadSession();
+    if (sess?.token && u?.id) {
+      sb.getPlans(sess.token, u.id).then(cp => {
+        if (Array.isArray(cp) && cp.length > 0) {
+          const cloudH = cp.map(p => ({
+            id: p.id, title: p.title, region: p.region,
+            day: p.day, date: (p.created_at||"").split("T")[0],
+            pain: p.pain, progress: p.progress,
+            plan: p.plan_data, intake_data: p.intake_data,
+          })).sort((a,b) => (b.day||0) - (a.day||0));
+          setPlanHistory(cloudH);
+          setPlan(cloudH[0]?.plan || null);
+          if (cloudH[0]?.intake_data) setIntake(cloudH[0].intake_data);
+          const maxDay = Math.max(...cloudH.map(p => p.day||1));
+          setDayNum(maxDay);
+          const checkins = cloudH
+            .filter(p => p.day && typeof p.pain === "number")
+            .map(p => ({day: p.day, pain: p.pain, energy: 5, date: p.date||""}))
+            .sort((a,b) => a.day - b.day);
+          if (checkins.length > 0) setCheckinHistory(checkins);
+        } else {
+          setPlanHistory([]); setPlan(null); setDayNum(1);
+        }
+      }).catch(() => {
+        setPlanHistory([]); setPlan(null); setDayNum(1);
+      });
+    } else {
+      setPlanHistory([]); setPlan(null); setDayNum(1);
     }
-    // Seed checkinHistory from planHistory pain values
-    const seededCheckins = history
-      .filter(p => p.day && typeof p.pain === "number")
-      .map(p => ({day: p.day, pain: p.pain, energy: 5, date: p.date || ""}))
-      .sort((a,b) => a.day - b.day);
-    if (seededCheckins.length > 0) setCheckinHistory(seededCheckins);
-    // Restore dayNum
-    const savedDay = parseInt(localStorage.getItem(`physio_daynum_${userKey}`)||"1", 10);
-    const restoredDay = isNaN(savedDay) ? 1 : savedDay;
-    setDayNum(restoredDay);
-    if (restoredDay <= 1) {
-      localStorage.removeItem("physio_checkin_history");
-      localStorage.removeItem("physio_pain_history");
-      localStorage.removeItem("physio_last_checkin");
-    }
+    // Navigate
     if (u.role === "physiotherapist" || u.role === "clinic_admin") go("clinic");
     else go("dashboard");
   }
@@ -6716,15 +6733,20 @@ const rootEl=document.getElementById("root");
 const root=ReactDOM.createRoot(rootEl);
 root.render(React.createElement(App));
 
-</script>
-<script>
-// Hide loading only after React has mounted
-window.__appReady = function() {
-  var l = document.getElementById("loading");
-  if (l) { l.style.opacity="0"; l.style.transition="opacity .3s"; setTimeout(function(){l.style.display="none";},300); }
-};
-// Fallback: hide after 15 seconds max
-setTimeout(function(){window.__appReady&&window.__appReady();}, 15000);
-</script>
+  </script>
+  <script>
+    // Hide loading after React mounts OR after 20s max
+    window.__appReady = function() {
+      var l = document.getElementById("loading");
+      if (l) { l.style.opacity="0"; l.style.transition="opacity .3s"; setTimeout(function(){l.style.display="none";},300); }
+    };
+    setTimeout(window.__appReady, 20000);
+    // Show error if Babel fails
+    window.onerror = function(msg, src, line, col, err) {
+      var l = document.getElementById("loading");
+      if (l) l.innerHTML = '<div style="text-align:center;padding:20px;font-family:sans-serif"><div style="color:#dc2626;font-size:16px;font-weight:600;margin-bottom:8px">Failed to load app</div><div style="color:#666;font-size:13px">Please refresh the page</div><button onclick="location.reload()" style="margin-top:16px;padding:10px 24px;background:#0a7e6e;color:white;border:none;border-radius:8px;cursor:pointer;font-size:14px">Refresh</button></div>';
+      return false;
+    };
+  </script>
 </body>
 </html>
