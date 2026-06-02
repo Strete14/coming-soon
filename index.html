@@ -6087,11 +6087,11 @@ function App() {
   useEffect(() => {
     const session = loadSession();
     if (!session?.token || !session?.user) return;
-    // Validate token then restore from Supabase only
+    // Validate token with Supabase
     fetch(`${SUPABASE_URL}/auth/v1/user`, {
       headers: { apikey: SUPABASE_ANON, Authorization: `Bearer ${session.token}` }
-    }).then(r => {
-      if (!r.ok) { clearSession(); return; }
+    }).then(r => r.json()).then(userData => {
+      if (!userData?.id) { clearSession(); return; }
       setUser(session.user);
       // Load plans from Supabase
       sb.getPlans(session.token, session.user.id || session.userId).then(cp => {
