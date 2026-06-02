@@ -28,9 +28,10 @@
   </div>
   <style>@keyframes spin{to{transform:rotate(360deg)}}</style>
   <script>
-  window.addEventListener("error", function(e) {
-    document.getElementById("root").innerHTML = '<div style="min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px;background:#f8f7f4"><div style="background:white;border-radius:12px;padding:32px;max-width:400px;width:100%;text-align:center"><div style="color:#dc2626;font-weight:700;font-size:18px;margin-bottom:12px">Error</div><div style="color:#333;font-size:13px;margin-bottom:16px">' + e.message + ' (Line ' + e.lineno + ')</div><button onclick="location.reload()" style="padding:10px 20px;background:#0a7e6e;color:white;border:none;border-radius:8px;cursor:pointer">Reload</button></div></div>';
-  });
+    window.onerror = function(msg,src,line,col,err) {
+      var r = document.getElementById("root");
+      if(r) r.innerHTML = '<div style="min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px"><div style="background:white;border-radius:12px;padding:32px;max-width:400px;width:100%;text-align:center;box-shadow:0 4px 20px rgba(0,0,0,.1)"><div style="color:#dc2626;font-weight:700;font-size:18px;margin-bottom:12px">Error</div><div style="color:#333;font-size:13px;margin-bottom:8px">'+msg+'</div><div style="color:#999;font-size:11px;margin-bottom:16px">Line: '+line+'</div><button onclick="location.reload()" style="padding:10px 20px;background:#0a7e6e;color:white;border:none;border-radius:8px;cursor:pointer">Reload</button></div></div>';
+    };
   </script>
   <script>
 var __defProp = Object.defineProperty;
@@ -4912,9 +4913,19 @@ ${checkIn ? `- Today's check-in: pain ${checkIn.pain}/10, energy ${checkIn.energ
   ), error && /* @__PURE__ */ React.createElement("div", { style: { position: "fixed", bottom: 20, right: 20, left: 20, maxWidth: 380, margin: "0 auto", background: T.redPale, border: `1px solid ${T.red}28`, borderRadius: 10, padding: "13px 16px", fontSize: 14, color: T.red, zIndex: 999, boxShadow: "0 4px 20px rgba(0,0,0,.1)", display: "flex", gap: 10, alignItems: "flex-start", animation: "scaleIn .3s ease" } }, /* @__PURE__ */ React.createElement("span", { style: { flex: 1, lineHeight: 1.5 } }, error), /* @__PURE__ */ React.createElement("button", { onClick: () => setError(""), style: { background: "none", border: "none", cursor: "pointer", color: T.red, fontWeight: 700, fontSize: 16, padding: 0, flexShrink: 0 } }, "\u2715")), toastNotif && /* @__PURE__ */ React.createElement(NotifToast, { notif: toastNotif, onDismiss: () => setToastNotif(null) }));
 }
 
-const rootEl=document.getElementById("root");
-const root=ReactDOM.createRoot(rootEl);
-root.render(React.createElement(App));
+// Mount React app
+(function() {
+  const rootEl = document.getElementById("root");
+  if (!rootEl) { console.error("No #root element"); return; }
+  if (typeof App === "undefined") { console.error("App not defined"); return; }
+  try {
+    const root = ReactDOM.createRoot(rootEl);
+    root.render(React.createElement(App));
+  } catch(e) {
+    console.error("Mount error:", e);
+    rootEl.innerHTML = '<div style="padding:20px;color:red">Mount error: ' + e.message + '</div>';
+  }
+})();
 
   </script>
 </body>
