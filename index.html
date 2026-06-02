@@ -3595,15 +3595,28 @@ function AuthScreen({mode:init="login",onSuccess,lang}) {
   // Email confirmation screen
   if (confirmed) return (
     <div style={{minHeight:"100vh",display:"flex",alignItems:"center",justifyContent:"center",background:`linear-gradient(155deg,${T.white} 0%,${T.tealPale} 100%)`,padding:"40px 16px"}}>
-      <div style={{background:T.white,border:`1px solid ${T.grey100}`,borderRadius:16,padding:"clamp(32px,5vw,48px)",width:"100%",maxWidth:420,boxShadow:"0 20px 60px rgba(10,126,110,.09)",textAlign:"center",animation:"scaleIn .4s ease"}}>
-        <div style={{width:72,height:72,borderRadius:"50%",background:T.tealPale,display:"flex",alignItems:"center",justifyContent:"center",fontSize:32,margin:"0 auto 20px"}}>✉️</div>
-        <h2 style={{fontFamily:"'Fraunces',serif",fontWeight:600,fontSize:24,color:T.navy,marginBottom:10}}>{t.checkYourEmail}</h2>
-        <p style={{fontSize:14,color:T.grey500,lineHeight:1.7,marginBottom:24}}>
-          {t.confirmEmailDesc} <strong style={{color:T.navy}}>{f.email}</strong>.<br/>{t.confirmEmailDesc2}
+      <div style={{background:T.white,border:`1px solid ${T.grey100}`,borderRadius:16,padding:"clamp(32px,5vw,48px)",width:"100%",maxWidth:440,boxShadow:"0 20px 60px rgba(10,126,110,.09)",textAlign:"center",animation:"scaleIn .4s ease"}}>
+        <div style={{width:72,height:72,borderRadius:"50%",background:T.tealPale,display:"flex",alignItems:"center",justifyContent:"center",margin:"0 auto 24px"}}>
+          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke={T.teal} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+            <polyline points="22,6 12,13 2,6"/>
+          </svg>
+        </div>
+        <div style={{display:"inline-block",background:T.tealPale,borderRadius:20,padding:"4px 14px",fontSize:11,color:T.teal,fontFamily:"'DM Mono',monospace",letterSpacing:".08em",marginBottom:16,textTransform:"uppercase"}}>Check your inbox</div>
+        <h2 style={{fontFamily:"'Fraunces',serif",fontWeight:600,fontSize:"clamp(22px,4vw,28px)",color:T.navy,marginBottom:12,lineHeight:1.2}}>Confirm your email to get started</h2>
+        <p style={{fontSize:14,color:T.grey500,lineHeight:1.8,marginBottom:8}}>
+          We sent a confirmation link to
         </p>
-        <button onClick={()=>setMode("login")} className="btn btn-teal" style={{width:"100%",padding:"13px",fontSize:15,fontWeight:600}}>{t.confirmEmailBack}
+        <p style={{fontSize:15,fontWeight:600,color:T.navy,marginBottom:20}}>{f.email}</p>
+        <p style={{fontSize:13,color:T.grey500,lineHeight:1.7,marginBottom:28}}>
+          Click the link in the email to verify your account, then come back here to log in and start your rehabilitation programme.
+        </p>
+        <button onClick={()=>setMode("login")} className="btn-teal" style={{width:"100%",justifyContent:"center",padding:"13px",fontSize:15,fontWeight:600}}>
+          Go to Login
         </button>
-        <div style={{marginTop:16,fontSize:12,color:T.grey400}}>Didn't receive it? Check your spam folder.</div>
+        <div style={{marginTop:20,padding:"14px 16px",background:T.grey50,borderRadius:10,fontSize:12,color:T.grey500,lineHeight:1.6}}>
+          Didn't receive it? Check your spam folder or <span style={{color:T.teal,cursor:"pointer",textDecoration:"underline"}} onClick={()=>setMode("signup")}>try signing up again</span>.
+        </div>
       </div>
     </div>
   );
@@ -4482,7 +4495,22 @@ function PlanScreen({plan,dayNum=1,subscription="standard",onReset,onCheckIn,onS
   const t=useT(lang);
   const [tab,setTab]=useState("exercises");
   const [expanded,setExpanded]=useState(null);
-  const [showCI,setShowCI]=useState(subscription !== "trial" || dayNum < 1);
+  const [showCI,setShowCI]=useState(false);
+  const [ciAvailableDate,setCiAvailableDate]=useState(null);
+  useEffect(()=>{
+    if (subscription === "trial") { setShowCI(false); return; }
+    const planDate = plan?._generatedDate || plan?.generatedDate || null;
+    if (!planDate) { setShowCI(true); return; } // no date stored, allow check-in
+    const today = new Date().toISOString().split("T")[0];
+    const canCheckin = today > planDate;
+    setShowCI(canCheckin);
+    if (!canCheckin) {
+      // Calculate tomorrow date for display
+      const tomorrow = new Date(planDate);
+      tomorrow.setDate(tomorrow.getDate()+1);
+      setCiAvailableDate(tomorrow.toLocaleDateString("en-GB",{day:"numeric",month:"short"}));
+    }
+  },[plan, subscription, dayNum]);
   const [ci,setCi]=useState({pain:4,stiffness:3,helped:""});
   if(!plan)return null;
   const phC=[T.red,T.orange,T.teal];
@@ -5215,7 +5243,7 @@ function DashboardScreen({user,onStartPlan,onLogout,plan,dayNum=1,onViewPlan,onE
   const allPlans=planHistory.length>0?planHistory:[];
   const tabs=isPhysio
     ?[{k:"overview",l:"Overview"},{k:"patients",l:"Patients"},{k:"plans",l:t.planHistory}]
-    :[{k:"overview",l:"Overview"},{k:"plans",l:t.planHistory},{k:"progress",l:t.progressTracking},{k:"checkin",l:"Check In"}];
+    :[{k:"overview",l:"Overview"},{k:"plans",l:t.planHistory},{k:"progress",l:t.progressTracking}];
 
   return (
     <div style={{minHeight:"100vh",background:T.offwhite}}>
@@ -6058,22 +6086,32 @@ function App() {
   // ── Session restore on startup ─────────────────────────────────────────────
   useEffect(() => {
     const session = loadSession();
-    if (!session?.token || !session?.user) return; // no saved session — start fresh
-    // Validate token with Supabase before restoring
+    if (!session?.token || !session?.user) return;
+    // Validate token then restore from Supabase only
     fetch(`${SUPABASE_URL}/auth/v1/user`, {
       headers: { apikey: SUPABASE_ANON, Authorization: `Bearer ${session.token}` }
     }).then(r => {
-      if (!r.ok) { clearSession(); return; } // invalid token — clear and stay logged out
+      if (!r.ok) { clearSession(); return; }
       setUser(session.user);
+      // Load plans from Supabase
+      sb.getPlans(session.token, session.user.id || session.userId).then(cp => {
+        if (Array.isArray(cp) && cp.length > 0) {
+          const cloudH = cp.map(p => ({
+            id: p.id, title: p.title, region: p.region,
+            day: p.day, date: (p.created_at||"").split("T")[0],
+            pain: p.pain, progress: p.progress,
+            plan: p.plan_data, intake_data: p.intake_data,
+          })).sort((a,b) => (b.day||0) - (a.day||0));
+          setPlanHistory(cloudH);
+          setPlan(cloudH[0]?.plan || null);
+          if (cloudH[0]?.intake_data) setIntake(cloudH[0].intake_data);
+          const maxDay = Math.max(...cloudH.map(p => p.day||1));
+          setDayNum(maxDay);
+          const sub = localStorage.getItem(`physio_subscription_${session.user?.email?.toLowerCase().replace(/[^a-z0-9]/g,"_")||"anon"}`);
+          if (sub) setSubscription(sub);
+        }
+      }).catch(e => console.warn('Supabase load:', e));
     }).catch(() => clearSession());
-    if (!session?.token) return;
-    // Clear stale localStorage plan data — Supabase is the truth
-    const _uk0 = session.user?.email?.toLowerCase().replace(/[^a-z0-9]/g,"_") || "anon";
-    try {
-      localStorage.removeItem(`physio_plan_history_${_uk0}`);
-      localStorage.removeItem("physio_plan_history");
-    } catch {}
-    setUser(session.user);
     try {
       const _uk = session.user?.email?.toLowerCase().replace(/[^a-z0-9]/g,"_") || "anon";
       // ONLY load from Supabase — ignore localStorage for plan data
@@ -6319,6 +6357,8 @@ ${checkIn ? `- Today's check-in: pain ${checkIn.pain}/10, energy ${checkIn.energ
         const entryPain = (checkIn && typeof checkIn.pain === "number") ? checkIn.pain : (Number(intakeData?.pain)||0);
         // Clean title — remove AI-added day/phase suffixes
         const cleanTitle = (parsed.title||"").replace(/[\s\-–—]+day\s*\d+/gi,"").replace(/[\s\-–—]+phase\s*\d+/gi,"").trim();
+        const generatedDate = new Date().toISOString().split("T")[0];
+        parsed._generatedDate = generatedDate;
         const entry = {
           id: Date.now(), title: cleanTitle, region: parsed.region,
           day: currentDay, date: new Date().toLocaleDateString("en-GB",{day:"numeric",month:"short",year:"numeric"}),
@@ -6453,17 +6493,30 @@ ${checkIn ? `- Today's check-in: pain ${checkIn.pain}/10, energy ${checkIn.energ
   }
 
   function handleCheckIn(ci) {
-    // Trial = 1 day only — redirect to subscribe after Day 1
+    // Trial = 1 day only — redirect to subscribe
     if (subscription === "trial" && dayNum >= 1) {
       go("subscribe");
       return;
     }
-    // Paid plans — hard limit 7 days
-    const planLimit = 7;
-    if (dayNum >= planLimit) {
-      setError(`You have completed your ${planLimit}-day programme. Start a new plan to continue.`);
+    // Standard plan — max 7 days
+    if (subscription === "standard" && dayNum >= 7) {
       go("dashboard");
       return;
+    }
+    // Premium plan — check 7-day window from first plan date
+    if (subscription === "premium") {
+      const firstPlan = planHistory.length > 0 ? planHistory[planHistory.length-1] : null;
+      if (firstPlan?.date) {
+        const firstDate = new Date(firstPlan.date);
+        const today = new Date();
+        const daysDiff = Math.floor((today - firstDate) / (1000*60*60*24));
+        if (daysDiff >= 7) {
+          setError("Your 7-day premium window has expired. Subscribe again to continue.");
+          go("subscribe");
+          return;
+        }
+      }
+      if (dayNum >= 7) { go("dashboard"); return; }
     }
     const nextDay = dayNum + 1;
     // NOTE: Do NOT increment dayNum here — only increment after successful generation
@@ -6600,25 +6653,24 @@ ${checkIn ? `- Today's check-in: pain ${checkIn.pain}/10, energy ${checkIn.energ
           planHistory={planHistory} checkinHistory={checkinHistory} initialTab={dashboardTab}
           onSaveCheckin={entry=>setCheckinHistory(prev=>{const f=prev.filter(p=>p.day!==entry.day);return [...f,entry].sort((a,b)=>a.day-b.day);})}
           onStartPlan={() => {
-          // Reset for a new programme
+          // Reset for a new programme — go to subscribe first
           setDayNum(1);
           setCheckinHistory([]);
-          setPlanHistory([]);
           setPlan(null);
           setIntake(null);
-          try {
-            const uk = user?.email?.toLowerCase().replace(/[^a-z0-9]/g,"_")||"anon";
-            localStorage.removeItem(`physio_daynum_${uk}`);
-            localStorage.removeItem(`physio_plan_history_${uk}`);
-            localStorage.removeItem("physio_checkin_history");
-            localStorage.removeItem("physio_pain_history");
-            localStorage.removeItem("physio_last_checkin");
-            // Clear from Supabase too
-            const _sess = loadSession();
-            if (_sess?.token && _sess?.userId) {
-              sb.deletePlans(_sess.token, _sess.userId).catch(()=>{});
-            }
-          } catch {}
+          // For premium users starting a new body area, keep existing plans
+          if (subscription !== "standard" && subscription !== "premium") {
+            setPlanHistory([]);
+            try {
+              const uk = user?.email?.toLowerCase().replace(/[^a-z0-9]/g,"_")||"anon";
+              localStorage.removeItem(`physio_daynum_${uk}`);
+              localStorage.removeItem(`physio_plan_history_${uk}`);
+              const _sess = loadSession();
+              if (_sess?.token && _sess?.userId) {
+                sb.deletePlans(_sess.token, _sess.userId).catch(()=>{});
+              }
+            } catch {}
+          }
           go("subscribe");
         }}
           onCheckIn={handleCheckIn}
