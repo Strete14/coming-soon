@@ -6083,6 +6083,9 @@ function App() {
     }
   }, [notifSystem.inAppNotifs.length]);
 
+  // Signal app is ready to hide loading screen
+  useEffect(()=>{ if(window.__appReady) window.__appReady(); },[]);
+
   // ── Session restore on startup ─────────────────────────────────────────────
   useEffect(() => {
     const session = loadSession();
@@ -6714,6 +6717,14 @@ const root=ReactDOM.createRoot(rootEl);
 root.render(React.createElement(App));
 
 </script>
-<script>window.addEventListener("load",function(){setTimeout(function(){var l=document.getElementById("loading");if(l)l.style.display="none";},500);});</script>
+<script>
+// Hide loading only after React has mounted
+window.__appReady = function() {
+  var l = document.getElementById("loading");
+  if (l) { l.style.opacity="0"; l.style.transition="opacity .3s"; setTimeout(function(){l.style.display="none";},300); }
+};
+// Fallback: hide after 15 seconds max
+setTimeout(function(){window.__appReady&&window.__appReady();}, 15000);
+</script>
 </body>
 </html>
