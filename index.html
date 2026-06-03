@@ -119,11 +119,13 @@ const sb = {
       },
       body: JSON.stringify({
         user_id: userId,
+        programme_id: entry.programme_id || entry.programmeId || null,
         day: entry.day,
         title: entry.title,
         region: entry.region,
         pain: entry.pain,
         progress: entry.progress,
+        status: entry.status || "active",
         plan_data: entry.plan,
         intake_data: entry.intake_data
       })
@@ -3798,7 +3800,7 @@ function OnboardingTour({ onDone, lang }) {
   const s = steps[step];
   return /* @__PURE__ */ React.createElement("div", { style: { position: "fixed", inset: 0, zIndex: 1e3, background: "rgba(15,31,61,.7)", display: "flex", alignItems: "center", justifyContent: "center", padding: 16, animation: "fadeIn .3s ease" } }, /* @__PURE__ */ React.createElement("div", { style: { background: T.white, borderRadius: 18, padding: "clamp(28px,5vw,40px)", maxWidth: 400, width: "100%", boxShadow: "0 24px 80px rgba(0,0,0,.25)", animation: "scaleIn .35s ease", textAlign: "center" } }, /* @__PURE__ */ React.createElement("div", { style: { width: 72, height: 72, borderRadius: "50%", background: T.tealPale, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 34, margin: "0 auto 18px" } }, s.icon), /* @__PURE__ */ React.createElement("div", { style: __spreadProps(__spreadValues({}, mono), { fontSize: 11, color: T.teal, textTransform: "uppercase", letterSpacing: ".14em", marginBottom: 8 }) }, "Step ", step + 1, " of ", steps.length), /* @__PURE__ */ React.createElement("h2", { style: { fontFamily: "'Fraunces',serif", fontWeight: 600, fontSize: 22, color: T.navy, marginBottom: 12 } }, s.title), /* @__PURE__ */ React.createElement("p", { style: { fontSize: 14, color: T.grey500, lineHeight: 1.75, marginBottom: 28 } }, s.body), /* @__PURE__ */ React.createElement("div", { style: { display: "flex", gap: 8, justifyContent: "center", marginBottom: 20 } }, steps.map((_, i) => /* @__PURE__ */ React.createElement("div", { key: i, style: { width: i === step ? 20 : 6, height: 6, borderRadius: 3, background: i === step ? T.teal : T.grey200, transition: "all .25s" } }))), /* @__PURE__ */ React.createElement("div", { style: { display: "flex", gap: 10 } }, step > 0 && /* @__PURE__ */ React.createElement("button", { onClick: () => setStep((s2) => s2 - 1), style: { flex: 1, padding: "12px", borderRadius: 9, border: `1px solid ${T.grey200}`, background: "transparent", cursor: "pointer", fontFamily: "'DM Sans',sans-serif", fontSize: 14, color: T.grey600 } }, "\u2190 Back"), /* @__PURE__ */ React.createElement("button", { onClick: () => step < steps.length - 1 ? setStep((s2) => s2 + 1) : onDone(), style: { flex: 2, padding: "12px", borderRadius: 9, border: "none", background: T.teal, color: "#fff", cursor: "pointer", fontFamily: "'DM Sans',sans-serif", fontWeight: 700, fontSize: 14 } }, step < steps.length - 1 ? "Next \u2192" : "Got it \u2014 let's go! \u{1F680}")), /* @__PURE__ */ React.createElement("button", { onClick: onDone, style: { marginTop: 12, background: "none", border: "none", cursor: "pointer", fontSize: 12, color: T.grey400, fontFamily: "'DM Sans',sans-serif" } }, t2.tourSkip)));
 }
-function DashboardScreen({ user, onStartPlan, onLogout, plan, dayNum = 1, onViewPlan, onCheckIn, onSaveCheckin, notifSystem, lang, planHistory = [], checkinHistory = [], initialTab = "overview" }) {
+function DashboardScreen({ user, onStartPlan, onLogout, plan, dayNum = 1, onViewPlan, onCheckIn, onSaveCheckin, notifSystem, lang, planHistory = [], checkinHistory = [], initialTab = "overview", programmes = [], activeProgrammeId, setActiveProgrammeId, setPlan, setDayNum, setIntake }) {
   var _a2, _b2, _c, _d, _e, _f;
   const t2 = useT(lang);
   const [tab, setTab] = useState(initialTab);
@@ -4250,6 +4252,8 @@ function App() {
   }
   const [planHistory, setPlanHistory] = useState([]);
   const [checkinHistory, setCheckinHistory2] = useState([]);
+  const [programmes, setProgrammes] = useState([]);
+  const [activeProgrammeId, setActiveProgrammeId] = useState(null);
   const ADMIN_EMAILS = ["contact@physioroutine.com"];
   const isAdmin = user && ADMIN_EMAILS.includes((user.email || "").toLowerCase().trim());
   const notifSystem = useNotifications();
@@ -4372,12 +4376,13 @@ function App() {
     setScreen(s);
     window.scrollTo({ top: 0, behavior: "smooth" });
   }, []);
-  async function generatePlan(intakeData, checkIn = null) {
+  async function generatePlan(intakeData, checkIn = null, progId = null) {
     var _a2, _b2, _c, _d, _e;
     if (!intakeData) {
       console.warn("generatePlan called with no intake data");
       return;
     }
+    const currentProgId = progId || activeProgrammeId || "prog_" + Date.now();
     go("loading");
     setError("");
     const langNames = { en: "English", ro: "Romanian", de: "German", fr: "French", it: "Italian", es: "Spanish" };
@@ -4522,6 +4527,7 @@ ${checkIn ? `- Today's check-in: pain ${checkIn.pain}/10, energy ${checkIn.energ
         parsed._generatedDate = generatedDate;
         const entry = {
           id: Date.now(),
+          programme_id: currentProgId,
           title: cleanTitle,
           region: parsed.region,
           day: currentDay,
@@ -4658,16 +4664,11 @@ ${checkIn ? `- Today's check-in: pain ${checkIn.pain}/10, energy ${checkIn.energ
       } catch (e) {
       }
     }
-    setPlanHistory([]);
+    const newProgId = "prog_" + Date.now() + "_" + Math.random().toString(36).slice(2, 7);
+    setActiveProgrammeId(newProgId);
     setPlan(null);
     setIntake(null);
     setDayNum(1);
-    setCheckinHistory2([]);
-    const _sess3 = loadSession();
-    if ((_sess3 == null ? void 0 : _sess3.token) && (_sess3 == null ? void 0 : _sess3.userId)) {
-      sb.deletePlans(_sess3.token, _sess3.userId).catch(() => {
-      });
-    }
     go("disclaimer");
   }
   function handleCheckIn(ci) {
@@ -4725,7 +4726,7 @@ ${checkIn ? `- Today's check-in: pain ${checkIn.pain}/10, energy ${checkIn.energ
         } catch (e) {
         }
       }
-      generatePlan(__spreadProps(__spreadValues({}, activeIntake), { _dayOverride: nextDay }), ci);
+      generatePlan(__spreadProps(__spreadValues({}, activeIntake), { _dayOverride: nextDay }), ci, activeProgrammeId);
     } else {
       go("quiz");
     }
@@ -4841,6 +4842,12 @@ ${checkIn ? `- Today's check-in: pain ${checkIn.pain}/10, energy ${checkIn.energ
       planHistory,
       checkinHistory,
       initialTab: dashboardTab,
+      programmes,
+      activeProgrammeId,
+      setActiveProgrammeId,
+      setPlan,
+      setDayNum,
+      setIntake,
       onSaveCheckin: (entry) => setCheckinHistory2((prev) => {
         const f = prev.filter((p) => p.day !== entry.day);
         return [...f, entry].sort((a, b) => a.day - b.day);
@@ -4915,11 +4922,7 @@ class ErrBound extends React.Component {
     return this.props.children;
   }
 }
-(function(){
-  var el=document.getElementById("root");
-  if(!el)return;
-  ReactDOM.createRoot(el).render(React.createElement(ErrBound,null,React.createElement(App)));
-})();
+(function(){var el=document.getElementById("root");if(!el)return;ReactDOM.createRoot(el).render(React.createElement(ErrBound,null,React.createElement(App)));})();
 
 </script>
 </body>
