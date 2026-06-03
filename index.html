@@ -4467,7 +4467,7 @@ function LoadingScreen({lang, dayNum=1}) {
 // ═══════════════════════════════════════════════════════════════
 // PLAN SCREEN — translated + animated exercise GIFs
 // ═══════════════════════════════════════════════════════════════
-function PlanScreen({plan,dayNum=1,subscription="standard",onReset,onCheckIn,onSaveCheckin,onExportPDF,onBack,lang}) {
+function PlanScreen({plan,dayNum=1,subscription="standard",onReset,onCheckIn,onSaveCheckin,onBack,lang}) {
   const t=useT(lang);
   const [tab,setTab]=useState("exercises");
   const [expanded,setExpanded]=useState(null);
@@ -5211,7 +5211,7 @@ function OnboardingTour({ onDone, lang }) {
   );
 }
 
-function DashboardScreen({user,onStartPlan,onLogout,plan,dayNum=1,onViewPlan,onExportPDF,onCheckIn,onSaveCheckin,notifSystem,lang,planHistory=[],checkinHistory=[],initialTab="overview"}) {
+function DashboardScreen({user,onStartPlan,onLogout,plan,dayNum=1,onViewPlan,onCheckIn,onSaveCheckin,notifSystem,lang,planHistory=[],checkinHistory=[],initialTab="overview"}) {
   const t=useT(lang);
   const [tab,setTab]=useState(initialTab);
   const isPhysio=user?.role==="physiotherapist"||user?.role==="clinic_admin";
@@ -6624,9 +6624,7 @@ ${checkIn ? `- Today's check-in: pain ${checkIn.pain}/10, energy ${checkIn.energ
           onReset={reset}
           onBack={() => go("dashboard")}
           onCheckIn={handleCheckIn}
-          onSaveCheckin={entry=>setCheckinHistory(prev=>{const f=prev.filter(p=>p.day!==entry.day);return [...f,entry].sort((a,b)=>a.day-b.day);})}
-          onExportPDF={() => exportPDF(plan, dayNum, subscription, user?.name || "")}
-        />
+          onSaveCheckin={entry=>setCheckinHistory(prev=>{const f=prev.filter(p=>p.day!==entry.day);return [...f,entry].sort((a,b)=>a.day-b.day);})} />
       )}
       {screen === "dashboard" && showTour && (
         <OnboardingTour lang={lang} onDone={()=>{ setShowTour(false); try{localStorage.setItem("physio_tour_done","1");}catch{} }}/>
@@ -6658,9 +6656,7 @@ ${checkIn ? `- Today's check-in: pain ${checkIn.pain}/10, energy ${checkIn.energ
           go("subscribe");
         }}
           onCheckIn={handleCheckIn}
-          onViewPlan={() => plan && go("plan")}
-          onExportPDF={() => plan && exportPDF(plan, dayNum, subscription, user?.name || "")}
-          onLogout={async () => {
+          onViewPlan={() => plan && go("plan")} onLogout={async () => {
               const session = loadSession();
               if (session?.token) { try { await sb.signOut(session.token); } catch {} }
               clearSession();
