@@ -3588,11 +3588,11 @@ function AuthScreen({mode:init="login",onSuccess,lang}) {
         <p style={{fontSize:13,color:T.grey500,lineHeight:1.7,marginBottom:28}}>
           Click the link in the email to verify your account, then come back here to log in and start your rehabilitation programme.
         </p>
-        <button onClick={()=>setMode("login")} className="btn-teal" style={{width:"100%",justifyContent:"center",padding:"13px",fontSize:15,fontWeight:600}}>
+        <button onClick={()=>{setConfirmed(false);setMode("login");}} className="btn-teal" style={{width:"100%",justifyContent:"center",padding:"13px",fontSize:15,fontWeight:600}}>
           Go to Login
         </button>
         <div style={{marginTop:20,padding:"14px 16px",background:T.grey50,borderRadius:10,fontSize:12,color:T.grey500,lineHeight:1.6}}>
-          Didn't receive it? Check your spam folder or <span style={{color:T.teal,cursor:"pointer",textDecoration:"underline"}} onClick={()=>setMode("signup")}>try signing up again</span>.
+          Didn't receive it? Check your spam folder or <span style={{color:T.teal,cursor:"pointer",textDecoration:"underline"}} onClick={()=>{setConfirmed(false);setMode("signup");}}>try signing up again</span>.
         </div>
       </div>
     </div>
