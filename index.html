@@ -1,8 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8"/>
-  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1.0"/>
   <title>PhysioRoutine — AI Physiotherapy Plans</title>
   <meta name="description" content="Get a personalised physiotherapy rehabilitation plan in under 3 minutes."/>
   <meta name="theme-color" content="#0a7e6e"/>
@@ -11,18 +10,12 @@
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;0,9..144,700;1,9..144,400&family=DM+Sans:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet"/>
   <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
   <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
-  <style>
-    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-    html,body,#root{height:100%}
-    body{font-family:'DM Sans',sans-serif;-webkit-font-smoothing:antialiased;background:#f8f7f4}
-  </style>
+  <style>*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}html,body,#root{height:100%}body{font-family:'DM Sans',sans-serif;-webkit-font-smoothing:antialiased;background:#f8f7f4}</style>
 </head>
 <body>
   <div id="root">
     <div style="min-height:100vh;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:16px;background:#f8f7f4">
-      <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#0a7e6e" stroke-width="2.5" stroke-linecap="round" style="animation:spin 1s linear infinite">
-        <path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/>
-      </svg>
+      <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#0a7e6e" stroke-width="2.5" stroke-linecap="round" style="animation:spin 1s linear infinite"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg>
       <span style="font-family:DM Sans,sans-serif;color:#0a7e6e;font-size:14px">Loading PhysioRoutine...</span>
     </div>
   </div>
@@ -3488,7 +3481,9 @@ function PlanScreen({ plan, dayNum = 1, subscription = "standard", onReset, onCh
   const [expanded, setExpanded] = useState(null);
   const [showCI, setShowCI] = useState(false);
   const [ciAvailableDate, setCiAvailableDate] = useState(null);
+  const [ci, setCi] = useState({ pain: 4, stiffness: 3, helped: "" });
   useEffect(() => {
+    if (!plan) return;
     if (subscription === "trial") {
       setShowCI(false);
       return;
@@ -3507,7 +3502,6 @@ function PlanScreen({ plan, dayNum = 1, subscription = "standard", onReset, onCh
       setCiAvailableDate(tomorrow.toLocaleDateString("en-GB", { day: "numeric", month: "short" }));
     }
   }, [plan, subscription, dayNum]);
-  const [ci, setCi] = useState({ pain: 4, stiffness: 3, helped: "" });
   if (!plan) return null;
   const phC = [T.red, T.orange, T.teal];
   const tabs = [
@@ -4907,42 +4901,28 @@ ${checkIn ? `- Today's check-in: pain ${checkIn.pain}/10, energy ${checkIn.energ
   ), error && /* @__PURE__ */ React.createElement("div", { style: { position: "fixed", bottom: 20, right: 20, left: 20, maxWidth: 380, margin: "0 auto", background: T.redPale, border: `1px solid ${T.red}28`, borderRadius: 10, padding: "13px 16px", fontSize: 14, color: T.red, zIndex: 999, boxShadow: "0 4px 20px rgba(0,0,0,.1)", display: "flex", gap: 10, alignItems: "flex-start", animation: "scaleIn .3s ease" } }, /* @__PURE__ */ React.createElement("span", { style: { flex: 1, lineHeight: 1.5 } }, error), /* @__PURE__ */ React.createElement("button", { onClick: () => setError(""), style: { background: "none", border: "none", cursor: "pointer", color: T.red, fontWeight: 700, fontSize: 16, padding: 0, flexShrink: 0 } }, "\u2715")), toastNotif && /* @__PURE__ */ React.createElement(NotifToast, { notif: toastNotif, onDismiss: () => setToastNotif(null) }));
 }
 
-// Error boundary class
 class AppErrorBoundary extends React.Component {
-  constructor(props) {
-    super(props);
-    this.state = { hasError: false, error: null };
-  }
-  static getDerivedStateFromError(error) {
-    return { hasError: true, error: error };
-  }
+  constructor(props) { super(props); this.state = { hasError: false, error: null }; }
+  static getDerivedStateFromError(error) { return { hasError: true, error: error }; }
   render() {
     if (this.state.hasError) {
-      return React.createElement('div', {
-        style: { minHeight:'100vh', display:'flex', alignItems:'center', justifyContent:'center', padding:'20px', background:'#f8f7f4' }
-      }, React.createElement('div', {
-        style: { background:'white', borderRadius:'12px', padding:'32px', maxWidth:'400px', width:'100%', textAlign:'center' }
-      }, React.createElement('div', { style:{ color:'#dc2626', fontWeight:700, fontSize:18, marginBottom:12 } }, 'App Error'),
-         React.createElement('div', { style:{ color:'#333', fontSize:13, marginBottom:16 } }, this.state.error ? this.state.error.message : 'Unknown error'),
-         React.createElement('button', { onClick:()=>window.location.reload(), style:{ padding:'10px 20px', background:'#0a7e6e', color:'white', border:'none', borderRadius:'8px', cursor:'pointer' } }, 'Reload')
-      ));
+      return React.createElement('div', { style:{ padding:'40px', fontFamily:'sans-serif', textAlign:'center' } },
+        React.createElement('div', { style:{ color:'#dc2626', fontSize:18, fontWeight:'bold', marginBottom:12 } }, 'Error'),
+        React.createElement('pre', { style:{ color:'#333', fontSize:11, textAlign:'left', background:'#f5f5f5', padding:16, borderRadius:8, overflow:'auto', marginBottom:16, maxHeight:300 } },
+          this.state.error ? this.state.error.stack || this.state.error.message : 'Unknown'),
+        React.createElement('button', { onClick:()=>window.location.reload(), style:{ padding:'10px 20px', background:'#0a7e6e', color:'white', border:'none', borderRadius:'8px', cursor:'pointer' } }, 'Reload')
+      );
     }
     return this.props.children;
   }
 }
-
-// Mount
 (function() {
   const rootEl = document.getElementById("root");
   try {
     const root = ReactDOM.createRoot(rootEl);
-    root.render(
-      React.createElement(AppErrorBoundary, null,
-        React.createElement(App)
-      )
-    );
+    root.render(React.createElement(AppErrorBoundary, null, React.createElement(App)));
   } catch(e) {
-    rootEl.innerHTML = '<div style="padding:40px;text-align:center;font-family:sans-serif"><div style="color:#dc2626;font-size:18px;font-weight:bold;margin-bottom:12px">Fatal Error</div><div style="color:#333;font-size:14px;margin-bottom:16px">'+e.message+'</div><button onclick="location.reload()" style="padding:10px 20px;background:#0a7e6e;color:white;border:none;border-radius:8px;cursor:pointer">Reload</button></div>';
+    rootEl.innerHTML = '<pre style="padding:20px;color:red;font-size:12px">' + e.stack + '</pre>';
   }
 })();
 
