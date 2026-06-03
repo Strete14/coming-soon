@@ -1,35 +1,22 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8"/>
-  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
-  <title>PhysioRoutine — AI Physiotherapy Plans</title>
-  <meta name="description" content="Get a personalised physiotherapy rehabilitation plan in under 3 minutes."/>
-  <meta name="theme-color" content="#0a7e6e"/>
-  <link rel="preconnect" href="https://fonts.googleapis.com"/>
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
-  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;0,9..144,700;1,9..144,400&family=DM+Sans:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet"/>
-  <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
-  <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
-  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-  <style>
-    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-    html,body,#root{height:100%}
-    body{font-family:'DM Sans',sans-serif;-webkit-font-smoothing:antialiased;background:#f8f7f4}
-    #splash{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:16px;background:#f8f7f4;z-index:9999}
-    #splash svg{animation:spin 1s linear infinite}
-    @keyframes spin{to{transform:rotate(360deg)}}
-  </style>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>PhysioRoutine — AI Physiotherapy Plans</title>
+<meta name="description" content="Get a personalised physiotherapy rehabilitation plan in under 3 minutes."/>
+<meta name="theme-color" content="#0a7e6e"/>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;0,9..144,700;1,9..144,400&family=DM+Sans:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
+<script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
+<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+<style>*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}html,body,#root{height:100%}body{font-family:'DM Sans',sans-serif;-webkit-font-smoothing:antialiased;background:#f8f7f4}</style>
 </head>
 <body>
-  <div id="splash">
-    <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#0a7e6e" stroke-width="2.5" stroke-linecap="round">
-      <path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/>
-    </svg>
-    <span style="font-family:DM Sans,sans-serif;color:#0a7e6e;font-size:14px">Loading PhysioRoutine...</span>
-  </div>
-  <div id="root"></div>
-  <script type="text/babel" data-presets="react">
+<div id="root"></div>
+<script type="text/babel" data-presets="react">
 const { useState, useEffect, useRef, useCallback } = React;
 
 // ── Supabase config ─────────────────────────────────────────────────────────
@@ -3611,8 +3598,6 @@ function AuthScreen({mode:init="login",onSuccess,lang}) {
     </div>
   );
 
-  const [resetSent, setResetSent] = useState(false);
-
   async function handleForgotPassword() {
     if (!f.email) { setErr(t.errEmailFirst); return; }
     if (!supabaseReady) { setResetSent(true); return; }
@@ -6708,24 +6693,6 @@ ${checkIn ? `- Today's check-in: pain ${checkIn.pain}/10, energy ${checkIn.energ
 }
 
 ReactDOM.createRoot(document.getElementById("root")).render(React.createElement(App));
-
-  </script>
-  <script>
-    // Hide splash when Babel finishes and React renders
-    var _orig = ReactDOM.createRoot;
-    if(_orig) {
-      var _splash = document.getElementById('splash');
-      setTimeout(function(){ if(_splash) _splash.style.display='none'; }, 8000);
-      // Also watch for root to have content
-      var _obs = new MutationObserver(function(){
-        var r = document.getElementById('root');
-        if(r && r.children.length > 0){
-          if(_splash) _splash.style.display='none';
-          _obs.disconnect();
-        }
-      });
-      _obs.observe(document.getElementById('root'), {childList:true});
-    }
-  </script>
+</script>
 </body>
 </html>
