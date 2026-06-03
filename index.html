@@ -19,9 +19,9 @@
 </head>
 <body>
   <div id="root">
-    <div style="min-height:100vh;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:12px;background:#f8f7f4">
+    <div style="min-height:100vh;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:12px">
       <div style="width:40px;height:40px;border:3px solid #e4e7ed;border-top-color:#0a7e6e;border-radius:50%;animation:spin .8s linear infinite"></div>
-      <div style="font-family:DM Sans,sans-serif;color:#0a7e6e;font-size:14px">Loading PhysioRoutine...</div>
+      <span style="font-family:DM Sans,sans-serif;color:#0a7e6e;font-size:14px">Loading...</span>
     </div>
   </div>
   <style>@keyframes spin{to{transform:rotate(360deg)}}</style>
@@ -4910,14 +4910,31 @@ ${checkIn ? `- Today's check-in: pain ${checkIn.pain}/10, energy ${checkIn.energ
   ), error && /* @__PURE__ */ React.createElement("div", { style: { position: "fixed", bottom: 20, right: 20, left: 20, maxWidth: 380, margin: "0 auto", background: T.redPale, border: `1px solid ${T.red}28`, borderRadius: 10, padding: "13px 16px", fontSize: 14, color: T.red, zIndex: 999, boxShadow: "0 4px 20px rgba(0,0,0,.1)", display: "flex", gap: 10, alignItems: "flex-start", animation: "scaleIn .3s ease" } }, /* @__PURE__ */ React.createElement("span", { style: { flex: 1, lineHeight: 1.5 } }, error), /* @__PURE__ */ React.createElement("button", { onClick: () => setError(""), style: { background: "none", border: "none", cursor: "pointer", color: T.red, fontWeight: 700, fontSize: 16, padding: 0, flexShrink: 0 } }, "\u2715")), toastNotif && /* @__PURE__ */ React.createElement(NotifToast, { notif: toastNotif, onDismiss: () => setToastNotif(null) }));
 }
 
+
+// Error boundary
+class ErrBound extends React.Component {
+  constructor(p){super(p);this.state={err:null};}
+  static getDerivedStateFromError(e){return{err:e};}
+  componentDidCatch(e,i){console.error("CRASH:",e,i);}
+  render(){
+    if(this.state.err){
+      return React.createElement('div',{style:{padding:'20px',fontFamily:'sans-serif',background:'#fee2e2',minHeight:'100vh'}},
+        React.createElement('h2',{style:{color:'#dc2626',marginBottom:'12px'}},'App crashed'),
+        React.createElement('pre',{style:{fontSize:'12px',whiteSpace:'pre-wrap',color:'#333',background:'white',padding:'12px',borderRadius:'8px',marginBottom:'12px'}},
+          this.state.err.stack||this.state.err.message),
+        React.createElement('button',{onClick:()=>location.reload(),style:{padding:'8px 16px',background:'#0a7e6e',color:'white',border:'none',borderRadius:'6px',cursor:'pointer'}},'Reload')
+      );
+    }
+    return this.props.children;
+  }
+}
+
 (function() {
   var el = document.getElementById("root");
   if (!el) return;
-  try {
-    ReactDOM.createRoot(el).render(React.createElement(App));
-  } catch(e) {
-    el.innerHTML = '<div style="padding:40px;text-align:center;font-family:sans-serif"><b style="color:red">Error: </b>' + e.message + '<br><br><button onclick="location.reload()" style="padding:8px 16px;background:#0a7e6e;color:white;border:none;border-radius:6px;cursor:pointer">Reload</button></div>';
-  }
+  ReactDOM.createRoot(el).render(
+    React.createElement(ErrBound, null, React.createElement(App))
+  );
 })();
 
   </script>
