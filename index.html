@@ -4797,6 +4797,19 @@ ${checkIn ? `- Today's check-in: pain ${checkIn.pain}/10, energy ${checkIn.energ
     if (user.role === "physiotherapist" || user.role === "clinic_admin") go("clinic");
     else go("dashboard");
   }
+  function goToProgramme(prog) {
+    if (!prog) return;
+    setSelectedProg(prog);
+    setActiveProgrammeId(prog.programmeId);
+    const latest = (prog.plans || []).sort((a, b) => b.day - a.day)[0];
+    if (latest) {
+      setPlan(latest.plan);
+      setDayNum(prog.currentDay);
+      setIntake(latest.intake_data);
+    }
+    setScreen("programme");
+    window.scrollTo(0, 0);
+  }
   return /* @__PURE__ */ React.createElement("div", { style: { minHeight: "100vh", fontFamily: "'DM Sans',sans-serif", overflowX: "hidden" } }, /* @__PURE__ */ React.createElement("style", null, CSS), /* @__PURE__ */ React.createElement("style", null, `
         @import url('https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,600;0,9..144,700;1,9..144,300;1,9..144,600&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap');
         .desktop-only{display:flex}.hamburger{display:none!important}
