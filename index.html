@@ -4520,7 +4520,9 @@ ${checkIn ? `- Today's check-in: pain ${checkIn.pain}/10, energy ${checkIn.energ
           const _sess = loadSession();
           if ((_sess == null ? void 0 : _sess.token) && (_sess == null ? void 0 : _sess.userId)) {
             sb.getPlans(_sess.token, _sess.userId).then((existing) => {
-              const alreadySaved = Array.isArray(existing) && existing.some((p) => p.day === currentDay);
+              const alreadySaved = Array.isArray(existing) && existing.some(
+                (p) => p.day === currentDay && p.programme_id === currentProgId
+              );
               if (!alreadySaved) {
                 sb.savePlan(_sess.token, _sess.userId, entry).catch((e) => console.warn("Supabase save failed:", e));
               }
@@ -4868,10 +4870,10 @@ class ErrBound extends React.Component {
   static getDerivedStateFromError(e){return{err:e};}
   render(){
     if(this.state.err){
-      return React.createElement("div",{style:{padding:"20px",fontFamily:"sans-serif",background:"#fee2e2",minHeight:"100vh"}},
-        React.createElement("h2",{style:{color:"#dc2626",marginBottom:"12px"}},"Error"),
-        React.createElement("pre",{style:{fontSize:"11px",whiteSpace:"pre-wrap",color:"#333",background:"white",padding:"12px",borderRadius:"8px",marginBottom:"12px"}},this.state.err.stack||this.state.err.message),
-        React.createElement("button",{onClick:()=>location.reload(),style:{padding:"8px 16px",background:"#0a7e6e",color:"white",border:"none",borderRadius:"6px",cursor:"pointer"}},"Reload")
+      return React.createElement('div',{style:{padding:'20px',fontFamily:'sans-serif',background:'#fee2e2',minHeight:'100vh'}},
+        React.createElement('h2',{style:{color:'#dc2626',marginBottom:'12px'}},'Error'),
+        React.createElement('pre',{style:{fontSize:'11px',whiteSpace:'pre-wrap',color:'#333',background:'white',padding:'12px',borderRadius:'8px',marginBottom:'12px'}},this.state.err.stack||this.state.err.message),
+        React.createElement('button',{onClick:()=>location.reload(),style:{padding:'8px 16px',background:'#0a7e6e',color:'white',border:'none',borderRadius:'6px',cursor:'pointer'}},'Reload')
       );
     }
     return this.props.children;
