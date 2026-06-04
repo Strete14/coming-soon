@@ -3610,33 +3610,7 @@ function PlanScreen({ plan, dayNum = 1, subscription = "standard", onReset, onCh
   })(), plan.nutrition.sleepTip && /* @__PURE__ */ React.createElement("div", { style: { background: "#F0F4FF", border: "1px solid #C7D7FD", borderRadius: 12, padding: "13px 16px", marginBottom: 10, display: "flex", gap: 10, alignItems: "flex-start" } }, /* @__PURE__ */ React.createElement("span", { style: { fontSize: 20, flexShrink: 0 } }, "\u{1F634}"), /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("div", { style: __spreadProps(__spreadValues({ fontSize: 11 }, mono), { color: "#4F46E5", textTransform: "uppercase", letterSpacing: ".12em", marginBottom: 4 }) }, t2.nutritionSleep || t2.nutritionSleep), /* @__PURE__ */ React.createElement("div", { style: { display: "flex", flexDirection: "column", gap: 5 } }, (plan.nutrition.sleepTip || "").split(new RegExp("(?<=\\.)\\s+")).filter((s) => s.trim().length > 3).map((line, li) => /* @__PURE__ */ React.createElement("div", { key: li, style: { display: "flex", alignItems: "flex-start", gap: 8 } }, /* @__PURE__ */ React.createElement("span", { style: { color: "#4F46E5", fontWeight: 700, fontSize: 14, flexShrink: 0, lineHeight: 1.5 } }, "\u2022"), /* @__PURE__ */ React.createElement("span", { style: { fontSize: 13, color: "#312E81", lineHeight: 1.65 } }, line.trim())))))), plan.nutrition.hydration && /* @__PURE__ */ React.createElement("div", { style: { background: "#EFF6FF", border: "1px solid #BAE6FD", borderRadius: 12, padding: "13px 16px", marginBottom: 10, display: "flex", gap: 10, alignItems: "flex-start" } }, /* @__PURE__ */ React.createElement("span", { style: { fontSize: 20, flexShrink: 0 } }, "\u{1F4A7}"), /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("div", { style: __spreadProps(__spreadValues({ fontSize: 11 }, mono), { color: "#0369A1", textTransform: "uppercase", letterSpacing: ".12em", marginBottom: 4 }) }, t2.nutritionHydration || t2.nutritionHydration), /* @__PURE__ */ React.createElement("div", { style: { display: "flex", flexDirection: "column", gap: 5 } }, (plan.nutrition.hydration || "").split(new RegExp("(?<=\\.)\\s+")).filter((s) => s.trim().length > 3).map((line, li) => /* @__PURE__ */ React.createElement("div", { key: li, style: { display: "flex", alignItems: "flex-start", gap: 8 } }, /* @__PURE__ */ React.createElement("span", { style: { color: "#0369A1", fontWeight: 700, fontSize: 14, flexShrink: 0, lineHeight: 1.5 } }, "\u2022"), /* @__PURE__ */ React.createElement("span", { style: { fontSize: 13, color: "#0C4A6E", lineHeight: 1.65 } }, line.trim())))))), plan.nutrition.supplements && plan.nutrition.supplements.length > 0 && /* @__PURE__ */ React.createElement("div", { style: { background: T.white, border: `1px solid ${T.grey100}`, borderRadius: 12, padding: "14px 16px", marginBottom: 10 } }, /* @__PURE__ */ React.createElement("div", { style: { display: "flex", alignItems: "center", gap: 8, marginBottom: 12 } }, /* @__PURE__ */ React.createElement("span", { style: { fontSize: 18 } }, "\u{1F48A}"), /* @__PURE__ */ React.createElement("div", { style: { fontWeight: 700, fontSize: 14, color: T.navy } }, t2.nutritionSupplements || t2.nutritionSupplements)), plan.nutrition.supplements.map((s, i) => /* @__PURE__ */ React.createElement("div", { key: i, style: { display: "flex", alignItems: "flex-start", gap: 10, marginBottom: 10, paddingBottom: 10, borderBottom: i < plan.nutrition.supplements.length - 1 ? `1px solid ${T.grey100}` : "none" } }, /* @__PURE__ */ React.createElement("div", { style: { width: 20, height: 20, borderRadius: "50%", background: T.tealPale, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, marginTop: 1 } }, /* @__PURE__ */ React.createElement("span", { style: { color: T.teal, fontSize: 11, fontWeight: 700 } }, "\u2713")), /* @__PURE__ */ React.createElement("div", { style: { fontSize: 13, color: T.grey600, lineHeight: 1.65 } }, s))), /* @__PURE__ */ React.createElement("div", { style: { fontSize: 11, color: T.grey400, marginTop: 4, fontStyle: "italic", lineHeight: 1.5 } }, "\u2695\uFE0F ", t2.nutritionDisclaimer || t2.nutritionDisclaimer)), plan.nutrition.foodsToAvoid && /* @__PURE__ */ React.createElement("div", { style: { background: "#FEF2F2", border: "1px solid #FECACA", borderRadius: 12, padding: "13px 16px", marginBottom: 14, display: "flex", gap: 10, alignItems: "flex-start" } }, /* @__PURE__ */ React.createElement("span", { style: { fontSize: 20, flexShrink: 0 } }, "\u26A0\uFE0F"), /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("div", { style: __spreadProps(__spreadValues({ fontSize: 11 }, mono), { color: T.red, textTransform: "uppercase", letterSpacing: ".12em", marginBottom: 4 }) }, t2.nutritionAvoid || t2.nutritionAvoid), /* @__PURE__ */ React.createElement("div", { style: { display: "flex", flexDirection: "column", gap: 5 } }, (plan.nutrition.foodsToAvoid || "").split(/[,.]/).filter((s) => s.trim().length > 3).map((line, li) => /* @__PURE__ */ React.createElement("div", { key: li, style: { display: "flex", alignItems: "flex-start", gap: 8 } }, /* @__PURE__ */ React.createElement("span", { style: { color: T.red, fontWeight: 700, fontSize: 14, flexShrink: 0, lineHeight: 1.5 } }, "\u2022"), /* @__PURE__ */ React.createElement("span", { style: { fontSize: 13, color: "#7F1D1D", lineHeight: 1.65 } }, line.trim()))))))) : /* @__PURE__ */ React.createElement("div", { style: { textAlign: "center", padding: "40px 20px" } }, /* @__PURE__ */ React.createElement("div", { style: { fontSize: 48, marginBottom: 12 } }, "\u{1F957}"), /* @__PURE__ */ React.createElement("div", { style: { fontWeight: 700, fontSize: 16, color: T.navy, marginBottom: 6 } }, t2.nutritionLoading || t2.nutritionLoading), /* @__PURE__ */ React.createElement("div", { style: { fontSize: 13, color: T.grey500 } }, t2.generateNewPlan || "Generate a new plan to see your personalised daily meal plan."))), tab === "progress" && /* @__PURE__ */ React.createElement("div", null, (_f = plan.phases) == null ? void 0 : _f.map((ph, i) => {
     var _a3;
     return /* @__PURE__ */ React.createElement("div", { key: i, style: { background: T.white, border: `1px solid ${T.grey100}`, borderLeft: `3px solid ${phC[i]}`, borderRadius: "0 10px 10px 0", padding: "16px 18px", marginBottom: 10 } }, /* @__PURE__ */ React.createElement("div", { style: { display: "flex", justifyContent: "space-between", marginBottom: 7 } }, /* @__PURE__ */ React.createElement("div", { style: __spreadProps(__spreadValues({ fontWeight: 700, color: phC[i], fontSize: 12 }, mono), { textTransform: "uppercase" }) }, ph.name), /* @__PURE__ */ React.createElement("div", { style: __spreadValues({ fontSize: 11, color: T.grey400 }, mono) }, ph.duration)), /* @__PURE__ */ React.createElement("div", { style: { fontSize: 14, color: T.grey600, marginBottom: 10, lineHeight: 1.65 } }, ph.goal), (_a3 = ph.milestones) == null ? void 0 : _a3.map((m, j) => /* @__PURE__ */ React.createElement("div", { key: j, style: { display: "flex", gap: 8, alignItems: "flex-start", marginBottom: 7 } }, /* @__PURE__ */ React.createElement("div", { style: { width: 6, height: 6, borderRadius: "50%", background: phC[i], flexShrink: 0, marginTop: 6 } }), /* @__PURE__ */ React.createElement("span", { style: { fontSize: 13, color: T.grey600, lineHeight: 1.5 } }, m))));
-  })), /* @__PURE__ */ React.createElement("div", { style: { display: "flex", gap: 10, marginTop: 16, flexWrap: "wrap" } }, /* @__PURE__ */ React.createElement("button", { onClick: () => {
-    var _a3;
-    var shareText = "PhysioRoutine Plan: " + ((plan == null ? void 0 : plan.title) || "My Rehab Plan") + "\nDay " + dayNum + " of your programme\nExercises: " + (((_a3 = plan == null ? void 0 : plan.exercises) == null ? void 0 : _a3.length) || 0) + "\nphysioroutine.com";
-    var copied = false;
-    try {
-      var ta = document.createElement("textarea");
-      ta.value = shareText;
-      ta.style.cssText = "position:fixed;opacity:0;top:0;left:0;";
-      document.body.appendChild(ta);
-      ta.focus();
-      ta.select();
-      copied = document.execCommand("copy");
-      document.body.removeChild(ta);
-    } catch (e) {
-    }
-    if (copied) {
-      alert("Plan info copied to clipboard! Paste it anywhere to share.");
-    } else if (navigator.clipboard) {
-      navigator.clipboard.writeText(shareText).then(function() {
-        alert("Plan info copied to clipboard! Paste it anywhere to share.");
-      }).catch(function() {
-        alert(shareText);
-      });
-    } else {
-      alert(shareText);
-    }
-  }, className: "btn-outline", style: { flex: 1, justifyContent: "center", gap: 6, minWidth: 120 } }, /* @__PURE__ */ React.createElement("span", null, "\u{1F517}"), " Share"), /* @__PURE__ */ React.createElement("button", { className: "btn-outline", onClick: onReset, style: { flex: 1, justifyContent: "center", minWidth: 140 } }, t2.newAssessment))));
+  }))));
 }
 function WeeklySummaryCard({ planHistory, dayNum, onDismiss }) {
   const today = /* @__PURE__ */ new Date();
@@ -4585,7 +4559,7 @@ ${checkIn ? `- Today's check-in: pain ${checkIn.pain}/10, energy ${checkIn.energ
     const fullIntake = __spreadValues(__spreadValues({}, intakeData), safetyData || {});
     setIntake(fullIntake);
     if (subscription) {
-      generatePlan(fullIntake);
+      generatePlan(fullIntake, null, activeProgrammeId);
       return;
     }
     go("subscribe");
@@ -4672,49 +4646,31 @@ ${checkIn ? `- Today's check-in: pain ${checkIn.pain}/10, energy ${checkIn.energ
     go("disclaimer");
   }
   function handleCheckIn(ci) {
-    var _a2, _b2;
-    if (subscription === "trial" && dayNum >= 1) {
+    const activeProg = programmes.find((p) => p.programmeId === activeProgrammeId);
+    const progDay = activeProg ? activeProg.currentDay : dayNum;
+    if (subscription === "trial" && progDay >= 1) {
       go("subscribe");
       return;
     }
-    if (subscription === "standard" && dayNum >= 7) {
+    if (progDay >= 7) {
+      setProgrammes((prev) => prev.map(
+        (p) => p.programmeId === activeProgrammeId ? __spreadProps(__spreadValues({}, p), { status: "completed" }) : p
+      ));
       go("dashboard");
       return;
     }
-    if (subscription === "premium") {
-      const firstPlan = planHistory.length > 0 ? planHistory[planHistory.length - 1] : null;
-      if (firstPlan == null ? void 0 : firstPlan.date) {
-        const firstDate = new Date(firstPlan.date);
-        const today = /* @__PURE__ */ new Date();
-        const daysDiff = Math.floor((today - firstDate) / (1e3 * 60 * 60 * 24));
-        if (daysDiff >= 7) {
-          setError("Your 7-day premium window has expired. Subscribe again to continue.");
-          go("subscribe");
-          return;
-        }
-      }
-      if (dayNum >= 7) {
-        go("dashboard");
-        return;
-      }
-    }
     const nextDay = dayNum + 1;
-    const activeIntake = intake || (planHistory.length > 0 ? ((_a2 = planHistory[0]) == null ? void 0 : _a2.intake_data) || ((_b2 = planHistory[planHistory.length - 1]) == null ? void 0 : _b2.intake_data) : null) || (() => {
-      var _a3, _b3;
-      try {
-        const userKey = ((_a3 = user == null ? void 0 : user.email) == null ? void 0 : _a3.toLowerCase().replace(/[^a-z0-9]/g, "_")) || "anon";
-        const history2 = JSON.parse(localStorage.getItem("physio_plan_history_" + userKey) || "[]");
-        return ((_b3 = history2[0]) == null ? void 0 : _b3.intake_data) || null;
-      } catch (e) {
-        return null;
-      }
-    })();
+    const activeProg2 = programmes.find((p) => p.programmeId === activeProgrammeId);
+    const progPlans = (activeProg2 == null ? void 0 : activeProg2.plans) || [];
+    const latestPlan = progPlans.sort((a, b) => b.day - a.day)[0];
+    const activeIntake = (latestPlan == null ? void 0 : latestPlan.intake_data) || intake;
     if (activeIntake) {
       if (ci && typeof ci.pain === "number") {
         const todayKey = (/* @__PURE__ */ new Date()).toISOString().split("T")[0];
-        const entry = { day: dayNum, pain: Number(ci.pain), energy: Number(ci.energy || 5), date: todayKey };
+        const progDay2 = (activeProg2 == null ? void 0 : activeProg2.currentDay) || dayNum;
+        const entry = { day: progDay2, pain: Number(ci.pain), energy: Number(ci.energy || 5), date: todayKey, programmeId: activeProgrammeId };
         setCheckinHistory2((prev) => {
-          const filtered = prev.filter((p) => p.day !== dayNum);
+          const filtered = prev.filter((p) => !(p.day === progDay2 && p.programmeId === activeProgrammeId));
           return [...filtered, entry].sort((a, b) => a.day - b.day);
         });
         try {
@@ -4726,7 +4682,8 @@ ${checkIn ? `- Today's check-in: pain ${checkIn.pain}/10, energy ${checkIn.energ
         } catch (e) {
         }
       }
-      generatePlan(__spreadProps(__spreadValues({}, activeIntake), { _dayOverride: nextDay }), ci, activeProgrammeId);
+      const progDay3 = ((activeProg2 == null ? void 0 : activeProg2.currentDay) || dayNum) + 1;
+      generatePlan(__spreadProps(__spreadValues({}, activeIntake), { _dayOverride: progDay3 }), ci, activeProgrammeId);
     } else {
       go("quiz");
     }
