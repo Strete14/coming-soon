@@ -3772,6 +3772,89 @@ function OnboardingTour({ onDone, lang }) {
   const s = steps[step];
   return /* @__PURE__ */ React.createElement("div", { style: { position: "fixed", inset: 0, zIndex: 1e3, background: "rgba(15,31,61,.7)", display: "flex", alignItems: "center", justifyContent: "center", padding: 16, animation: "fadeIn .3s ease" } }, /* @__PURE__ */ React.createElement("div", { style: { background: T.white, borderRadius: 18, padding: "clamp(28px,5vw,40px)", maxWidth: 400, width: "100%", boxShadow: "0 24px 80px rgba(0,0,0,.25)", animation: "scaleIn .35s ease", textAlign: "center" } }, /* @__PURE__ */ React.createElement("div", { style: { width: 72, height: 72, borderRadius: "50%", background: T.tealPale, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 34, margin: "0 auto 18px" } }, s.icon), /* @__PURE__ */ React.createElement("div", { style: __spreadProps(__spreadValues({}, mono), { fontSize: 11, color: T.teal, textTransform: "uppercase", letterSpacing: ".14em", marginBottom: 8 }) }, "Step ", step + 1, " of ", steps.length), /* @__PURE__ */ React.createElement("h2", { style: { fontFamily: "'Fraunces',serif", fontWeight: 600, fontSize: 22, color: T.navy, marginBottom: 12 } }, s.title), /* @__PURE__ */ React.createElement("p", { style: { fontSize: 14, color: T.grey500, lineHeight: 1.75, marginBottom: 28 } }, s.body), /* @__PURE__ */ React.createElement("div", { style: { display: "flex", gap: 8, justifyContent: "center", marginBottom: 20 } }, steps.map((_, i) => /* @__PURE__ */ React.createElement("div", { key: i, style: { width: i === step ? 20 : 6, height: 6, borderRadius: 3, background: i === step ? T.teal : T.grey200, transition: "all .25s" } }))), /* @__PURE__ */ React.createElement("div", { style: { display: "flex", gap: 10 } }, step > 0 && /* @__PURE__ */ React.createElement("button", { onClick: () => setStep((s2) => s2 - 1), style: { flex: 1, padding: "12px", borderRadius: 9, border: `1px solid ${T.grey200}`, background: "transparent", cursor: "pointer", fontFamily: "'DM Sans',sans-serif", fontSize: 14, color: T.grey600 } }, "\u2190 Back"), /* @__PURE__ */ React.createElement("button", { onClick: () => step < steps.length - 1 ? setStep((s2) => s2 + 1) : onDone(), style: { flex: 2, padding: "12px", borderRadius: 9, border: "none", background: T.teal, color: "#fff", cursor: "pointer", fontFamily: "'DM Sans',sans-serif", fontWeight: 700, fontSize: 14 } }, step < steps.length - 1 ? "Next \u2192" : "Got it \u2014 let's go! \u{1F680}")), /* @__PURE__ */ React.createElement("button", { onClick: onDone, style: { marginTop: 12, background: "none", border: "none", cursor: "pointer", fontSize: 12, color: T.grey400, fontFamily: "'DM Sans',sans-serif" } }, t2.tourSkip)));
 }
+function ProgrammeListScreen({ programmes, onSelect, onNewPlan, user, lang, onLogout, notifSystem }) {
+  const t2 = useT(lang);
+  const T2 = T;
+  const active = programmes.filter((p) => p.status === "active");
+  const completed = programmes.filter((p) => p.status === "completed");
+  const trial = programmes.filter((p) => p.subscription === "trial");
+  return /* @__PURE__ */ React.createElement("div", { style: { minHeight: "100vh", background: T2.offwhite, paddingBottom: 80 } }, /* @__PURE__ */ React.createElement("div", { style: { background: T2.white, borderBottom: `1px solid ${T2.grey100}`, padding: "16px clamp(16px,4vw,32px)", display: "flex", alignItems: "center", justifyContent: "space-between", position: "sticky", top: 0, zIndex: 100 } }, /* @__PURE__ */ React.createElement(LogoFull, { size: 28 }), /* @__PURE__ */ React.createElement("div", { style: { display: "flex", gap: 8, alignItems: "center" } }, /* @__PURE__ */ React.createElement(NotificationBell, { notifSystem, lang }), /* @__PURE__ */ React.createElement("button", { onClick: onLogout, style: { background: "none", border: `1px solid ${T2.grey200}`, borderRadius: 8, padding: "6px 12px", fontSize: 12, color: T2.grey600, cursor: "pointer", fontFamily: "'DM Sans',sans-serif" } }, "Log out"))), /* @__PURE__ */ React.createElement("div", { style: { maxWidth: 680, margin: "0 auto", padding: "24px clamp(16px,4vw,32px)" } }, /* @__PURE__ */ React.createElement("div", { style: { marginBottom: 24 } }, /* @__PURE__ */ React.createElement("div", { style: __spreadProps(__spreadValues({}, serif), { fontWeight: 600, fontSize: "clamp(22px,4vw,28px)", color: T2.navy, marginBottom: 4 }) }, "Welcome back", (user == null ? void 0 : user.name) ? ", " + user.name.split(" ")[0] : ""), /* @__PURE__ */ React.createElement("div", { style: { fontSize: 14, color: T2.grey500 } }, "Your rehabilitation programmes")), /* @__PURE__ */ React.createElement("button", { onClick: onNewPlan, className: "btn-teal", style: { width: "100%", justifyContent: "center", marginBottom: 28, padding: "14px", fontSize: 15, fontWeight: 600 } }, "+ Start New Programme"), active.length > 0 && /* @__PURE__ */ React.createElement("div", { style: { marginBottom: 24 } }, /* @__PURE__ */ React.createElement("div", { style: __spreadProps(__spreadValues({}, mono), { fontSize: 11, color: T2.grey500, textTransform: "uppercase", letterSpacing: ".12em", marginBottom: 12 }) }, "Active"), active.map((prog) => {
+    const pct = Math.min(100, Math.round(prog.currentDay / 7 * 100));
+    const isTrial = prog.subscription === "trial";
+    return /* @__PURE__ */ React.createElement(
+      "div",
+      {
+        key: prog.programmeId,
+        onClick: () => onSelect(prog),
+        style: { background: `linear-gradient(135deg,${T2.navy} 0%,#1a3a6e 100%)`, borderRadius: 16, padding: "clamp(18px,3vw,24px)", marginBottom: 12, cursor: "pointer", position: "relative", overflow: "hidden" }
+      },
+      /* @__PURE__ */ React.createElement("div", { style: { position: "absolute", right: -30, top: -30, width: 160, height: 160, borderRadius: "50%", background: "rgba(10,126,110,.12)" } }),
+      /* @__PURE__ */ React.createElement("div", { style: { display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 8 } }, /* @__PURE__ */ React.createElement("div", { style: __spreadProps(__spreadValues({}, mono), { fontSize: 10, color: T2.teal, textTransform: "uppercase", letterSpacing: ".12em" }) }, "Day ", prog.currentDay, " of 7"), /* @__PURE__ */ React.createElement("div", { style: { display: "flex", gap: 6 } }, isTrial && /* @__PURE__ */ React.createElement("div", { style: __spreadProps(__spreadValues({}, mono), { background: "rgba(251,191,36,.2)", border: "1px solid rgba(251,191,36,.4)", borderRadius: 5, padding: "2px 8px", fontSize: 10, color: "#fbbf24" }) }, "TRIAL"), /* @__PURE__ */ React.createElement("div", { style: __spreadProps(__spreadValues({}, mono), { background: T2.teal, borderRadius: 5, padding: "2px 8px", fontSize: 10, color: T2.white, fontWeight: 600 }) }, "ACTIVE"))),
+      /* @__PURE__ */ React.createElement("div", { style: __spreadProps(__spreadValues({}, serif), { fontWeight: 600, fontSize: "clamp(17px,3vw,22px)", color: T2.white, marginBottom: 4, lineHeight: 1.2 }) }, prog.title),
+      /* @__PURE__ */ React.createElement("div", { style: { fontSize: 12, color: "rgba(255,255,255,.5)", marginBottom: 12 } }, prog.region),
+      /* @__PURE__ */ React.createElement("div", { style: { display: "flex", alignItems: "center", gap: 8, marginBottom: 14 } }, /* @__PURE__ */ React.createElement("div", { style: { flex: 1, height: 4, borderRadius: 2, background: "rgba(255,255,255,.15)" } }, /* @__PURE__ */ React.createElement("div", { style: { width: `${pct}%`, height: "100%", borderRadius: 2, background: T2.teal, transition: "width .5s ease" } })), /* @__PURE__ */ React.createElement("span", { style: __spreadProps(__spreadValues({}, mono), { fontSize: 10, color: "rgba(255,255,255,.5)" }) }, pct, "%")),
+      /* @__PURE__ */ React.createElement("div", { style: { display: "flex", alignItems: "center", justifyContent: "space-between" } }, /* @__PURE__ */ React.createElement("div", { style: { fontSize: 12, color: "rgba(255,255,255,.4)" } }, "Started ", prog.startDate), /* @__PURE__ */ React.createElement("div", { style: __spreadProps(__spreadValues({}, mono), { fontSize: 12, color: T2.teal, fontWeight: 600 }) }, "Continue \u2192"))
+    );
+  })), completed.length > 0 && /* @__PURE__ */ React.createElement("div", { style: { marginBottom: 24 } }, /* @__PURE__ */ React.createElement("div", { style: __spreadProps(__spreadValues({}, mono), { fontSize: 11, color: T2.grey500, textTransform: "uppercase", letterSpacing: ".12em", marginBottom: 12 }) }, "Completed"), completed.map((prog) => /* @__PURE__ */ React.createElement(
+    "div",
+    {
+      key: prog.programmeId,
+      onClick: () => onSelect(prog),
+      style: { background: T2.white, border: `1px solid ${T2.grey100}`, borderRadius: 16, padding: "clamp(16px,3vw,20px)", marginBottom: 10, cursor: "pointer", opacity: 0.75 }
+    },
+    /* @__PURE__ */ React.createElement("div", { style: { display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 6 } }, /* @__PURE__ */ React.createElement("div", { style: __spreadProps(__spreadValues({}, serif), { fontWeight: 600, fontSize: 16, color: T2.navy }) }, prog.title), /* @__PURE__ */ React.createElement("div", { style: __spreadProps(__spreadValues({}, mono), { background: T2.tealPale, color: T2.teal, borderRadius: 6, padding: "3px 10px", fontSize: 11 }) }, "\u2713 Done")),
+    /* @__PURE__ */ React.createElement("div", { style: { fontSize: 12, color: T2.grey500, marginBottom: 8 } }, prog.region),
+    /* @__PURE__ */ React.createElement("div", { style: { height: 4, borderRadius: 2, background: T2.grey100 } }, /* @__PURE__ */ React.createElement("div", { style: { width: "100%", height: "100%", borderRadius: 2, background: T2.teal } }))
+  ))), programmes.length === 0 && /* @__PURE__ */ React.createElement("div", { className: "card", style: { textAlign: "center", padding: "48px 24px" } }, /* @__PURE__ */ React.createElement("div", { style: __spreadProps(__spreadValues({}, serif), { fontWeight: 600, fontSize: 18, color: T2.navy, marginBottom: 8 }) }, "No programmes yet"), /* @__PURE__ */ React.createElement("div", { style: { fontSize: 14, color: T2.grey500, marginBottom: 20 } }, "Start your first rehabilitation programme above."))));
+}
+function ProgrammeDashboard({ prog, onBack, onContinue, onNewPlan, lang, user, notifSystem }) {
+  const t2 = useT(lang);
+  const T2 = T;
+  const [tab, setTab] = useState("overview");
+  const plans = ((prog == null ? void 0 : prog.plans) || []).sort((a, b) => a.day - b.day);
+  const latestPlan = plans[plans.length - 1];
+  const checkins = plans.filter((p) => typeof p.pain === "number");
+  const avgPain = checkins.length > 0 ? (checkins.reduce((s, p) => s + p.pain, 0) / checkins.length).toFixed(1) : null;
+  const pct = Math.min(100, Math.round(prog.currentDay / 7 * 100));
+  const tabs = [
+    { k: "overview", l: "Overview" },
+    { k: "progress", l: "Progress" },
+    { k: "history", l: "Plan History" }
+  ];
+  return /* @__PURE__ */ React.createElement("div", { style: { minHeight: "100vh", background: T2.offwhite, paddingBottom: 80 } }, /* @__PURE__ */ React.createElement("div", { style: { background: T2.white, borderBottom: `1px solid ${T2.grey100}`, padding: "16px clamp(16px,4vw,32px)", display: "flex", alignItems: "center", gap: 12, position: "sticky", top: 0, zIndex: 100 } }, /* @__PURE__ */ React.createElement("button", { onClick: onBack, style: { background: "none", border: "none", cursor: "pointer", padding: "4px", display: "flex", alignItems: "center", color: T2.grey600 } }, /* @__PURE__ */ React.createElement("svg", { width: "20", height: "20", viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", strokeWidth: "2", strokeLinecap: "round" }, /* @__PURE__ */ React.createElement("polyline", { points: "15 18 9 12 15 6" }))), /* @__PURE__ */ React.createElement("div", { style: { flex: 1, minWidth: 0 } }, /* @__PURE__ */ React.createElement("div", { style: { fontWeight: 600, fontSize: 15, color: T2.navy, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" } }, prog.title), /* @__PURE__ */ React.createElement("div", { style: { fontSize: 11, color: T2.grey500 } }, prog.region, " \xB7 Day ", prog.currentDay, " of 7")), /* @__PURE__ */ React.createElement(NotificationBell, { notifSystem, lang })), /* @__PURE__ */ React.createElement("div", { style: { background: T2.white, borderBottom: `1px solid ${T2.grey100}`, display: "flex", overflowX: "auto" } }, tabs.map((tb) => /* @__PURE__ */ React.createElement(
+    "button",
+    {
+      key: tb.k,
+      onClick: () => setTab(tb.k),
+      style: { flex: 1, padding: "12px 8px", background: "none", border: "none", cursor: "pointer", fontSize: 13, fontWeight: tab === tb.k ? 600 : 400, color: tab === tb.k ? T2.teal : T2.grey500, borderBottom: tab === tb.k ? `2px solid ${T2.teal}` : "2px solid transparent", whiteSpace: "nowrap", fontFamily: "'DM Sans',sans-serif" }
+    },
+    tb.l
+  ))), /* @__PURE__ */ React.createElement("div", { style: { maxWidth: 680, margin: "0 auto", padding: "20px clamp(16px,4vw,32px)" } }, tab === "overview" && /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("div", { style: { background: `linear-gradient(135deg,${T2.navy},#1a3a6e)`, borderRadius: 16, padding: "clamp(18px,3vw,24px)", marginBottom: 16, position: "relative", overflow: "hidden" } }, /* @__PURE__ */ React.createElement("div", { style: { position: "absolute", right: -30, top: -30, width: 160, height: 160, borderRadius: "50%", background: "rgba(10,126,110,.12)" } }), /* @__PURE__ */ React.createElement("div", { style: __spreadProps(__spreadValues({}, mono), { fontSize: 10, color: T2.teal, textTransform: "uppercase", letterSpacing: ".12em", marginBottom: 6 }) }, prog.status === "completed" ? "Programme Complete" : `Day ${prog.currentDay} of 7`), /* @__PURE__ */ React.createElement("div", { style: __spreadProps(__spreadValues({}, serif), { fontWeight: 600, fontSize: "clamp(18px,3vw,24px)", color: T2.white, marginBottom: 4 }) }, prog.title), /* @__PURE__ */ React.createElement("div", { style: { fontSize: 12, color: "rgba(255,255,255,.5)", marginBottom: 12 } }, prog.region), /* @__PURE__ */ React.createElement("div", { style: { display: "flex", alignItems: "center", gap: 8, marginBottom: prog.status !== "completed" ? 14 : 0 } }, /* @__PURE__ */ React.createElement("div", { style: { flex: 1, height: 5, borderRadius: 3, background: "rgba(255,255,255,.15)" } }, /* @__PURE__ */ React.createElement("div", { style: { width: `${pct}%`, height: "100%", borderRadius: 3, background: T2.teal, transition: "width .5s ease" } })), /* @__PURE__ */ React.createElement("span", { style: __spreadProps(__spreadValues({}, mono), { fontSize: 11, color: "rgba(255,255,255,.5)" }) }, pct, "%")), prog.status !== "completed" && /* @__PURE__ */ React.createElement("button", { onClick: onContinue, className: "btn-teal", style: { width: "100%", justifyContent: "center", fontWeight: 600 } }, "Continue Day ", prog.currentDay, " \u2192")), /* @__PURE__ */ React.createElement("div", { style: { display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, marginBottom: 16 } }, /* @__PURE__ */ React.createElement("div", { className: "card", style: { textAlign: "center", padding: "16px" } }, /* @__PURE__ */ React.createElement("div", { style: __spreadProps(__spreadValues({}, serif), { fontWeight: 700, fontSize: 28, color: T2.teal }) }, prog.currentDay), /* @__PURE__ */ React.createElement("div", { style: { fontSize: 12, color: T2.grey500 } }, "Days completed")), /* @__PURE__ */ React.createElement("div", { className: "card", style: { textAlign: "center", padding: "16px" } }, /* @__PURE__ */ React.createElement("div", { style: __spreadProps(__spreadValues({}, serif), { fontWeight: 700, fontSize: 28, color: avgPain > 6 ? T2.red : avgPain > 3 ? T2.orange : T2.teal }) }, avgPain || "\u2014"), /* @__PURE__ */ React.createElement("div", { style: { fontSize: 12, color: T2.grey500 } }, "Avg pain score"))), /* @__PURE__ */ React.createElement("button", { onClick: onNewPlan, style: { width: "100%", padding: "12px", background: "none", border: `1px dashed ${T2.grey200}`, borderRadius: 10, fontSize: 13, color: T2.grey500, cursor: "pointer", fontFamily: "'DM Sans',sans-serif" } }, "+ Start another programme")), tab === "progress" && /* @__PURE__ */ React.createElement("div", null, checkins.length >= 2 ? /* @__PURE__ */ React.createElement("div", { className: "card", style: { padding: "20px", marginBottom: 16 } }, /* @__PURE__ */ React.createElement("div", { style: { fontWeight: 700, fontSize: 16, color: T2.navy, marginBottom: 4 } }, "Pain Trend"), /* @__PURE__ */ React.createElement("div", { style: __spreadProps(__spreadValues({}, mono), { fontSize: 11, color: T2.grey500, marginBottom: 16 }) }, "Lower is better"), /* @__PURE__ */ React.createElement("svg", { viewBox: `0 0 ${checkins.length * 80} 100`, style: { width: "100%", height: 120 } }, /* @__PURE__ */ React.createElement(
+    "polyline",
+    {
+      fill: "none",
+      stroke: T2.teal,
+      strokeWidth: "2.5",
+      strokeLinecap: "round",
+      strokeLinejoin: "round",
+      points: checkins.map((p, i) => `${i * 80 + 20},${90 - p.pain / 10 * 70}`).join(" ")
+    }
+  ), checkins.map((p, i) => /* @__PURE__ */ React.createElement("g", { key: i }, /* @__PURE__ */ React.createElement("circle", { cx: i * 80 + 20, cy: 90 - p.pain / 10 * 70, r: "5", fill: T2.teal }), /* @__PURE__ */ React.createElement("text", { x: i * 80 + 20, y: 90 - p.pain / 10 * 70 - 10, textAnchor: "middle", fontSize: "10", fill: T2.grey600 }, p.pain), /* @__PURE__ */ React.createElement("text", { x: i * 80 + 20, y: "105", textAnchor: "middle", fontSize: "9", fill: T2.grey400 }, "D", p.day))))) : /* @__PURE__ */ React.createElement("div", { className: "card", style: { textAlign: "center", padding: "32px", marginBottom: 16 } }, /* @__PURE__ */ React.createElement("div", { style: { fontSize: 14, color: T2.grey500 } }, "Complete at least 2 check-ins to see your pain trend.")), /* @__PURE__ */ React.createElement("div", { className: "card", style: { padding: "20px" } }, /* @__PURE__ */ React.createElement("div", { style: { fontWeight: 600, fontSize: 15, color: T2.navy, marginBottom: 12 } }, "Daily Check-ins"), checkins.length > 0 ? checkins.map((p, i) => /* @__PURE__ */ React.createElement("div", { key: i, style: { display: "flex", justifyContent: "space-between", alignItems: "center", padding: "10px 0", borderBottom: i < checkins.length - 1 ? `1px solid ${T2.grey100}` : "" } }, /* @__PURE__ */ React.createElement("div", { style: __spreadProps(__spreadValues({}, mono), { fontSize: 11, color: T2.grey500 }) }, "Day ", p.day), /* @__PURE__ */ React.createElement("div", { style: { display: "flex", gap: 16 } }, /* @__PURE__ */ React.createElement("div", { style: { textAlign: "center" } }, /* @__PURE__ */ React.createElement("div", { style: { fontWeight: 600, fontSize: 14, color: p.pain > 6 ? T2.red : p.pain > 3 ? T2.orange : T2.teal } }, p.pain, "/10"), /* @__PURE__ */ React.createElement("div", { style: { fontSize: 10, color: T2.grey400 } }, "Pain"))))) : /* @__PURE__ */ React.createElement("div", { style: { fontSize: 13, color: T2.grey500 } }, "No check-ins yet."))), tab === "history" && /* @__PURE__ */ React.createElement("div", null, plans.map((p, i) => {
+    var _a2, _b2, _c, _d, _e;
+    return /* @__PURE__ */ React.createElement(
+      "div",
+      {
+        key: i,
+        className: "card",
+        style: { padding: "16px", marginBottom: 10, cursor: "pointer" },
+        onClick: () => onContinue(p)
+      },
+      /* @__PURE__ */ React.createElement("div", { style: { display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 6 } }, /* @__PURE__ */ React.createElement("div", { style: __spreadProps(__spreadValues({}, mono), { fontSize: 11, color: T2.teal, fontWeight: 600 }) }, "Day ", p.day), /* @__PURE__ */ React.createElement("div", { style: { fontSize: 11, color: T2.grey400 } }, p.date)),
+      /* @__PURE__ */ React.createElement("div", { style: { fontWeight: 600, fontSize: 14, color: T2.navy, marginBottom: 2 } }, ((_a2 = p.plan) == null ? void 0 : _a2.title) || prog.title),
+      /* @__PURE__ */ React.createElement("div", { style: { fontSize: 12, color: T2.grey500 } }, ((_c = (_b2 = p.plan) == null ? void 0 : _b2.exercises) == null ? void 0 : _c.length) || 0, " exercises \xB7 ", ((_e = (_d = p.plan) == null ? void 0 : _d.electrotherapy) == null ? void 0 : _e.length) || 0, " electrotherapy")
+    );
+  }), plans.length === 0 && /* @__PURE__ */ React.createElement("div", { className: "card", style: { textAlign: "center", padding: "32px" } }, /* @__PURE__ */ React.createElement("div", { style: { fontSize: 14, color: T2.grey500 } }, "No plans generated yet.")))));
+}
 function DashboardScreen({ user, onStartPlan, onLogout, plan, dayNum = 1, onViewPlan, onCheckIn, onSaveCheckin, notifSystem, lang, planHistory = [], checkinHistory = [], initialTab = "overview", programmes = [], activeProgrammeId, setActiveProgrammeId, setPlan, setDayNum, setIntake }) {
   var _a2, _b2, _c, _d, _e, _f;
   const t2 = useT(lang);
@@ -4185,6 +4268,7 @@ const DEMO_PLAN = {
 };
 function App() {
   const [screen, setScreen] = useState("home");
+  const [selectedProg, setSelectedProg] = useState(null);
   const [lang, setLang] = useState(() => {
     try {
       return localStorage.getItem("physio_lang") || "en";
@@ -4618,7 +4702,7 @@ ${checkIn ? `- Today's check-in: pain ${checkIn.pain}/10, energy ${checkIn.energ
       setDayNum(1);
     }
     if (u.role === "physiotherapist" || u.role === "clinic_admin") go("clinic");
-    else go("dashboard");
+    else go("programmes");
   }
   function handlePaid(sub) {
     var _a2, _b2;
@@ -4775,7 +4859,9 @@ ${checkIn ? `- Today's check-in: pain ${checkIn.pain}/10, energy ${checkIn.energ
       subscription,
       lang,
       onReset: reset,
-      onBack: () => go("dashboard"),
+      onBack: () => {
+        go("programmes");
+      },
       onCheckIn: handleCheckIn,
       onSaveCheckin: (entry) => setCheckinHistory2((prev) => {
         const f = prev.filter((p) => p.day !== entry.day);
@@ -4788,7 +4874,63 @@ ${checkIn ? `- Today's check-in: pain ${checkIn.pain}/10, energy ${checkIn.energ
       localStorage.setItem("physio_tour_done", "1");
     } catch (e) {
     }
-  } }), screen === "dashboard" && /* @__PURE__ */ React.createElement(
+  } }), screen === "programmes" && /* @__PURE__ */ React.createElement(
+    ProgrammeListScreen,
+    {
+      programmes,
+      user,
+      lang,
+      notifSystem,
+      onSelect: goToProgramme,
+      onNewPlan: () => {
+        const newProgId = "prog_" + Date.now() + "_" + Math.random().toString(36).slice(2, 7);
+        setActiveProgrammeId(newProgId);
+        setPlan(null);
+        setIntake(null);
+        setDayNum(1);
+        go("subscribe");
+      },
+      onLogout: async () => {
+        const session = loadSession();
+        if (session == null ? void 0 : session.token) {
+          try {
+            await sb.signOut(session.token);
+          } catch (e) {
+          }
+        }
+        try {
+          Object.keys(localStorage).filter((k) => k.startsWith("physio")).forEach((k) => localStorage.removeItem(k));
+        } catch (e) {
+        }
+        reset();
+      }
+    }
+  ), screen === "programme" && selectedProg && /* @__PURE__ */ React.createElement(
+    ProgrammeDashboard,
+    {
+      prog: selectedProg,
+      lang,
+      user,
+      notifSystem,
+      onBack: () => go("programmes"),
+      onContinue: (specificDay) => {
+        if (specificDay == null ? void 0 : specificDay.plan) {
+          setPlan(specificDay.plan);
+          setDayNum(specificDay.day);
+          setIntake(specificDay.intake_data);
+        }
+        go("plan");
+      },
+      onNewPlan: () => {
+        const newProgId = "prog_" + Date.now() + "_" + Math.random().toString(36).slice(2, 7);
+        setActiveProgrammeId(newProgId);
+        setPlan(null);
+        setIntake(null);
+        setDayNum(1);
+        go("subscribe");
+      }
+    }
+  ), screen === "dashboard" && /* @__PURE__ */ React.createElement(
     DashboardScreen,
     {
       user,
