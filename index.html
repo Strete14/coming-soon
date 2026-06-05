@@ -4626,6 +4626,8 @@ ${checkIn ? `- Today's check-in: pain ${checkIn.pain}/10, energy ${checkIn.energ
         if (!localStorage.getItem(`physio_tour_done_${_userKey}`)) setShowTour(true);
       } catch (e) {
       }
+      const _updatedProg = programmes.find((p) => p.programmeId === currentProgId);
+      if (_updatedProg) setSelectedProg(_updatedProg);
       go("plan");
       notifSystem.addInApp("new_plan", `${parsed.title || "Plan"} \u2014 Day ${dayNum}`);
     } catch (e) {
@@ -4657,46 +4659,77 @@ ${checkIn ? `- Today's check-in: pain ${checkIn.pain}/10, energy ${checkIn.energ
       localStorage.setItem("physio_current_user", userKey);
     } catch (e) {
     }
+    if (u.role === "physiotherapist" || u.role === "clinic_admin") {
+      go("clinic");
+      return;
+    }
+    go("programmes");
     const sess = loadSession();
     if ((sess == null ? void 0 : sess.token) && (u == null ? void 0 : u.id)) {
       sb.getPlans(sess.token, u.id).then((cp) => {
-        var _a3, _b2;
-        if (Array.isArray(cp) && cp.length > 0) {
-          const cloudH = cp.map((p) => ({
-            id: p.id,
-            title: p.title,
-            region: p.region,
-            day: p.day,
-            date: (p.created_at || "").split("T")[0],
-            pain: p.pain,
-            progress: p.progress,
-            plan: p.plan_data,
-            intake_data: p.intake_data
-          })).sort((a, b) => (b.day || 0) - (a.day || 0));
-          setPlanHistory(cloudH);
-          setPlan(((_a3 = cloudH[0]) == null ? void 0 : _a3.plan) || null);
-          if ((_b2 = cloudH[0]) == null ? void 0 : _b2.intake_data) setIntake(cloudH[0].intake_data);
-          const maxDay = Math.max(...cloudH.map((p) => p.day || 1));
-          setDayNum(maxDay);
-          const checkins = cloudH.filter((p) => p.day && typeof p.pain === "number").map((p) => ({ day: p.day, pain: p.pain, energy: 5, date: p.date || "" })).sort((a, b) => a.day - b.day);
-          if (checkins.length > 0) setCheckinHistory2(checkins);
-        } else {
+        if (!Array.isArray(cp) || cp.length === 0) {
+          setProgrammes([]);
           setPlanHistory([]);
           setPlan(null);
           setDayNum(1);
+          return;
         }
-      }).catch(() => {
+        const cloudH = cp.map((p) => ({
+          id: p.id,
+          programme_id: p.programme_id || "legacy_" + p.id,
+          title: p.title || "",
+          region: p.region || "",
+          day: p.day || 1,
+          date: (p.created_at || "").split("T")[0],
+          pain: p.pain || 0,
+          progress: p.progress || 0,
+          status: p.status || "active",
+          plan: p.plan_data,
+          intake_data: p.intake_data
+        }));
+        setPlanHistory(cloudH);
+        const progMap = {};
+        cloudH.forEach((p) => {
+          const pid = p.programme_id;
+          if (!progMap[pid]) progMap[pid] = {
+            programmeId: pid,
+            title: p.title,
+            region: p.region,
+            status: "active",
+            currentDay: 0,
+            startDate: p.date,
+            plans: []
+          };
+          progMap[pid].plans.push(p);
+          if (p.day > progMap[pid].currentDay) {
+            progMap[pid].currentDay = p.day;
+            progMap[pid].title = p.title;
+            progMap[pid].region = p.region;
+          }
+          if (p.status === "completed" || p.day >= 7) progMap[pid].status = "completed";
+        });
+        const progs = Object.values(progMap).sort(
+          (a, b) => (b.startDate || "") > (a.startDate || "") ? 1 : -1
+        );
+        setProgrammes(progs);
+        const activeP = progs.find((p) => p.status === "active") || progs[0];
+        if (activeP) {
+          setActiveProgrammeId(activeP.programmeId);
+          const latestDay = activeP.plans.sort((a, b) => b.day - a.day)[0];
+          if (latestDay) {
+            setPlan(latestDay.plan);
+            setIntake(latestDay.intake_data);
+          }
+          setDayNum(activeP.currentDay);
+        }
+      }).catch((e) => {
+        console.warn("Supabase load error:", e);
+        setProgrammes([]);
         setPlanHistory([]);
         setPlan(null);
         setDayNum(1);
       });
-    } else {
-      setPlanHistory([]);
-      setPlan(null);
-      setDayNum(1);
     }
-    if (u.role === "physiotherapist" || u.role === "clinic_admin") go("clinic");
-    else go("programmes");
   }
   function handlePaid(sub) {
     var _a2, _b2;
