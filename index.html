@@ -4366,6 +4366,7 @@ function App() {
             pain: p.pain || 0,
             progress: p.progress || 0,
             status: p.status || "active",
+            subscription: p.subscription || null,
             plan: p.plan_data,
             intake_data: p.intake_data
           }));
@@ -4380,6 +4381,7 @@ function App() {
               status: "active",
               currentDay: 0,
               startDate: p.date,
+              subscription: p.subscription || null,
               plans: []
             };
             progMap[pid].plans.push(p);
@@ -4696,6 +4698,7 @@ ${checkIn ? `- Today's check-in: pain ${checkIn.pain}/10, energy ${checkIn.energ
             status: "active",
             currentDay: 0,
             startDate: p.date,
+            subscription: p.subscription || null,
             plans: []
           };
           progMap[pid].plans.push(p);
