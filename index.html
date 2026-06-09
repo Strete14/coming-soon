@@ -101,10 +101,16 @@ const sb = {
   },
   async getPlans(token, userId) {
     const r = await fetch(
-      `${SUPABASE_URL}/rest/v1/plans?user_id=eq.${userId}&order=created_at.desc&limit=20`,
+      `${SUPABASE_URL}/rest/v1/plans?user_id=eq.${userId}&select=id,user_id,programme_id,day,title,region,pain,progress,status,plan_data,intake_data,created_at&order=created_at.asc&limit=100`,
       { headers: { apikey: SUPABASE_ANON, Authorization: `Bearer ${token}` } }
     );
-    return r.json();
+    if (!r.ok) {
+      console.warn("getPlans error:", r.status);
+      return [];
+    }
+    const data = await r.json();
+    console.log("getPlans returned:", data == null ? void 0 : data.length, "plans", data == null ? void 0 : data[0]);
+    return data;
   },
   async savePlan(token, userId, entry) {
     const r = await fetch(`${SUPABASE_URL}/rest/v1/plans`, {
@@ -117,12 +123,12 @@ const sb = {
       },
       body: JSON.stringify({
         user_id: userId,
-        programme_id: entry.programme_id || entry.programmeId || null,
-        day: entry.day,
-        title: entry.title,
-        region: entry.region,
-        pain: entry.pain,
-        progress: entry.progress,
+        programme_id: entry.programme_id || entry.programmeId || "prog_legacy_" + userId,
+        day: entry.day || 1,
+        title: entry.title || "Rehabilitation Plan",
+        region: entry.region || "",
+        pain: entry.pain || 0,
+        progress: entry.progress || 0,
         status: entry.status || "active",
         plan_data: entry.plan,
         intake_data: entry.intake_data
@@ -2804,7 +2810,7 @@ function TestimonialsScreen({ onBack, onStart, lang }) {
   ];
   return /* @__PURE__ */ React.createElement("div", { style: { minHeight: "100vh", background: T.offwhite, fontFamily: "'DM Sans',sans-serif" } }, /* @__PURE__ */ React.createElement("div", { style: { background: T.navy, padding: "clamp(60px,8vw,100px) clamp(20px,5vw,60px) clamp(40px,6vw,70px)", textAlign: "center" } }, onBack && /* @__PURE__ */ React.createElement("button", { onClick: onBack, style: { position: "absolute", top: 80, left: 24, background: "rgba(255,255,255,.1)", border: "none", borderRadius: 8, padding: "7px 14px", cursor: "pointer", color: "rgba(255,255,255,.7)", fontSize: 13, fontFamily: "'DM Sans',sans-serif" } }, "\u2190 Back"), /* @__PURE__ */ React.createElement("div", { style: __spreadProps(__spreadValues({}, mono), { fontSize: 11, color: T.teal, textTransform: "uppercase", letterSpacing: ".16em", marginBottom: 14 }) }, "Patient Stories"), /* @__PURE__ */ React.createElement("h1", { style: { fontFamily: "'Fraunces',serif", fontWeight: 600, fontSize: "clamp(28px,4vw,48px)", color: "#fff", marginBottom: 16, lineHeight: 1.2 } }, "Real people.", /* @__PURE__ */ React.createElement("br", null), /* @__PURE__ */ React.createElement("em", { style: { color: T.teal, fontStyle: "normal" } }, "Real recovery.")), /* @__PURE__ */ React.createElement("p", { style: { fontSize: "clamp(14px,2vw,17px)", color: "rgba(255,255,255,.6)", maxWidth: 520, margin: "0 auto 28px", lineHeight: 1.7 } }, "Over 2,400 personalised rehab plans generated. Here's what patients across Europe say about their recovery."), /* @__PURE__ */ React.createElement("div", { style: { display: "flex", justifyContent: "center", gap: "clamp(24px,4vw,48px)", flexWrap: "wrap" } }, [["2,400+", "Plans generated"], ["4.9/5", "Patient rating"], ["6", "Languages supported"]].map(([v, l], i) => /* @__PURE__ */ React.createElement("div", { key: i, style: { textAlign: "center" } }, /* @__PURE__ */ React.createElement("div", { style: { fontFamily: "'Fraunces',serif", fontWeight: 600, fontSize: "clamp(22px,3vw,32px)", color: T.teal } }, v), /* @__PURE__ */ React.createElement("div", { style: __spreadProps(__spreadValues({ fontSize: 12, color: "rgba(255,255,255,.45)" }, mono), { marginTop: 2 }) }, l))))), /* @__PURE__ */ React.createElement("div", { style: { maxWidth: 1100, margin: "0 auto", padding: "clamp(32px,5vw,56px) clamp(16px,4vw,32px)" } }, /* @__PURE__ */ React.createElement("div", { style: { display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(300px,1fr))", gap: 20, marginBottom: 56 } }, REVIEWS.map((r, i) => /* @__PURE__ */ React.createElement("div", { key: i, className: "card", style: { display: "flex", flexDirection: "column", gap: 0, animation: `fadeUp .4s ease ${i * 0.07}s both` } }, /* @__PURE__ */ React.createElement("div", { style: { display: "flex", gap: 2, marginBottom: 12 } }, "\u2605\u2605\u2605\u2605\u2605".split("").map((s, j) => /* @__PURE__ */ React.createElement("span", { key: j, style: { color: "#F59E0B", fontSize: 14 } }, s))), /* @__PURE__ */ React.createElement("div", { style: __spreadProps(__spreadValues({ display: "inline-flex", alignItems: "center", gap: 6, background: T.tealPale, border: `1px solid ${T.tealMid}`, borderRadius: 20, padding: "3px 10px", fontSize: 11 }, mono), { color: T.teal, alignSelf: "flex-start", marginBottom: 12 }) }, r.condition), /* @__PURE__ */ React.createElement("p", { style: { fontSize: 14, color: T.grey600, lineHeight: 1.75, flex: 1, marginBottom: 16, fontStyle: "italic" } }, '"', r.text, '"'), /* @__PURE__ */ React.createElement("div", { style: { background: T.offwhite, borderRadius: 8, padding: "10px 12px", marginBottom: 14, display: "flex", alignItems: "center", gap: 10 } }, /* @__PURE__ */ React.createElement("div", { style: { flex: 1 } }, /* @__PURE__ */ React.createElement("div", { style: __spreadProps(__spreadValues({ fontSize: 11 }, mono), { color: T.grey400, marginBottom: 4 }) }, "PAIN SCORE"), /* @__PURE__ */ React.createElement("div", { style: { display: "flex", alignItems: "center", gap: 6 } }, /* @__PURE__ */ React.createElement("span", { style: { fontWeight: 700, color: T.red, fontSize: 15 } }, r.painBefore, "/10"), /* @__PURE__ */ React.createElement("span", { style: { color: T.grey400, fontSize: 13 } }, "\u2192"), /* @__PURE__ */ React.createElement("span", { style: { fontWeight: 700, color: T.teal, fontSize: 15 } }, r.painAfter, "/10"), /* @__PURE__ */ React.createElement("span", { style: { fontSize: 11, color: T.teal, marginLeft: 4 } }, "\u2193", r.painBefore - r.painAfter, " pts"))), /* @__PURE__ */ React.createElement("div", { style: { textAlign: "right" } }, /* @__PURE__ */ React.createElement("div", { style: __spreadProps(__spreadValues({ fontSize: 11 }, mono), { color: T.grey400 }) }, "DURATION"), /* @__PURE__ */ React.createElement("div", { style: { fontWeight: 600, color: T.navy, fontSize: 13 } }, r.days, " days"))), /* @__PURE__ */ React.createElement("div", { style: { display: "flex", alignItems: "center", gap: 10 } }, /* @__PURE__ */ React.createElement("div", { style: { width: 36, height: 36, borderRadius: "50%", background: T.navy, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13, fontWeight: 700, color: "#fff", flexShrink: 0 } }, r.name.charAt(0)), /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("div", { style: { fontWeight: 600, fontSize: 13, color: T.navy } }, r.name), /* @__PURE__ */ React.createElement("div", { style: { fontSize: 11, color: T.grey400 } }, r.flag, " ", r.country)))))), /* @__PURE__ */ React.createElement("div", { style: { textAlign: "center", background: T.white, border: `1px solid ${T.grey100}`, borderRadius: 16, padding: "clamp(32px,5vw,48px)" } }, /* @__PURE__ */ React.createElement("div", { style: { fontFamily: "'Fraunces',serif", fontWeight: 600, fontSize: "clamp(22px,3vw,32px)", color: T.navy, marginBottom: 12 } }, "Start your recovery today"), /* @__PURE__ */ React.createElement("p", { style: { fontSize: 15, color: T.grey500, marginBottom: 24, maxWidth: 440, margin: "0 auto 24px" } }, "Get a personalised rehabilitation plan in under 3 minutes. Evidence-based, clinician-designed."), /* @__PURE__ */ React.createElement("button", { onClick: onStart, className: "btn-teal", style: { padding: "14px 36px", fontSize: 16, fontWeight: 700 } }, "Start Free Trial \u2192"))));
 }
-function HomeScreen({ onStart, lang, onNav }) {
+function HomeScreen({ onStart, lang, onNav, user }) {
   var _a2, _b2, _c;
   const t2 = useT(lang);
   const steps = [
@@ -4626,8 +4632,6 @@ ${checkIn ? `- Today's check-in: pain ${checkIn.pain}/10, energy ${checkIn.energ
         if (!localStorage.getItem(`physio_tour_done_${_userKey}`)) setShowTour(true);
       } catch (e) {
       }
-      const _updatedProg = programmes.find((p) => p.programmeId === currentProgId);
-      if (_updatedProg) setSelectedProg(_updatedProg);
       go("plan");
       notifSystem.addInApp("new_plan", `${parsed.title || "Plan"} \u2014 Day ${dayNum}`);
     } catch (e) {
@@ -4667,6 +4671,7 @@ ${checkIn ? `- Today's check-in: pain ${checkIn.pain}/10, energy ${checkIn.energ
     const sess = loadSession();
     if ((sess == null ? void 0 : sess.token) && (u == null ? void 0 : u.id)) {
       sb.getPlans(sess.token, u.id).then((cp) => {
+        console.log("Auth load - plans from Supabase:", cp == null ? void 0 : cp.length, cp == null ? void 0 : cp[0]);
         if (!Array.isArray(cp) || cp.length === 0) {
           setProgrammes([]);
           setPlanHistory([]);
@@ -4888,7 +4893,7 @@ ${checkIn ? `- Today's check-in: pain ${checkIn.pain}/10, energy ${checkIn.energ
     }
   ), screen === "home" && /* @__PURE__ */ React.createElement(HomeScreen, { onStart: () => go(user ? "subscribe" : "login"), onNav: (s) => {
     go(s);
-  }, lang }), screen === "how_it_works" && /* @__PURE__ */ React.createElement(HowItWorksScreen, { onBack: () => go("home"), onStart: () => go(user ? "subscribe" : "login"), lang }), screen === "pricing" && /* @__PURE__ */ React.createElement(PricingScreen, { onBack: () => go("home"), onStart: () => go(user ? "subscribe" : "login"), lang }), screen === "coming_soon" && /* @__PURE__ */ React.createElement(ComingSoonScreen, { onBack: () => go("home"), lang }), screen === "testimonials" && /* @__PURE__ */ React.createElement(TestimonialsScreen, { onBack: () => go("home"), onStart: () => go(user ? "subscribe" : "login"), lang }), screen === "login" && /* @__PURE__ */ React.createElement(AuthScreen, { mode: "login", onSuccess: handleAuthSuccess, lang }), screen === "signup" && /* @__PURE__ */ React.createElement(AuthScreen, { mode: "signup", onSuccess: handleAuthSuccess, lang }), screen === "disclaimer" && /* @__PURE__ */ React.createElement(DisclaimerScreen, { onAccept: (safety) => {
+  }, lang, user }), screen === "how_it_works" && /* @__PURE__ */ React.createElement(HowItWorksScreen, { onBack: () => go("home"), onStart: () => go(user ? "subscribe" : "login"), lang, user }), screen === "pricing" && /* @__PURE__ */ React.createElement(PricingScreen, { onBack: () => go("home"), onStart: () => go(user ? "subscribe" : "login"), lang, user }), screen === "coming_soon" && /* @__PURE__ */ React.createElement(ComingSoonScreen, { onBack: () => go("home"), lang }), screen === "testimonials" && /* @__PURE__ */ React.createElement(TestimonialsScreen, { onBack: () => go("home"), onStart: () => go(user ? "subscribe" : "login"), lang }), screen === "login" && /* @__PURE__ */ React.createElement(AuthScreen, { mode: "login", onSuccess: handleAuthSuccess, lang }), screen === "signup" && /* @__PURE__ */ React.createElement(AuthScreen, { mode: "signup", onSuccess: handleAuthSuccess, lang }), screen === "disclaimer" && /* @__PURE__ */ React.createElement(DisclaimerScreen, { onAccept: (safety) => {
     setSafetyData(safety);
     go("quiz");
   }, onBack: () => go("dashboard"), lang }), screen === "quiz" && /* @__PURE__ */ React.createElement(QuizScreen, { onComplete: handleIntakeComplete, lang }), screen === "subscribe" && /* @__PURE__ */ React.createElement(SubscribeScreen, { onPaid: handlePaid, user, onLogin: () => go("login"), onBack: () => go(user ? "dashboard" : "home"), lang, trialUsed }), screen === "loading" && /* @__PURE__ */ React.createElement(LoadingScreen, { lang, dayNum }), screen === "plan" && /* @__PURE__ */ React.createElement(
