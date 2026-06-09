@@ -12,8 +12,7 @@
 <style>*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}html,body,#root{height:100%}body{font-family:'DM Sans',sans-serif;-webkit-font-smoothing:antialiased;background:#f8f7f4}</style>
 </head>
 <body>
-<div id="root"><div style="min-height:100vh;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:12px"><div style="width:40px;height:40px;border:3px solid #e4e7ed;border-top-color:#0a7e6e;border-radius:50%;animation:spin .8s linear infinite"></div><span style="font-family:DM Sans,sans-serif;color:#0a7e6e;font-size:14px">Loading...</span></div></div>
-<style>@keyframes spin{to{transform:rotate(360deg)}}</style>
+<div id="root"></div>
 <script>
 var __defProp = Object.defineProperty;
 var __defProps = Object.defineProperties;
@@ -5232,7 +5231,15 @@ class ErrBound extends React.Component {
     return this.props.children;
   }
 }
-(function(){var el=document.getElementById("root");if(!el)return;ReactDOM.createRoot(el).render(React.createElement(ErrBound,null,React.createElement(App)));})();
+(function(){
+  var el=document.getElementById("root");
+  if(!el)return;
+  try {
+    ReactDOM.createRoot(el).render(React.createElement(ErrBound,null,React.createElement(App)));
+  } catch(e) {
+    el.innerHTML = '<div style="padding:40px;text-align:center;font-family:sans-serif"><b style="color:red">Fatal Error: </b>' + e.message + '<br><br><button onclick="location.reload()" style="padding:8px 16px;background:#0a7e6e;color:white;border:none;border-radius:8px;cursor:pointer">Reload</button></div>';
+  }
+})();
 
 </script>
 </body>
