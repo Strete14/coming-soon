@@ -4829,6 +4829,7 @@ ${checkIn ? `- Today's check-in: pain ${checkIn.pain}/10, energy ${checkIn.energ
     if (!prog) return;
     setSelectedProg(prog);
     setActiveProgrammeId(prog.programmeId);
+    if (prog.subscription) setSubscription(prog.subscription);
     const latest = (prog.plans || []).sort((a, b) => b.day - a.day)[0];
     if (latest) {
       setPlan(latest.plan);
@@ -5024,12 +5025,13 @@ ${checkIn ? `- Today's check-in: pain ${checkIn.pain}/10, energy ${checkIn.energ
         reset();
       },
       onContinue: (specificDay) => {
+        if (selectedProg == null ? void 0 : selectedProg.subscription) setSubscription(selectedProg.subscription);
         if (specificDay == null ? void 0 : specificDay.plan) {
           setPlan(specificDay.plan);
           setDayNum(specificDay.day || 1);
           setIntake(specificDay.intake_data || null);
           go("plan");
-        } else if (!specificDay || !specificDay.plan) {
+        } else {
           go("plan");
         }
       },
