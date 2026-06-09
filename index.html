@@ -3486,7 +3486,7 @@ function LoadingScreen({ lang, dayNum = 1 }) {
   }, []);
   return /* @__PURE__ */ React.createElement("div", { style: { minHeight: "100vh", background: T.white, display: "flex", alignItems: "center", justifyContent: "center", padding: "80px 20px", flexDirection: "column", gap: 26 } }, /* @__PURE__ */ React.createElement(Spinner, { size: 58 }), /* @__PURE__ */ React.createElement("div", { style: { textAlign: "center", maxWidth: 300 } }, /* @__PURE__ */ React.createElement("div", { style: __spreadProps(__spreadValues({}, serif), { fontWeight: 600, fontSize: 20, marginBottom: 10 }) }, dayNum > 1 ? `${t2.buildingPlan} \u2014 Day ${dayNum}` : t2.buildingPlan), /* @__PURE__ */ React.createElement("div", { style: { fontSize: 14, color: T.grey500, animation: "pulse 1.5s ease infinite", minHeight: 20 } }, msgs[s])), /* @__PURE__ */ React.createElement("div", { style: { display: "flex", gap: 6 } }, msgs.map((_, i) => /* @__PURE__ */ React.createElement("div", { key: i, style: { width: i <= s ? 20 : 7, height: 7, borderRadius: 4, background: i <= s ? T.teal : T.grey100, transition: "all .4s ease" } }))));
 }
-function PlanScreen({ plan, dayNum = 1, subscription: subscription2 = "standard", onReset, onCheckIn, onSaveCheckin, onBack, lang }) {
+function PlanScreen({ plan, dayNum = 1, subscription: subscription2 = "standard", onReset, onCheckIn, onSaveCheckin, onBack, lang, checkinHistory = [] }) {
   var _a2, _b2, _c, _d, _e;
   const t2 = useT(lang);
   const [tab, setTab] = useState("exercises");
@@ -3874,7 +3874,7 @@ function ProgrammeDashboard({ prog, onBack, onContinue, onNewPlan, lang, user, n
     );
   }), plans.length === 0 && /* @__PURE__ */ React.createElement("div", { className: "card", style: { textAlign: "center", padding: "32px" } }, /* @__PURE__ */ React.createElement("div", { style: { fontSize: 14, color: T2.grey500 } }, "No plans generated yet.")))));
 }
-function DashboardScreen({ user, onStartPlan, onLogout, plan, dayNum = 1, onViewPlan, onCheckIn, onSaveCheckin, notifSystem, lang, planHistory = [], checkinHistory: checkinHistory2 = [], initialTab = "overview", programmes = [], activeProgrammeId, setActiveProgrammeId, setPlan, setDayNum, setIntake }) {
+function DashboardScreen({ user, onStartPlan, onLogout, plan, dayNum = 1, onViewPlan, onCheckIn, onSaveCheckin, notifSystem, lang, planHistory = [], checkinHistory = [], initialTab = "overview", programmes = [], activeProgrammeId, setActiveProgrammeId, setPlan, setDayNum, setIntake }) {
   var _a2, _b2, _c, _d, _e, _f;
   const t2 = useT(lang);
   const [tab, setTab] = useState(initialTab);
@@ -3903,7 +3903,7 @@ function DashboardScreen({ user, onStartPlan, onLogout, plan, dayNum = 1, onView
   })()), (() => {
     var _a3;
     const seen = /* @__PURE__ */ new Set();
-    const chartData = [...checkinHistory2].filter((p) => p && typeof p.pain === "number" && p.day > 0).sort((a, b) => (a.day || 0) - (b.day || 0)).filter((p) => {
+    const chartData = [...checkinHistory].filter((p) => p && typeof p.pain === "number" && p.day > 0).sort((a, b) => (a.day || 0) - (b.day || 0)).filter((p) => {
       if (seen.has(p.day)) return false;
       seen.add(p.day);
       return true;
@@ -3937,7 +3937,7 @@ function DashboardScreen({ user, onStartPlan, onLogout, plan, dayNum = 1, onView
     { l: "Avg Pain", v: (() => {
       var _a3;
       const _seen = /* @__PURE__ */ new Set();
-      const _base = [...checkinHistory2].sort((a, b) => (a.day || 0) - (b.day || 0)).filter((p) => {
+      const _base = [...checkinHistory].sort((a, b) => (a.day || 0) - (b.day || 0)).filter((p) => {
         if (_seen.has(p.day)) return false;
         _seen.add(p.day);
         return true;
@@ -3955,7 +3955,7 @@ function DashboardScreen({ user, onStartPlan, onLogout, plan, dayNum = 1, onView
     })(), t2: "across all sessions", c: T.teal },
     { l: "Current Day", v: `Day ${dayNum}`, t2: "of your current plan", c: T.orange },
     { l: "Sessions", v: allPlans.length, t2: "total plans generated", c: T.teal },
-    { l: "Streak", v: `${checkinHistory2.length} days`, t2: "consecutive check-ins", c: T.navy }
+    { l: "Streak", v: `${checkinHistory.length} days`, t2: "consecutive check-ins", c: T.navy }
   ].map((s, i) => /* @__PURE__ */ React.createElement("div", { key: i, className: "card" }, /* @__PURE__ */ React.createElement("div", { style: __spreadProps(__spreadValues({}, serif), { fontSize: 22, fontWeight: 600, color: s.c, letterSpacing: "-.02em" }) }, s.v), /* @__PURE__ */ React.createElement("div", { style: { fontSize: 12, fontWeight: 500, marginTop: 3 } }, s.l), /* @__PURE__ */ React.createElement("div", { style: __spreadValues({ fontSize: 11, color: T.grey400, marginTop: 2 }, mono) }, s.t2)))))), tab === "checkin" && /* @__PURE__ */ React.createElement(CheckInPanel, { plan, dayNum, onCheckIn, onStartPlan, onSaveCheckin: (entry) => setCheckinHistory((prev) => {
     const f = prev.filter((p) => p.day !== entry.day);
     return [...f, entry].sort((a, b) => a.day - b.day);
@@ -4326,7 +4326,7 @@ function App() {
     });
   }
   const [planHistory, setPlanHistory] = useState([]);
-  const [checkinHistory2, setCheckinHistory2] = useState([]);
+  const [checkinHistory, setCheckinHistory2] = useState([]);
   const [programmes, setProgrammes] = useState([]);
   const [activeProgrammeId, setActiveProgrammeId] = useState(null);
   const ADMIN_EMAILS = ["contact@physioroutine.com"];
@@ -5063,7 +5063,7 @@ ${checkIn ? `- Today's check-in: pain ${checkIn.pain}/10, energy ${checkIn.energ
       lang,
       notifSystem,
       planHistory,
-      checkinHistory: checkinHistory2,
+      checkinHistory,
       initialTab: dashboardTab,
       programmes,
       activeProgrammeId,
