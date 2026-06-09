@@ -165,7 +165,7 @@ const sb = {
   async getReviews() {
     try {
       const r = await fetch(
-        `${SUPABASE_URL}/rest/v1/reviews?select=id,user_name,rating,body_area,review_text,created_at&order=created_at.desc&limit=50`,
+        `${SUPABASE_URL}/rest/v1/reviews?select=id,user_name,rating,body_area,review_text,pain_before,pain_after,created_at&order=created_at.desc&limit=50`,
         { headers: { apikey: SUPABASE_ANON } }
       );
       if (!r.ok) return [];
