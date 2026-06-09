@@ -161,6 +161,37 @@ const sb = {
       method: "DELETE",
       headers: { apikey: SUPABASE_ANON, Authorization: `Bearer ${token}` }
     });
+  },
+  async getReviews() {
+    try {
+      const r = await fetch(
+        `${SUPABASE_URL}/rest/v1/reviews?select=id,user_name,rating,body_area,review_text,created_at&order=created_at.desc&limit=50`,
+        { headers: { apikey: SUPABASE_ANON } }
+      );
+      if (!r.ok) return [];
+      return r.json();
+    } catch (e) {
+      return [];
+    }
+  },
+  async saveReview(token, userId, review) {
+    const r = await fetch(`${SUPABASE_URL}/rest/v1/reviews`, {
+      method: "POST",
+      headers: {
+        apikey: SUPABASE_ANON,
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+        Prefer: "return=representation"
+      },
+      body: JSON.stringify({
+        user_id: userId,
+        user_name: review.name,
+        rating: review.rating,
+        body_area: review.bodyArea || null,
+        review_text: review.text
+      })
+    });
+    return r.json();
   }
 };
 const SESSION_KEY = "physio_session";
@@ -184,10 +215,6 @@ function clearSession() {
   }
 }
 const IMG_BASE = "https://cdn.jsdelivr.net/gh/Strete14/coming-soon@main/images/";
-sb.getReviews().then((r) => {
-  if (Array.isArray(r)) window.__physioReviews = r;
-}).catch(() => {
-});
 const T = {
   white: "#ffffff",
   offwhite: "#f7f8fa",
@@ -5233,7 +5260,7 @@ class ErrBound extends React.Component {
   }
 }
 window.onerror = function(msg,src,line,col,err){
-  document.body.innerHTML = '<div style="padding:40px;font-family:sans-serif;background:#fee2e2;min-height:100vh"><h2 style="color:#dc2626;margin-bottom:12px">Error</h2><pre style="font-size:12px;background:white;padding:16px;border-radius:8px;white-space:pre-wrap">'+(err?err.stack:msg+' (line '+line+')')+'</pre><button onclick="location.reload()" style="margin-top:16px;padding:10px 20px;background:#0a7e6e;color:white;border:none;border-radius:8px;cursor:pointer">Reload</button></div>';
+  document.body.innerHTML = '<div style="padding:40px;font-family:sans-serif;background:#fee2e2;min-height:100vh"><h2 style="color:#dc2626;margin-bottom:12px">Error</h2><pre style="font-size:12px;background:white;padding:16px;border-radius:8px;white-space:pre-wrap">'+(err?err.stack:msg+' line '+line)+'</pre><button onclick="location.reload()" style="margin-top:16px;padding:10px 20px;background:#0a7e6e;color:white;border:none;border-radius:8px;cursor:pointer">Reload</button></div>';
   return true;
 };
 (function(){
@@ -5242,7 +5269,7 @@ window.onerror = function(msg,src,line,col,err){
   try {
     ReactDOM.createRoot(el).render(React.createElement(ErrBound,null,React.createElement(App)));
   } catch(e) {
-    el.innerHTML = '<div style="padding:40px;font-family:sans-serif"><b style="color:red">Error: </b>'+e.message+'<br><br><button onclick="location.reload()" style="padding:8px 16px;background:#0a7e6e;color:white;border:none;border-radius:8px;cursor:pointer">Reload</button></div>';
+    el.innerHTML = '<div style="padding:40px;font-family:sans-serif"><h2 style="color:red">Fatal: </h2><pre>'+e.stack+'</pre><button onclick="location.reload()" style="padding:8px 16px;background:#0a7e6e;color:white;border:none;border-radius:8px;cursor:pointer">Reload</button></div>';
   }
 })();
 
