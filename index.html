@@ -3664,9 +3664,9 @@ function getMilestones(planHistory, dayNum, streak) {
 }
 function getStreak() {
   try {
-    const history2 = JSON.parse(localStorage.getItem("physio_checkin_history") || "[]");
-    if (!history2.length) return 0;
-    const validDates = history2.filter((d) => d && !isNaN(new Date(d).getTime()));
+    const history = JSON.parse(localStorage.getItem("physio_checkin_history") || "[]");
+    if (!history.length) return 0;
+    const validDates = history.filter((d) => d && !isNaN(new Date(d).getTime()));
     if (!validDates.length) return 0;
     const sorted = [...validDates].sort((a, b) => new Date(b) - new Date(a));
     let streak = 0;
@@ -3689,10 +3689,10 @@ function getStreak() {
 function saveCheckinToHistory() {
   try {
     const today = (/* @__PURE__ */ new Date()).toISOString().split("T")[0];
-    const history2 = JSON.parse(localStorage.getItem("physio_checkin_history") || "[]");
-    if (!history2.includes(today)) {
-      history2.push(today);
-      localStorage.setItem("physio_checkin_history", JSON.stringify(history2));
+    const history = JSON.parse(localStorage.getItem("physio_checkin_history") || "[]");
+    if (!history.includes(today)) {
+      history.push(today);
+      localStorage.setItem("physio_checkin_history", JSON.stringify(history));
     }
   } catch (e) {
   }
@@ -4332,7 +4332,6 @@ function App() {
     }
   }, [notifSystem.inAppNotifs.length]);
   useEffect(() => {
-    var _a2, _b2;
     const session = loadSession();
     if (!(session == null ? void 0 : session.token) || !(session == null ? void 0 : session.user)) return;
     fetch(`${SUPABASE_URL}/auth/v1/user`, {
@@ -4340,90 +4339,84 @@ function App() {
     }).then((r) => {
       if (!r.ok) {
         clearSession();
-        return Promise.reject("invalid token");
+        return Promise.reject("invalid");
       }
       return r.json();
     }).then((userData) => {
+      var _a2;
       if (!(userData == null ? void 0 : userData.id)) {
         clearSession();
         return;
       }
-      setUser(session.user);
-      sb.getPlans(session.token, session.user.id || session.userId).then((cp) => {
-        var _a3, _b3, _c, _d;
+      const u = session.user;
+      setUser(u);
+      const userKey = ((_a2 = u.email) == null ? void 0 : _a2.toLowerCase().replace(/[^a-z0-9]/g, "_")) || "anon";
+      const sub = localStorage.getItem(`physio_subscription_${userKey}`);
+      if (sub) setSubscription(sub);
+      const trial = localStorage.getItem(`physio_trial_used_${userKey}`);
+      setTrialUsed(trial === "true");
+      sb.getPlans(session.token, u.id || session.userId).then((cp) => {
         if (Array.isArray(cp) && cp.length > 0) {
           const cloudH = cp.map((p) => ({
             id: p.id,
-            title: p.title,
-            region: p.region,
-            day: p.day,
+            programme_id: p.programme_id || "legacy_" + p.id,
+            title: p.title || "",
+            region: p.region || "",
+            day: p.day || 1,
             date: (p.created_at || "").split("T")[0],
-            pain: p.pain,
-            progress: p.progress,
+            pain: p.pain || 0,
+            progress: p.progress || 0,
+            status: p.status || "active",
             plan: p.plan_data,
             intake_data: p.intake_data
-          })).sort((a, b) => (b.day || 0) - (a.day || 0));
+          }));
           setPlanHistory(cloudH);
-          setPlan(((_a3 = cloudH[0]) == null ? void 0 : _a3.plan) || null);
-          if ((_b3 = cloudH[0]) == null ? void 0 : _b3.intake_data) setIntake(cloudH[0].intake_data);
-          const maxDay = Math.max(...cloudH.map((p) => p.day || 1));
-          setDayNum(maxDay);
-          const sub = localStorage.getItem(`physio_subscription_${((_d = (_c = session.user) == null ? void 0 : _c.email) == null ? void 0 : _d.toLowerCase().replace(/[^a-z0-9]/g, "_")) || "anon"}`);
-          if (sub) setSubscription(sub);
-        }
-      }).catch((e) => console.warn("Supabase load:", e));
-    }).catch(() => clearSession());
-    try {
-      const _uk = ((_b2 = (_a2 = session.user) == null ? void 0 : _a2.email) == null ? void 0 : _b2.toLowerCase().replace(/[^a-z0-9]/g, "_")) || "anon";
-      const _sessForCloud = loadSession();
-      if ((_sessForCloud == null ? void 0 : _sessForCloud.token) && (_sessForCloud == null ? void 0 : _sessForCloud.userId)) {
-        sb.getPlans(_sessForCloud.token, _sessForCloud.userId).then((cp) => {
-          var _a3, _b3;
-          if (Array.isArray(cp) && cp.length > 0) {
-            const cloudH = cp.map((p) => ({
-              id: p.id,
+          const progMap = {};
+          cloudH.forEach((p) => {
+            const pid = p.programme_id;
+            if (!progMap[pid]) progMap[pid] = {
+              programmeId: pid,
               title: p.title,
               region: p.region,
-              day: p.day,
-              date: (p.created_at || "").split("T")[0],
-              pain: p.pain,
-              progress: p.progress,
-              plan: p.plan_data,
-              intake_data: p.intake_data
-            })).sort((a, b) => (b.day || 0) - (a.day || 0));
-            setPlanHistory(cloudH);
-            setPlan(((_a3 = cloudH[0]) == null ? void 0 : _a3.plan) || null);
-            if ((_b3 = cloudH[0]) == null ? void 0 : _b3.intake_data) setIntake(cloudH[0].intake_data);
-            const maxDay = Math.max(...cloudH.map((p) => p.day || 1));
-            setDayNum(maxDay);
-            const cloudCheckins = cloudH.filter((p) => p.day && typeof p.pain === "number").map((p) => ({ day: p.day, pain: p.pain, energy: 5, date: p.date || "" })).sort((a, b) => a.day - b.day);
-            if (cloudCheckins.length > 0) setCheckinHistory2(cloudCheckins);
+              status: "active",
+              currentDay: 0,
+              startDate: p.date,
+              plans: []
+            };
+            progMap[pid].plans.push(p);
+            if (p.day > progMap[pid].currentDay) {
+              progMap[pid].currentDay = p.day;
+              progMap[pid].title = p.title;
+              progMap[pid].region = p.region;
+            }
+            if (p.status === "completed" || p.day >= 7) progMap[pid].status = "completed";
+          });
+          const progs = Object.values(progMap).sort(
+            (a, b) => (b.startDate || "") > (a.startDate || "") ? 1 : -1
+          );
+          setProgrammes(progs);
+          const activeP = progs.find((p) => p.status === "active") || progs[0];
+          if (activeP) {
+            setActiveProgrammeId(activeP.programmeId);
+            const latest = activeP.plans.sort((a, b) => b.day - a.day)[0];
+            if (latest) {
+              setPlan(latest.plan);
+              setIntake(latest.intake_data);
+            }
+            setDayNum(activeP.currentDay);
           }
-        }).catch((e) => console.warn("Supabase load error:", e));
-      }
-      const _seeded = history.filter((p) => p.day && typeof p.pain === "number").map((p) => ({ day: p.day, pain: p.pain, energy: 5, date: p.date || "" })).sort((a, b) => a.day - b.day);
-      const _seenD = /* @__PURE__ */ new Set();
-      const _deduped = _seeded.filter((p) => {
-        if (_seenD.has(p.day)) return false;
-        _seenD.add(p.day);
-        return true;
-      });
-      if (_deduped.length > 0) setCheckinHistory2(_deduped);
-      const _savedDay = parseInt(localStorage.getItem(`physio_daynum_${_uk}`) || "1", 10);
-      setDayNum(isNaN(_savedDay) ? 1 : _savedDay);
-      const sub = localStorage.getItem(`physio_subscription_${_uk}`) || localStorage.getItem("physio_subscription");
-      if (sub) setSubscription(sub);
-      const trial = localStorage.getItem(`physio_trial_used_${_uk}`);
-      setTrialUsed(trial === "true");
-    } catch (e) {
-    }
-    go("programmes");
-    if (session.refresh_token && !SUPABASE_URL.includes("YOUR_PROJECT")) {
-      sb.refreshToken(session.refresh_token).then((r) => {
-        if (r == null ? void 0 : r.access_token) saveSession(__spreadProps(__spreadValues({}, session), { token: r.access_token, refresh_token: r.refresh_token }));
+        }
+        go("programmes");
       }).catch(() => {
+        go("programmes");
       });
-    }
+      if (session.refresh_token) {
+        sb.refreshToken(session.refresh_token).then((r) => {
+          if (r == null ? void 0 : r.access_token) saveSession(__spreadProps(__spreadValues({}, session), { token: r.access_token, refresh_token: r.refresh_token }));
+        }).catch(() => {
+        });
+      }
+    }).catch(() => clearSession());
   }, []);
   useEffect(() => {
     if (!user || !plan) return;
@@ -4578,7 +4571,7 @@ ${checkIn ? `- Today's check-in: pain ${checkIn.pain}/10, energy ${checkIn.energ
       setPlan(effectivePlan);
       try {
         const _hKey = ((_d = user == null ? void 0 : user.email) == null ? void 0 : _d.toLowerCase().replace(/[^a-z0-9]/g, "_")) || "anon";
-        const history2 = JSON.parse(
+        const history = JSON.parse(
           localStorage.getItem(`physio_plan_history_${_hKey}`) || localStorage.getItem("physio_plan_history") || "[]"
         );
         const currentDay = intakeData._dayOverride || dayNum;
@@ -4604,7 +4597,7 @@ ${checkIn ? `- Today's check-in: pain ${checkIn.pain}/10, energy ${checkIn.energ
           intake_data: intakeData
         };
         const stateIds = new Set(planHistory.map((p) => p.id));
-        const merged = [entry, ...planHistory.filter((p) => p.id !== entry.id), ...history2.filter((p) => !stateIds.has(p.id) && p.id !== entry.id)];
+        const merged = [entry, ...planHistory.filter((p) => p.id !== entry.id), ...history.filter((p) => !stateIds.has(p.id) && p.id !== entry.id)];
         const trimmed = merged.slice(0, 20);
         const _userKey = ((_e = user == null ? void 0 : user.email) == null ? void 0 : _e.toLowerCase().replace(/[^a-z0-9]/g, "_")) || "anon";
         localStorage.setItem(`physio_plan_history_${_userKey}`, JSON.stringify(trimmed));
