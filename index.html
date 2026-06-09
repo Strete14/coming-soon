@@ -4407,7 +4407,6 @@ function App() {
   const [dayNum, setDayNum] = useState(1);
   const [subscription2, setSubscription] = useState(null);
   const [trialUsed, setTrialUsed] = useState(false);
-  const hasUsedTrial = trialUsed || programmes.some((p) => p.subscription === "trial");
   const [error, setError] = useState("");
   const [toastNotif, setToastNotif] = useState(null);
   const [dashboardTab, setDashboardTab] = useState("overview");
@@ -4436,6 +4435,7 @@ function App() {
   const [checkinHistory, setCheckinHistory2] = useState([]);
   const [programmes, setProgrammes] = useState([]);
   const [activeProgrammeId, setActiveProgrammeId] = useState(null);
+  const hasUsedTrial = trialUsed || programmes.some((p) => p.subscription === "trial");
   const ADMIN_EMAILS = ["contact@physioroutine.com"];
   const isAdmin = user && ADMIN_EMAILS.includes((user.email || "").toLowerCase().trim());
   const notifSystem = useNotifications();
@@ -5259,19 +5259,8 @@ class ErrBound extends React.Component {
     return this.props.children;
   }
 }
-window.onerror = function(msg,src,line,col,err){
-  document.body.innerHTML = '<div style="padding:40px;font-family:sans-serif;background:#fee2e2;min-height:100vh"><h2 style="color:#dc2626;margin-bottom:12px">Error</h2><pre style="font-size:12px;background:white;padding:16px;border-radius:8px;white-space:pre-wrap">'+(err?err.stack:msg+' line '+line)+'</pre><button onclick="location.reload()" style="margin-top:16px;padding:10px 20px;background:#0a7e6e;color:white;border:none;border-radius:8px;cursor:pointer">Reload</button></div>';
-  return true;
-};
-(function(){
-  var el=document.getElementById("root");
-  if(!el)return;
-  try {
-    ReactDOM.createRoot(el).render(React.createElement(ErrBound,null,React.createElement(App)));
-  } catch(e) {
-    el.innerHTML = '<div style="padding:40px;font-family:sans-serif"><h2 style="color:red">Fatal: </h2><pre>'+e.stack+'</pre><button onclick="location.reload()" style="padding:8px 16px;background:#0a7e6e;color:white;border:none;border-radius:8px;cursor:pointer">Reload</button></div>';
-  }
-})();
+window.onerror=function(msg,src,line,col,err){document.body.innerHTML='<div style="padding:40px;font-family:sans-serif;background:#fee2e2;min-height:100vh"><h2 style="color:#dc2626;margin-bottom:12px">Error</h2><pre style="font-size:12px;background:white;padding:16px;border-radius:8px;white-space:pre-wrap">'+(err?err.stack:msg+' line '+line)+'</pre><button onclick="location.reload()" style="margin-top:16px;padding:10px 20px;background:#0a7e6e;color:white;border:none;border-radius:8px;cursor:pointer">Reload</button></div>';return true;};
+(function(){var el=document.getElementById("root");if(!el)return;try{ReactDOM.createRoot(el).render(React.createElement(ErrBound,null,React.createElement(App)));}catch(e){el.innerHTML='<div style="padding:40px;font-family:sans-serif"><h2 style="color:red">Fatal: </h2><pre>'+e.stack+'</pre><button onclick="location.reload()" style="padding:8px 16px;background:#0a7e6e;color:white;border:none;border-radius:8px;cursor:pointer">Reload</button></div>';}})();
 
 </script>
 </body>
