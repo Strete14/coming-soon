@@ -4880,7 +4880,32 @@ ${checkIn ? `- Today's check-in: pain ${checkIn.pain}/10, energy ${checkIn.energ
         else if (s === "how_it_works") go("how_it_works");
         else if (s === "testimonials") go("testimonials");
         else if (s === "pricing") go("pricing");
-        else if (s === "dashboard" && user) handleDashboardNav();
+        else if (s === "programmes" || s === "dashboard") {
+          if (user) go("programmes");
+          else go("login");
+        }
+      },
+      onLogout: async () => {
+        const session = loadSession();
+        if (session == null ? void 0 : session.token) {
+          try {
+            await sb.signOut(session.token);
+          } catch (e) {
+          }
+        }
+        try {
+          Object.keys(localStorage).filter((k) => k.startsWith("physio")).forEach((k) => localStorage.removeItem(k));
+        } catch (e) {
+        }
+        setUser(null);
+        setSubscription(null);
+        setPlan(null);
+        setPlanHistory([]);
+        setProgrammes([]);
+        setIntake(null);
+        setDayNum(1);
+        setTrialUsed(false);
+        go("home");
       }
     }
   ), screen === "home" && /* @__PURE__ */ React.createElement(
