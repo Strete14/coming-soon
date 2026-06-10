@@ -4532,7 +4532,6 @@ function App() {
       const trial = localStorage.getItem(`physio_trial_used_${userKey}`);
       setTrialUsed(trial === "true");
       sb.getPlans(session.token, u.id || session.userId).then((cp) => {
-        var _a3;
         if (Array.isArray(cp) && cp.length > 0) {
           const cloudH = cp.map((p) => ({
             id: p.id,
@@ -4574,21 +4573,8 @@ function App() {
             (a, b) => (b.startDate || "") > (a.startDate || "") ? 1 : -1
           );
           setProgrammes(progs);
-          const uid = ((_a3 = session.user) == null ? void 0 : _a3.id) || session.userId;
-          if (uid) {
-            sb.getCheckins(session.token, uid).then((ckins) => {
-              if (Array.isArray(ckins) && ckins.length > 0) {
-                const mapped = ckins.map((ck) => ({
-                  day: ck.day,
-                  pain: ck.pain,
-                  energy: ck.energy || 5,
-                  date: ck.check_date || ""
-                })).sort((a, b) => a.day - b.day);
-                setCheckinHistory2(mapped);
-              }
-            }).catch(() => {
-            });
-          }
+          const sessionCheckins = cloudH.filter((p) => typeof p.pain === "number" && p.day).map((p) => ({ day: p.day, pain: p.pain, energy: 5, date: p.date || "" })).sort((a, b) => a.day - b.day);
+          if (sessionCheckins.length > 0) setCheckinHistory2(sessionCheckins);
           const activeP = progs.find((p) => p.status === "active") || progs[0];
           if (activeP) {
             setActiveProgrammeId(activeP.programmeId);
@@ -4910,21 +4896,8 @@ ${checkIn ? `- Today's check-in: pain ${checkIn.pain}/10, energy ${checkIn.energ
           (a, b) => (b.startDate || "") > (a.startDate || "") ? 1 : -1
         );
         setProgrammes(progs);
-        sb.getCheckins(sess.token, u.id).then((ckins) => {
-          if (Array.isArray(ckins) && ckins.length > 0) {
-            const mapped = ckins.map((ck) => ({
-              day: ck.day,
-              pain: ck.pain,
-              energy: ck.energy || 5,
-              date: ck.check_date || ""
-            })).sort((a, b) => a.day - b.day);
-            setCheckinHistory2(mapped);
-          } else {
-            const allCheckins = cloudH.filter((p) => typeof p.pain === "number" && p.day === 1).map((p) => ({ day: 1, pain: p.pain, energy: 5, date: p.date || "" }));
-            if (allCheckins.length > 0) setCheckinHistory2(allCheckins);
-          }
-        }).catch(() => {
-        });
+        const allCheckins = cloudH.filter((p) => typeof p.pain === "number" && p.day).map((p) => ({ day: p.day, pain: p.pain, energy: 5, date: p.date || "" })).sort((a, b) => a.day - b.day);
+        if (allCheckins.length > 0) setCheckinHistory2(allCheckins);
         const activeP = progs.find((p) => p.status === "active") || progs[0];
         if (activeP) {
           setActiveProgrammeId(activeP.programmeId);
