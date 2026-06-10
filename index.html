@@ -15,6 +15,7 @@
 <div id="root"><div style="min-height:100vh;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:12px"><div style="width:40px;height:40px;border:3px solid #e4e7ed;border-top-color:#0a7e6e;border-radius:50%;animation:spin .8s linear infinite"></div><span style="font-family:DM Sans,sans-serif;color:#0a7e6e;font-size:14px">Loading...</span></div></div>
 <style>@keyframes spin{to{transform:rotate(360deg)}}</style>
 <script>
+
 var __defProp = Object.defineProperty;
 var __defProps = Object.defineProperties;
 var __getOwnPropDescs = Object.getOwnPropertyDescriptors;
@@ -4120,7 +4121,7 @@ function DashboardScreen({ user, onStartPlan, onLogout, plan, dayNum = 1, onView
     { l: "Current Day", v: `Day ${dayNum}`, t2: "of your current plan", c: T.orange },
     { l: "Sessions", v: allPlans.length, t2: "total plans generated", c: T.teal },
     { l: "Streak", v: `${checkinHistory.length} days`, t2: "consecutive check-ins", c: T.navy }
-  ].map((s, i) => /* @__PURE__ */ React.createElement("div", { key: i, className: "card" }, /* @__PURE__ */ React.createElement("div", { style: __spreadProps(__spreadValues({}, serif), { fontSize: 22, fontWeight: 600, color: s.c, letterSpacing: "-.02em" }) }, s.v), /* @__PURE__ */ React.createElement("div", { style: { fontSize: 12, fontWeight: 500, marginTop: 3 } }, s.l), /* @__PURE__ */ React.createElement("div", { style: __spreadValues({ fontSize: 11, color: T.grey400, marginTop: 2 }, mono) }, s.t2)))))), tab === "checkin" && /* @__PURE__ */ React.createElement(CheckInPanel, { plan, dayNum, onCheckIn, onStartPlan, onSaveCheckin: (entry) => setCheckinHistory((prev) => {
+  ].map((s, i) => /* @__PURE__ */ React.createElement("div", { key: i, className: "card" }, /* @__PURE__ */ React.createElement("div", { style: __spreadProps(__spreadValues({}, serif), { fontSize: 22, fontWeight: 600, color: s.c, letterSpacing: "-.02em" }) }, s.v), /* @__PURE__ */ React.createElement("div", { style: { fontSize: 12, fontWeight: 500, marginTop: 3 } }, s.l), /* @__PURE__ */ React.createElement("div", { style: __spreadValues({ fontSize: 11, color: T.grey400, marginTop: 2 }, mono) }, s.t2)))))), tab === "checkin" && /* @__PURE__ */ React.createElement(CheckInPanel, { plan, dayNum, onCheckIn, onStartPlan, onSaveCheckin: (entry) => setCheckinHistory2((prev) => {
     const f = prev.filter((p) => p.day !== entry.day);
     return [...f, entry].sort((a, b) => a.day - b.day);
   }) }))));
@@ -5323,6 +5324,7 @@ ${checkIn ? `- Today's check-in: pain ${checkIn.pain}/10, energy ${checkIn.energ
     }
   ), error && /* @__PURE__ */ React.createElement("div", { style: { position: "fixed", bottom: 20, right: 20, left: 20, maxWidth: 380, margin: "0 auto", background: T.redPale, border: `1px solid ${T.red}28`, borderRadius: 10, padding: "13px 16px", fontSize: 14, color: T.red, zIndex: 999, boxShadow: "0 4px 20px rgba(0,0,0,.1)", display: "flex", gap: 10, alignItems: "flex-start", animation: "scaleIn .3s ease" } }, /* @__PURE__ */ React.createElement("span", { style: { flex: 1, lineHeight: 1.5 } }, error), /* @__PURE__ */ React.createElement("button", { onClick: () => setError(""), style: { background: "none", border: "none", cursor: "pointer", color: T.red, fontWeight: 700, fontSize: 16, padding: 0, flexShrink: 0 } }, "\u2715")), toastNotif && /* @__PURE__ */ React.createElement(NotifToast, { notif: toastNotif, onDismiss: () => setToastNotif(null) }));
 }
+
 
 class ErrBound extends React.Component {
   constructor(p){super(p);this.state={err:null};}
