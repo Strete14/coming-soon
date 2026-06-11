@@ -4578,6 +4578,8 @@ ${checkIn ? `- Today's check-in: pain ${checkIn.pain}/10, energy ${checkIn.energ
         }
       } catch (e) {
       }
+      const _updatedProg = programmes.find((p) => p.programmeId === currentProgId);
+      if (_updatedProg) setSelectedProg(_updatedProg);
       go("plan");
       notifSystem.addInApp("new_plan", `${parsed.title || "Plan"} \u2014 Day ${dayNum}`);
     } catch (e) {
