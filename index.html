@@ -2845,6 +2845,18 @@ function ReviewModal({ user, onClose, onSubmitted }) {
   const [done, setDone] = useState(false);
   async function submit() {
     var _a2;
+    try {
+      const sess = loadSession();
+      const uid = sess.userId || ((_a2 = sess.user) == null ? void 0 : _a2.id);
+      const existing = await fetch(`${SUPABASE_URL}/rest/v1/reviews?user_id=eq.${uid}&select=id`, {
+        headers: { apikey: SUPABASE_ANON, Authorization: `Bearer ${sess.token}` }
+      });
+      const rows = await existing.json();
+      if (Array.isArray(rows) && rows.length > 0) {
+        setError("You have already submitted a review.");
+        return;
+      }
+    } catch (e) {}
     if (!rating) {
       setError("Please select a star rating.");
       return;
