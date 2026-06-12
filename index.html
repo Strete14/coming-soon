@@ -2846,9 +2846,9 @@ function ReviewModal({ user, onClose, onSubmitted }) {
   async function submit() {
     var _a2;
     try {
+      const uid = user && user.id;
       const sess = loadSession();
-      const uid = (sess && sess.userId) || (sess && sess.user && sess.user.id);
-      if (uid) {
+      if (uid && sess && sess.token) {
         const existing = await fetch(`${SUPABASE_URL}/rest/v1/reviews?user_id=eq.${uid}&select=id`, {
           headers: { apikey: SUPABASE_ANON, Authorization: `Bearer ${sess.token}` }
         });
