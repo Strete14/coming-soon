@@ -175,13 +175,13 @@ const sb = {
     }
   },
   async saveReview(token, userId, review) {
-    const r = await fetch(`${SUPABASE_URL}/rest/v1/reviews`, {
+    const r = await fetch(`${SUPABASE_URL}/rest/v1/reviews?on_conflict=user_id`, {
       method: "POST",
       headers: {
         apikey: SUPABASE_ANON,
         Authorization: `Bearer ${token}`,
         "Content-Type": "application/json",
-        Prefer: "return=representation"
+        Prefer: "resolution=merge-duplicates,return=representation"
       },
       body: JSON.stringify({
         user_id: userId,
@@ -4443,6 +4443,11 @@ function App() {
   const [selectedProg, setSelectedProg] = useState(null);
   const [showReviewModal, setShowReviewModal] = useState(false);
   const [liveReviews, setLiveReviews] = useState([]);
+  React.useEffect(() => {
+    sb.getReviews().then((r) => {
+      if (Array.isArray(r)) setLiveReviews(r);
+    }).catch(() => {});
+  }, []);
   const [lang, setLang] = useState(() => {
     try {
       return localStorage.getItem("physio_lang") || "en";
