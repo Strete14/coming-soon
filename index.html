@@ -175,13 +175,13 @@ const sb = {
     }
   },
   async saveReview(token, userId, review) {
-    const r = await fetch(`${SUPABASE_URL}/rest/v1/reviews?on_conflict=user_id`, {
+    const r = await fetch(`${SUPABASE_URL}/rest/v1/reviews`, {
       method: "POST",
       headers: {
         apikey: SUPABASE_ANON,
         Authorization: `Bearer ${token}`,
         "Content-Type": "application/json",
-        Prefer: "resolution=merge-duplicates,return=representation"
+        Prefer: "return=representation"
       },
       body: JSON.stringify({
         user_id: userId,
@@ -2845,20 +2845,6 @@ function ReviewModal({ user, onClose, onSubmitted }) {
   const [done, setDone] = useState(false);
   async function submit() {
     var _a2;
-    try {
-      const uid = user && user.id;
-      const sess = loadSession();
-      if (uid && sess && sess.token) {
-        const existing = await fetch(`${SUPABASE_URL}/rest/v1/reviews?user_id=eq.${uid}&select=id`, {
-          headers: { apikey: SUPABASE_ANON, Authorization: `Bearer ${sess.token}` }
-        });
-        const rows = await existing.json();
-        if (Array.isArray(rows) && rows.length > 0) {
-          setError("You have already submitted a review.");
-          return;
-        }
-      }
-    } catch (e) {}
     if (!rating) {
       setError("Please select a star rating.");
       return;
@@ -4053,7 +4039,7 @@ function DashboardScreen({ user, onStartPlan, onLogout, plan, dayNum = 1, onView
     const todayKey = (/* @__PURE__ */ new Date()).toISOString().split("T")[0];
     const lastCheckin = localStorage.getItem("physio_last_checkin");
     const doneToday = lastCheckin === todayKey;
-    return !doneToday ? /* @__PURE__ */ React.createElement("div", { style: { background: `linear-gradient(135deg,${T.teal},${T.tealLight})`, borderRadius: 12, padding: "14px 18px", marginBottom: 14, display: "flex", alignItems: "center", gap: 14, flexWrap: "wrap", boxShadow: `0 4px 16px ${T.teal}30` } }, /* @__PURE__ */ React.createElement("div", { style: { flex: 1 } }, /* @__PURE__ */ React.createElement("div", { style: { fontWeight: 700, fontSize: 14, color: "#fff", marginBottom: 2 } }, "Time for today's session!"), /* @__PURE__ */ React.createElement("div", { style: { fontSize: 12, color: "rgba(255,255,255,.8)" } }, "Log your pain level and exercises to track your progress.")), /* @__PURE__ */ React.createElement("button", { onClick: () => setTab("checkin"), style: { background: "rgba(255,255,255,.15)", color: "#fff", border: "1px solid rgba(255,255,255,.3)", borderRadius: 8, padding: "8px 16px", cursor: "pointer", fontFamily: "'DM Sans',sans-serif", fontWeight: 600, fontSize: 13, flexShrink: 0, whiteSpace: "nowrap" } }, "Check In \u2192")) : /* @__PURE__ */ React.createElement("div", { style: { background: T.tealPale, border: `1px solid ${T.tealMid}`, borderRadius: 12, padding: "12px 16px", marginBottom: 14, display: "flex", alignItems: "center", gap: 10 } }, /* @__PURE__ */ React.createElement("span", { style: { fontSize: 20 } }, "\u2705"), /* @__PURE__ */ React.createElement("div", { style: { fontSize: 13, color: T.teal, fontWeight: 500 } }, "Great work \u2014 you've checked in today!"));
+    return !doneToday && dayNum < 7 ? /* @__PURE__ */ React.createElement("div", { style: { background: `linear-gradient(135deg,${T.teal},${T.tealLight})`, borderRadius: 12, padding: "14px 18px", marginBottom: 14, display: "flex", alignItems: "center", gap: 14, flexWrap: "wrap", boxShadow: `0 4px 16px ${T.teal}30` } }, /* @__PURE__ */ React.createElement("div", { style: { flex: 1 } }, /* @__PURE__ */ React.createElement("div", { style: { fontWeight: 700, fontSize: 14, color: "#fff", marginBottom: 2 } }, "Time for today's session!"), /* @__PURE__ */ React.createElement("div", { style: { fontSize: 12, color: "rgba(255,255,255,.8)" } }, "Log your pain level and exercises to track your progress.")), /* @__PURE__ */ React.createElement("button", { onClick: () => setTab("checkin"), style: { background: "rgba(255,255,255,.15)", color: "#fff", border: "1px solid rgba(255,255,255,.3)", borderRadius: 8, padding: "8px 16px", cursor: "pointer", fontFamily: "'DM Sans',sans-serif", fontWeight: 600, fontSize: 13, flexShrink: 0, whiteSpace: "nowrap" } }, "Check In \u2192")) : /* @__PURE__ */ React.createElement("div", { style: { background: T.tealPale, border: `1px solid ${T.tealMid}`, borderRadius: 12, padding: "12px 16px", marginBottom: 14, display: "flex", alignItems: "center", gap: 10 } }, /* @__PURE__ */ React.createElement("span", { style: { fontSize: 20 } }, "\u2705"), /* @__PURE__ */ React.createElement("div", { style: { fontSize: 13, color: T.teal, fontWeight: 500 } }, "Great work \u2014 you've checked in today!"));
   })(), plan ? /* @__PURE__ */ React.createElement("div", { style: { background: T.navy, borderRadius: 13, padding: "clamp(18px,4vw,24px) clamp(16px,4vw,26px)", marginBottom: 20, position: "relative", overflow: "hidden" } }, /* @__PURE__ */ React.createElement("div", { style: { position: "absolute", right: -30, bottom: -30, width: 150, height: 150, borderRadius: "50%", background: "rgba(10,126,110,.14)" } }), /* @__PURE__ */ React.createElement("div", { style: __spreadProps(__spreadValues({}, mono), { fontSize: 10, color: T.teal, textTransform: "uppercase", letterSpacing: ".14em", marginBottom: 5 }) }, t2.todaysProgramme, " \u2014 Day ", dayNum), /* @__PURE__ */ React.createElement("div", { style: __spreadProps(__spreadValues({}, serif), { fontWeight: 600, fontSize: "clamp(16px,3vw,20px)", color: T.white, marginBottom: 4 }) }, plan.title), /* @__PURE__ */ React.createElement("div", { style: { fontSize: 13, color: "rgba(255,255,255,.45)", marginBottom: 14 } }, ((_e = plan.exercises) == null ? void 0 : _e.length) || 0, " exercises \xB7 ", ((_f = plan.electrotherapy) == null ? void 0 : _f.length) || 0, " electrotherapy"), /* @__PURE__ */ React.createElement("div", { style: { height: 4, background: "rgba(255,255,255,.1)", borderRadius: 2, marginBottom: 8, overflow: "hidden" } }, /* @__PURE__ */ React.createElement("div", { style: { height: 4, width: `${subscription === "trial" ? 100 : Math.min(100, Math.round(dayNum / 7 * 100))}%`, background: `linear-gradient(90deg,${T.teal},${T.tealLight})`, borderRadius: 2 } })), /* @__PURE__ */ React.createElement("div", { style: { display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 10 } }, /* @__PURE__ */ React.createElement("span", { style: __spreadValues({ fontSize: 12, color: "rgba(255,255,255,.38)" }, mono) }, subscription === "trial" ? 100 : Math.min(100, Math.round(dayNum / 7 * 100)), "% complete"), /* @__PURE__ */ React.createElement("div", { style: { display: "flex", gap: 8, flexWrap: "wrap" } }, /* @__PURE__ */ React.createElement("button", { className: "btn-teal", onClick: onViewPlan, style: { padding: "9px 18px", fontSize: 13 } }, t2.continuePlan), /* @__PURE__ */ React.createElement("button", { onClick: () => setTab("plans"), style: { padding: "9px 14px", fontSize: 13, background: "rgba(255,255,255,.1)", color: "rgba(255,255,255,.7)", border: "1px solid rgba(255,255,255,.2)", borderRadius: 8, cursor: "pointer", fontFamily: "'DM Sans',sans-serif" } }, t2.history || "History")))) : /* @__PURE__ */ React.createElement("div", { style: { background: T.navy, borderRadius: 13, padding: "clamp(18px,4vw,24px) clamp(16px,4vw,26px)", marginBottom: 20, position: "relative", overflow: "hidden", textAlign: "center" } }, /* @__PURE__ */ React.createElement("div", { style: { fontSize: 36, marginBottom: 10 } }, "\u{1F4CB}"), /* @__PURE__ */ React.createElement("div", { style: __spreadProps(__spreadValues({}, serif), { fontWeight: 600, fontSize: 18, color: T.white, marginBottom: 6 }) }, t2.noActivePlan || "No active plan yet"), /* @__PURE__ */ React.createElement("div", { style: { fontSize: 13, color: "rgba(255,255,255,.5)", marginBottom: 16 } }, t2.chooseAPlan || "Choose a plan and complete the assessment."), /* @__PURE__ */ React.createElement("button", { className: "btn-teal", onClick: onStartPlan, style: { padding: "9px 24px", fontSize: 13 } }, t2.startFirstPlan || "Start Your First Plan \u2192")), (() => {
     const ms = getMilestones(allPlans, dayNum, getStreak());
     if (!ms.length) return null;
@@ -4457,11 +4443,6 @@ function App() {
   const [selectedProg, setSelectedProg] = useState(null);
   const [showReviewModal, setShowReviewModal] = useState(false);
   const [liveReviews, setLiveReviews] = useState([]);
-  React.useEffect(() => {
-    sb.getReviews().then((r) => {
-      if (Array.isArray(r)) setLiveReviews(r);
-    }).catch(() => {});
-  }, []);
   const [lang, setLang] = useState(() => {
     try {
       return localStorage.getItem("physio_lang") || "en";
