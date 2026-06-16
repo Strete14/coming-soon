@@ -147,6 +147,7 @@ const sb = {
       },
       body: JSON.stringify({
         user_id: userId,
+        programme_id: entry.programme_id || entry.programmeId || null,
         day: entry.day,
         pain: entry.pain,
         energy: entry.energy,
@@ -154,6 +155,16 @@ const sb = {
         check_date: entry.date
       })
     });
+    return r.json();
+  },
+  async getCheckins(token, userId, programmeId = null) {
+    const url = programmeId
+      ? `${SUPABASE_URL}/rest/v1/checkins?user_id=eq.${userId}&programme_id=eq.${programmeId}&order=day.asc`
+      : `${SUPABASE_URL}/rest/v1/checkins?user_id=eq.${userId}&order=day.asc`;
+    const r = await fetch(url, {
+      headers: { apikey: SUPABASE_ANON, Authorization: `Bearer ${token}` }
+    });
+    if (!r.ok) return [];
     return r.json();
   },
   async deletePlans(token, userId) {
@@ -4572,7 +4583,8 @@ function App() {
                   day: ck.day,
                   pain: ck.pain,
                   energy: ck.energy || 5,
-                  date: ck.check_date || ""
+                  date: ck.check_date || "",
+                  programmeId: ck.programme_id || null
                 })).sort((a, b) => a.day - b.day);
                 setCheckinHistory2(mapped);
               }
@@ -4642,6 +4654,33 @@ function App() {
       return (_a3 = p.plan) == null ? void 0 : _a3.exercises;
     }).flatMap((p) => (p.plan.exercises || []).map((e) => e.exerciseKey)).filter(Boolean).join(", ") || "none yet";
     const allergies = (intakeData.allergies || []).filter((x) => x !== "none").join(", ") || "none";
+    const progHistory = checkinHistory.filter((p) => p.programmeId === currentProgId && typeof p.pain === "number").sort((a, b) => a.day - b.day);
+    let trendSummary = "No prior check-ins yet \u2014 this is the first day.";
+    if (progHistory.length >= 2) {
+      const firstPain = progHistory[0].pain;
+      const lastPain = progHistory[progHistory.length - 1].pain;
+      const recentWindow = progHistory.slice(-3);
+      const recentPains = recentWindow.map((p) => p.pain);
+      const recentAvg = recentPains.reduce((s, v) => s + v, 0) / recentPains.length;
+      const plateauThreshold = 0.5;
+      const isPlateau = recentWindow.length >= 3 && Math.max(...recentPains) - Math.min(...recentPains) <= plateauThreshold;
+      const isWorsening = lastPain > firstPain + 1 || (recentWindow.length >= 2 && recentPains[recentPains.length - 1] > recentPains[0] + 1);
+      const isImproving = lastPain < firstPain - 1 && !isWorsening;
+      const trendLine = progHistory.map((p) => `Day ${p.day}: pain ${p.pain}/10${typeof p.energy === "number" ? `, energy ${p.energy}/10` : ""}`).join(" | ");
+      let pattern;
+      if (isWorsening) {
+        pattern = "WORSENING \u2014 pain has increased over recent days. Ease intensity, prioritise pain relief and gentle ROM, avoid progressing load. Flag if this continues.";
+      } else if (isPlateau) {
+        pattern = "PLATEAU \u2014 pain has stayed flat for the last few check-ins despite following the programme. Do NOT simply repeat the same intensity \u2014 introduce a meaningfully different exercise selection or angle of approach this session to break the plateau.";
+      } else if (isImproving) {
+        pattern = "IMPROVING \u2014 pain trending down across the programme. Progress intensity and complexity a bit faster than the standard day-phase default.";
+      } else {
+        pattern = "STABLE/MIXED \u2014 follow the standard day-phase progression.";
+      }
+      trendSummary = `Full check-in history for this programme: ${trendLine}\nTrend pattern: ${pattern}\nFirst recorded pain: ${firstPain}/10. Most recent: ${lastPain}/10. Recent 3-day average: ${recentAvg.toFixed(1)}/10.`;
+    } else if (progHistory.length === 1) {
+      trendSummary = `Only one check-in so far: Day ${progHistory[0].day}, pain ${progHistory[0].pain}/10. Not enough history yet to detect a trend \u2014 follow standard day-phase progression.`;
+    }
     const systemPrompt = `You are a senior physiotherapist. Respond ONLY with valid JSON \u2014 no markdown, no extra text, no explanations.
 All string values in ${targetLang} EXCEPT exerciseKey (always English).
 
@@ -4661,6 +4700,7 @@ RULES:
 - Equipment: home_none=bodyweight, home_basic=bands/foam roller, home_full=dumbbells/bench, gym=machines
 - Safety: surgery=gentle ROM only, cardiac=low intensity, pregnancy=safe modifications, osteoporosis=no spinal flexion
 - Day ${effectiveDayNum} of ${subscription2 === "premium" ? 14 : 7}: select DIFFERENT exercises from previous days. Previously used: ${prevUsed || "none yet"}
+- IMPORTANT: base your exercise selection and intensity primarily on the Recovery trend analysis above, not just today's single check-in. If the trend says WORSENING, ease off regardless of the standard day-phase default. If it says PLATEAU, deliberately vary the exercise selection rather than repeating the same approach. If IMPROVING, you may progress slightly faster than the default phase suggests.
 - Nutrition: avoid allergens (${allergies || "none"}), include accurate macros per meal
 - Keep ALL text fields under 50 words for efficiency
 
@@ -4686,7 +4726,8 @@ IMPORTANT: Include exactly 7 exercises and exactly 3 electrotherapy procedures. 
 - Programme day: ${effectiveDayNum} (Phase ${dayPhase})
 - Day approach: ${dayApproach}
 - Language: ${targetLang}
-${checkIn ? `- Today's check-in: pain ${checkIn.pain}/10, energy ${checkIn.energy}/10` : ""}`;
+${checkIn ? `- Today's check-in: pain ${checkIn.pain}/10, energy ${checkIn.energy}/10` : ""}
+- Recovery trend analysis: ${trendSummary}`;
     let res;
     try {
       let lastErr = null;
@@ -4800,9 +4841,9 @@ ${checkIn ? `- Today's check-in: pain ${checkIn.pain}/10, energy ${checkIn.energ
           const intakePainVal = Number(intakeData == null ? void 0 : intakeData.pain) || 0;
           if (intakePainVal > 0) {
             setCheckinHistory2((prev) => {
-              const hasDay1 = prev.some((p) => p.day === 1);
+              const hasDay1 = prev.some((p) => p.day === 1 && p.programmeId === currentProgId);
               if (hasDay1) return prev;
-              return [{ day: 1, pain: intakePainVal, energy: 5, date: (/* @__PURE__ */ new Date()).toISOString().split("T")[0] }, ...prev].sort((a, b) => a.day - b.day);
+              return [{ day: 1, pain: intakePainVal, energy: 5, date: (/* @__PURE__ */ new Date()).toISOString().split("T")[0], programmeId: currentProgId }, ...prev].sort((a, b) => a.day - b.day);
             });
           }
         }
@@ -4906,7 +4947,8 @@ ${checkIn ? `- Today's check-in: pain ${checkIn.pain}/10, energy ${checkIn.energ
               day: ck.day,
               pain: ck.pain,
               energy: ck.energy || 5,
-              date: ck.check_date || ""
+              date: ck.check_date || "",
+              programmeId: ck.programme_id || null
             })).sort((a, b) => a.day - b.day);
             setCheckinHistory2(mapped);
           } else {
