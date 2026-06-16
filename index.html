@@ -4825,7 +4825,10 @@ ${checkIn ? `- Today's check-in: pain ${checkIn.pain}/10, energy ${checkIn.energ
           localStorage.removeItem("physio_last_checkin");
         }
         const entryPain = checkIn && typeof checkIn.pain === "number" ? checkIn.pain : Number(intakeData == null ? void 0 : intakeData.pain) || 0;
-        const cleanTitle = (parsed.title || "").replace(/[\s\-–—]+day\s*\d+/gi, "").replace(/[\s\-–—]+phase\s*\d+/gi, "").trim();
+        const existingProg = programmes.find((pr) => pr.programmeId === currentProgId);
+        const stripPhaseOnly = (t) => (t || "").replace(/[\s\-–—]*\bphase\s*\d+\b/gi, "").replace(/[\s\-–—]*\bday\s*\d+\b/gi, "").replace(/[\s\-–—:]+$/, "").trim();
+        const cleanTitle = (existingProg && existingProg.title) ? stripPhaseOnly(existingProg.title) : stripPhaseOnly(parsed.title);
+        parsed.title = cleanTitle;
         const generatedDate = (/* @__PURE__ */ new Date()).toISOString().split("T")[0];
         parsed._generatedDate = generatedDate;
         const entry = {
