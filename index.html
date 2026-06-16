@@ -186,13 +186,13 @@ const sb = {
     }
   },
   async saveReview(token, userId, review) {
-    const r = await fetch(`${SUPABASE_URL}/rest/v1/reviews`, {
+    const r = await fetch(`${SUPABASE_URL}/rest/v1/reviews?on_conflict=user_id`, {
       method: "POST",
       headers: {
         apikey: SUPABASE_ANON,
         Authorization: `Bearer ${token}`,
         "Content-Type": "application/json",
-        Prefer: "return=representation"
+        Prefer: "resolution=merge-duplicates,return=representation"
       },
       body: JSON.stringify({
         user_id: userId,
@@ -2856,6 +2856,20 @@ function ReviewModal({ user, onClose, onSubmitted }) {
   const [done, setDone] = useState(false);
   async function submit() {
     var _a2;
+    try {
+      const uid = user && user.id;
+      const sess0 = loadSession();
+      if (uid && sess0 && sess0.token) {
+        const existing = await fetch(`${SUPABASE_URL}/rest/v1/reviews?user_id=eq.${uid}&select=id`, {
+          headers: { apikey: SUPABASE_ANON, Authorization: `Bearer ${sess0.token}` }
+        });
+        const rows = await existing.json();
+        if (Array.isArray(rows) && rows.length > 0) {
+          setError("You have already submitted a review.");
+          return;
+        }
+      }
+    } catch (e) {}
     if (!rating) {
       setError("Please select a star rating.");
       return;
@@ -4455,6 +4469,11 @@ function App() {
   const [selectedProg, setSelectedProg] = useState(null);
   const [showReviewModal, setShowReviewModal] = useState(false);
   const [liveReviews, setLiveReviews] = useState([]);
+  React.useEffect(() => {
+    sb.getReviews().then((r) => {
+      if (Array.isArray(r)) setLiveReviews(r);
+    }).catch(() => {});
+  }, []);
   const [lang, setLang] = useState(() => {
     try {
       return localStorage.getItem("physio_lang") || "en";
