@@ -5197,10 +5197,6 @@ ${checkIn ? `- Today's check-in: pain ${checkIn.pain}/10, energy ${checkIn.energ
           go("disclaimer");
           return;
         }
-        if (activePremiumCount >= 2) {
-          setError("You\u2019ve reached the limit of 2 active body-area programmes under your Premium subscription. Complete one, or purchase another subscription to start a new programme.");
-          return;
-        }
         go("subscribe");
       },
       hasUsedTrial,
@@ -5262,10 +5258,6 @@ ${checkIn ? `- Today's check-in: pain ${checkIn.pain}/10, energy ${checkIn.energ
         if (activePremiumCount === 1) {
           setSubscription("premium");
           go("disclaimer");
-          return;
-        }
-        if (activePremiumCount >= 2) {
-          setError("You\u2019ve reached the limit of 2 active body-area programmes under your Premium subscription. Complete one, or purchase another subscription to start a new programme.");
           return;
         }
         go("subscribe");
