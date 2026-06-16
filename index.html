@@ -5186,18 +5186,21 @@ ${checkIn ? `- Today's check-in: pain ${checkIn.pain}/10, energy ${checkIn.energ
       onSelect: goToProgramme,
       onReview: () => setShowReviewModal(true),
       onNewPlan: () => {
-        if (subscription2 === "premium") {
-          const activePremiumCount = programmes.filter((p) => p.status === "active" && p.subscription === "premium").length;
-          if (activePremiumCount >= 2) {
-            setError("You\u2019ve reached the limit of 2 active body-area programmes under your Premium subscription. Complete one, or purchase another subscription to start a new programme.");
-            return;
-          }
-        }
+        const activePremiumCount = programmes.filter((p) => p.status === "active" && p.subscription === "premium").length;
         const newProgId = "prog_" + Date.now() + "_" + Math.random().toString(36).slice(2, 7);
         setActiveProgrammeId(newProgId);
         setPlan(null);
         setIntake(null);
         setDayNum(1);
+        if (activePremiumCount === 1) {
+          setSubscription("premium");
+          go("disclaimer");
+          return;
+        }
+        if (activePremiumCount >= 2) {
+          setError("You\u2019ve reached the limit of 2 active body-area programmes under your Premium subscription. Complete one, or purchase another subscription to start a new programme.");
+          return;
+        }
         go("subscribe");
       },
       hasUsedTrial,
@@ -5250,18 +5253,21 @@ ${checkIn ? `- Today's check-in: pain ${checkIn.pain}/10, energy ${checkIn.energ
         }
       },
       onNewPlan: () => {
-        if (subscription2 === "premium") {
-          const activePremiumCount = programmes.filter((p) => p.status === "active" && p.subscription === "premium").length;
-          if (activePremiumCount >= 2) {
-            setError("You\u2019ve reached the limit of 2 active body-area programmes under your Premium subscription. Complete one, or purchase another subscription to start a new programme.");
-            return;
-          }
-        }
+        const activePremiumCount = programmes.filter((p) => p.status === "active" && p.subscription === "premium").length;
         const newProgId = "prog_" + Date.now() + "_" + Math.random().toString(36).slice(2, 7);
         setActiveProgrammeId(newProgId);
         setPlan(null);
         setIntake(null);
         setDayNum(1);
+        if (activePremiumCount === 1) {
+          setSubscription("premium");
+          go("disclaimer");
+          return;
+        }
+        if (activePremiumCount >= 2) {
+          setError("You\u2019ve reached the limit of 2 active body-area programmes under your Premium subscription. Complete one, or purchase another subscription to start a new programme.");
+          return;
+        }
         go("subscribe");
       },
       hasUsedTrial
