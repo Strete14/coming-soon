@@ -3084,8 +3084,9 @@ function AuthScreen({ mode: init = "login", onSuccess, lang }) {
     try {
       if (mode === "signup") {
         const res = await sb.signUp(f.email, f.password, f.name, f.role);
-        if (res.error) {
-          setErr(res.error.message || t2.errSignUpFailed);
+        if (res.error || res.error_description || res.msg) {
+          const realMsg = (res.error && res.error.message) || res.error_description || res.msg || (typeof res.error === "string" ? res.error : null);
+          setErr(realMsg || t2.errSignUpFailed);
           setLoading(false);
           return;
         }
@@ -3118,8 +3119,9 @@ function AuthScreen({ mode: init = "login", onSuccess, lang }) {
         onSuccess({ id: userId, name: f.name, email: f.email, role: f.role, token });
       } else {
         const res = await sb.signIn(f.email, f.password);
-        if (res.error) {
-          setErr(res.error.message || t2.errLoginFailed);
+        if (res.error || res.error_description || res.msg) {
+          const realMsg = (res.error && res.error.message) || res.error_description || res.msg || (typeof res.error === "string" ? res.error : null);
+          setErr(realMsg || t2.errLoginFailed);
           setLoading(false);
           return;
         }
