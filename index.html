@@ -5140,6 +5140,9 @@ ${checkIn ? `- Today's check-in: pain ${checkIn.pain}/10, energy ${checkIn.energ
         else if (s === "programmes" || s === "dashboard") {
           if (user) go("programmes");
           else go("login");
+        } else if (s === "profile") {
+          if (user) go("profile");
+          else go("login");
         }
       },
       onLogout: async () => {
