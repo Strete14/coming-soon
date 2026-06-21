@@ -2768,6 +2768,48 @@ function LegalScreen({ type, onBack, lang }) {
     )
   ));
 }
+function ProfileScreen({ user, lang, subscription, programmes = [], onBack, onLogout, onDeleteAccount }) {
+  const t2 = useT(lang);
+  const mono = { fontFamily: "'DM Mono',monospace" };
+  const totalPurchased = programmes.length;
+  const roleLabel = user && user.role === "physiotherapist" ? t2.physiotherapist : user && user.role === "clinic_admin" ? t2.clinicAdmin : t2.patient;
+  const tierLabel = subscription === "premium" ? t2.plan3name : subscription === "standard" ? t2.plan2name : subscription === "trial" ? t2.plan1name : "\u2014";
+  const initial = (user && user.name && user.name[0] && user.name[0].toUpperCase()) || "U";
+  return /* @__PURE__ */ React.createElement("div", { style: { minHeight: "100vh", background: T.offwhite, padding: "60px 20px 80px", fontFamily: "'DM Sans',sans-serif" } }, /* @__PURE__ */ React.createElement("div", { style: { maxWidth: 560, margin: "0 auto" } },
+    /* @__PURE__ */ React.createElement("button", { onClick: onBack, className: "btn-outline", style: { fontSize: 14, marginBottom: 28 } }, "\u2190 Back"),
+    /* @__PURE__ */ React.createElement("div", { style: { display: "flex", alignItems: "center", gap: 16, marginBottom: 32 } },
+      /* @__PURE__ */ React.createElement("div", { style: { width: 64, height: 64, borderRadius: "50%", background: T.teal, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 26, color: T.white, fontWeight: 700, flexShrink: 0 } }, initial),
+      /* @__PURE__ */ React.createElement("div", null,
+        /* @__PURE__ */ React.createElement("div", { style: { fontFamily: "'Fraunces',serif", fontWeight: 600, fontSize: 24, color: T.navy } }, (user && user.name) || "\u2014"),
+        /* @__PURE__ */ React.createElement("div", { style: { fontSize: 14, color: T.grey500 } }, (user && user.email) || "\u2014")
+      )
+    ),
+    /* @__PURE__ */ React.createElement("div", { style: { background: T.white, border: `1px solid ${T.grey100}`, borderRadius: 14, padding: "22px 24px", marginBottom: 16 } },
+      /* @__PURE__ */ React.createElement("div", { style: { display: "grid", gridTemplateColumns: "1fr 1fr", gap: 18 } },
+        /* @__PURE__ */ React.createElement("div", null,
+          /* @__PURE__ */ React.createElement("div", { style: __spreadProps(__spreadValues({}, mono), { fontSize: 10, color: T.grey400, textTransform: "uppercase", letterSpacing: ".1em", marginBottom: 4 }) }, "Account type"),
+          /* @__PURE__ */ React.createElement("div", { style: { fontSize: 15, fontWeight: 600, color: T.navy } }, roleLabel)
+        ),
+        /* @__PURE__ */ React.createElement("div", null,
+          /* @__PURE__ */ React.createElement("div", { style: __spreadProps(__spreadValues({}, mono), { fontSize: 10, color: T.grey400, textTransform: "uppercase", letterSpacing: ".1em", marginBottom: 4 }) }, "Current plan"),
+          /* @__PURE__ */ React.createElement("div", { style: { fontSize: 15, fontWeight: 600, color: T.teal } }, tierLabel)
+        ),
+        /* @__PURE__ */ React.createElement("div", null,
+          /* @__PURE__ */ React.createElement("div", { style: __spreadProps(__spreadValues({}, mono), { fontSize: 10, color: T.grey400, textTransform: "uppercase", letterSpacing: ".1em", marginBottom: 4 }) }, "Programmes purchased"),
+          /* @__PURE__ */ React.createElement("div", { style: { fontSize: 15, fontWeight: 600, color: T.navy } }, totalPurchased)
+        ),
+        /* @__PURE__ */ React.createElement("div", null,
+          /* @__PURE__ */ React.createElement("div", { style: __spreadProps(__spreadValues({}, mono), { fontSize: 10, color: T.grey400, textTransform: "uppercase", letterSpacing: ".1em", marginBottom: 4 }) }, "Language"),
+          /* @__PURE__ */ React.createElement("div", { style: { fontSize: 15, fontWeight: 600, color: T.navy } }, (lang || "en").toUpperCase())
+        )
+      )
+    ),
+    /* @__PURE__ */ React.createElement("div", { style: { background: T.white, border: `1px solid ${T.grey100}`, borderRadius: 14, overflow: "hidden" } },
+      /* @__PURE__ */ React.createElement("button", { onClick: onLogout, style: { width: "100%", textAlign: "left", padding: "16px 24px", background: "none", border: "none", borderBottom: `1px solid ${T.grey100}`, cursor: "pointer", fontSize: 14, color: T.grey600, fontFamily: "'DM Sans',sans-serif" } }, "Log out"),
+      /* @__PURE__ */ React.createElement("button", { onClick: onDeleteAccount, style: { width: "100%", textAlign: "left", padding: "16px 24px", background: "none", border: "none", cursor: "pointer", fontSize: 14, color: T.red, fontFamily: "'DM Sans',sans-serif" } }, "Delete account")
+    )
+  ));
+}
 function ComingSoonScreen({ onBack, lang }) {
   const t2 = useT(lang);
   return /* @__PURE__ */ React.createElement("div", { style: { minHeight: "100vh", background: `linear-gradient(155deg,${T.white} 0%,${T.tealPale} 100%)`, display: "flex", alignItems: "center", justifyContent: "center", padding: "80px 20px", flexDirection: "column", gap: 24, textAlign: "center" } }, /* @__PURE__ */ React.createElement("div", { style: { width: 72, height: 72, borderRadius: 18, background: T.teal, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 34, boxShadow: `0 8px 32px rgba(10,126,110,.25)` } }, "\u{1F3E5}"), /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("div", { style: { fontFamily: "'DM Mono',monospace", fontSize: 11, color: T.teal, textTransform: "uppercase", letterSpacing: ".16em", marginBottom: 12 } }, "For Clinics & Physiotherapists"), /* @__PURE__ */ React.createElement("h1", { style: { fontFamily: "'Fraunces',serif", fontWeight: 600, fontSize: "clamp(28px,5vw,48px)", color: T.navy, lineHeight: 1.1, marginBottom: 16 } }, "Coming ", /* @__PURE__ */ React.createElement("em", { style: { color: T.teal } }, "Soon")), /* @__PURE__ */ React.createElement("p", { style: { fontSize: "clamp(14px,2vw,17px)", color: T.grey500, lineHeight: 1.75, maxWidth: 480, margin: "0 auto 28px" } }, "We are building a dedicated clinic dashboard with multi-patient management, advanced reporting, custom branding, and priority support. Leave your email to be notified when it launches.")), /* @__PURE__ */ React.createElement("div", { style: { display: "flex", gap: 10, flexWrap: "wrap", justifyContent: "center" } }, /* @__PURE__ */ React.createElement("input", { className: "input", type: "email", placeholder: "your@email.com", style: { width: 260, fontSize: 15, minHeight: 50 } }), /* @__PURE__ */ React.createElement("button", { className: "btn-teal", style: { fontSize: 15, padding: "12px 24px", minHeight: 50 } }, "Notify Me")), /* @__PURE__ */ React.createElement("div", { style: { display: "flex", gap: 12, flexWrap: "wrap", justifyContent: "center", marginTop: 8 } }, ["Multi-patient dashboard", "Progress analytics", "Custom clinic branding", "Appointment integration"].map((f, i) => /* @__PURE__ */ React.createElement("span", { key: i, style: { background: T.tealPale, border: `1px solid ${T.tealMid}`, borderRadius: 20, padding: "5px 14px", fontSize: 12, color: T.teal, fontFamily: "'DM Mono',monospace" } }, "\u2713 ", f))), /* @__PURE__ */ React.createElement("button", { onClick: onBack, className: "btn-outline", style: { marginTop: 16, fontSize: 14 } }, "\u2190 Back to Home"));
@@ -2830,7 +2872,7 @@ function Nav({ screen, user, lang, setLang, onNav, notifSystem, onLogout }) {
     } catch (e) {
     }
     setLangOpen(false);
-  }, style: { display: "flex", width: "100%", alignItems: "center", gap: 8, padding: "10px 14px", background: l.c === lang ? T.tealPale : "none", border: "none", cursor: "pointer", fontFamily: "'DM Sans',sans-serif", fontSize: 13, color: l.c === lang ? T.teal : T.grey600, minHeight: 44 } }, l.f, " ", l.c.toUpperCase())))), notifSystem && /* @__PURE__ */ React.createElement(NotificationBell, { notifSystem }), /* @__PURE__ */ React.createElement("div", { className: "desktop-only", style: { display: "flex", gap: 8, alignItems: "center" } }, !user ? /* @__PURE__ */ React.createElement(React.Fragment, null, /* @__PURE__ */ React.createElement("button", { onClick: () => onNav("login"), style: { background: "none", border: "none", cursor: "pointer", fontSize: 13, color: T.grey600, fontFamily: "'DM Sans',sans-serif", padding: "6px 10px", minHeight: 36 } }, t2.logIn), /* @__PURE__ */ React.createElement("button", { className: "btn-teal", onClick: () => onNav("quiz"), style: { padding: "9px 18px", fontSize: 13, minHeight: 36 } }, t2.startFree)) : /* @__PURE__ */ React.createElement("div", { style: { display: "flex", gap: 6, alignItems: "center" } }, /* @__PURE__ */ React.createElement("button", { onClick: () => onNav("programmes"), style: { display: "flex", alignItems: "center", gap: 8, background: T.tealPale, border: `1px solid ${T.tealMid}`, borderRadius: 7, padding: "7px 14px", cursor: "pointer", fontFamily: "'DM Sans',sans-serif", fontSize: 13, color: T.teal, fontWeight: 500, minHeight: 36 } }, /* @__PURE__ */ React.createElement("div", { style: { width: 24, height: 24, borderRadius: "50%", background: T.teal, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 11, color: T.white, fontWeight: 700 } }, ((_c = (_b2 = user.name) == null ? void 0 : _b2[0]) == null ? void 0 : _c.toUpperCase()) || "U"), t2.goToDashboard), /* @__PURE__ */ React.createElement("button", { onClick: onLogout, style: { background: "none", border: `1px solid ${T.grey200}`, borderRadius: 7, padding: "7px 12px", cursor: "pointer", fontFamily: "'DM Sans',sans-serif", fontSize: 13, color: T.grey600, minHeight: 36 } }, "Log out"))), /* @__PURE__ */ React.createElement("button", { onClick: () => setMenuOpen(!menuOpen), style: { background: "none", border: `1px solid ${T.grey200}`, borderRadius: 8, width: 38, height: 38, cursor: "pointer", display: "none", flexDirection: "column", gap: 4, alignItems: "center", justifyContent: "center", WebkitTapHighlightColor: "transparent" }, className: "hamburger" }, /* @__PURE__ */ React.createElement("div", { style: { width: 18, height: 2, background: T.navy, borderRadius: 1, transition: "all .2s", transform: menuOpen ? "rotate(45deg) translate(4px,4px)" : "none" } }), /* @__PURE__ */ React.createElement("div", { style: { width: 18, height: 2, background: T.navy, borderRadius: 1, opacity: menuOpen ? 0 : 1, transition: "all .2s" } }), /* @__PURE__ */ React.createElement("div", { style: { width: 18, height: 2, background: T.navy, borderRadius: 1, transition: "all .2s", transform: menuOpen ? "rotate(-45deg) translate(4px,-4px)" : "none" } })))), /* @__PURE__ */ React.createElement("div", { className: `mobile-menu${menuOpen ? " open" : ""}`, onClick: (e) => e.stopPropagation() }, /* @__PURE__ */ React.createElement("button", { onClick: () => {
+  }, style: { display: "flex", width: "100%", alignItems: "center", gap: 8, padding: "10px 14px", background: l.c === lang ? T.tealPale : "none", border: "none", cursor: "pointer", fontFamily: "'DM Sans',sans-serif", fontSize: 13, color: l.c === lang ? T.teal : T.grey600, minHeight: 44 } }, l.f, " ", l.c.toUpperCase())))), notifSystem && /* @__PURE__ */ React.createElement(NotificationBell, { notifSystem }), /* @__PURE__ */ React.createElement("div", { className: "desktop-only", style: { display: "flex", gap: 8, alignItems: "center" } }, !user ? /* @__PURE__ */ React.createElement(React.Fragment, null, /* @__PURE__ */ React.createElement("button", { onClick: () => onNav("login"), style: { background: "none", border: "none", cursor: "pointer", fontSize: 13, color: T.grey600, fontFamily: "'DM Sans',sans-serif", padding: "6px 10px", minHeight: 36 } }, t2.logIn), /* @__PURE__ */ React.createElement("button", { className: "btn-teal", onClick: () => onNav("quiz"), style: { padding: "9px 18px", fontSize: 13, minHeight: 36 } }, t2.startFree)) : /* @__PURE__ */ React.createElement("div", { style: { display: "flex", gap: 6, alignItems: "center" } }, /* @__PURE__ */ React.createElement("button", { onClick: () => onNav("programmes"), style: { display: "flex", alignItems: "center", gap: 8, background: T.tealPale, border: `1px solid ${T.tealMid}`, borderRadius: 7, padding: "7px 14px", cursor: "pointer", fontFamily: "'DM Sans',sans-serif", fontSize: 13, color: T.teal, fontWeight: 500, minHeight: 36 } }, /* @__PURE__ */ React.createElement("div", { style: { width: 24, height: 24, borderRadius: "50%", background: T.teal, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 11, color: T.white, fontWeight: 700 } }, ((_c = (_b2 = user.name) == null ? void 0 : _b2[0]) == null ? void 0 : _c.toUpperCase()) || "U"), t2.goToDashboard), /* @__PURE__ */ React.createElement("button", { onClick: () => onNav("profile"), style: { background: "none", border: `1px solid ${T.grey200}`, borderRadius: 7, padding: "7px 12px", cursor: "pointer", fontFamily: "'DM Sans',sans-serif", fontSize: 13, color: T.grey600, minHeight: 36 } }, "Profile"))), /* @__PURE__ */ React.createElement("button", { onClick: () => setMenuOpen(!menuOpen), style: { background: "none", border: `1px solid ${T.grey200}`, borderRadius: 8, width: 38, height: 38, cursor: "pointer", display: "none", flexDirection: "column", gap: 4, alignItems: "center", justifyContent: "center", WebkitTapHighlightColor: "transparent" }, className: "hamburger" }, /* @__PURE__ */ React.createElement("div", { style: { width: 18, height: 2, background: T.navy, borderRadius: 1, transition: "all .2s", transform: menuOpen ? "rotate(45deg) translate(4px,4px)" : "none" } }), /* @__PURE__ */ React.createElement("div", { style: { width: 18, height: 2, background: T.navy, borderRadius: 1, opacity: menuOpen ? 0 : 1, transition: "all .2s" } }), /* @__PURE__ */ React.createElement("div", { style: { width: 18, height: 2, background: T.navy, borderRadius: 1, transition: "all .2s", transform: menuOpen ? "rotate(-45deg) translate(4px,-4px)" : "none" } })))), /* @__PURE__ */ React.createElement("div", { className: `mobile-menu${menuOpen ? " open" : ""}`, onClick: (e) => e.stopPropagation() }, /* @__PURE__ */ React.createElement("button", { onClick: () => {
     setMenuOpen(false);
     onNav("how_it_works");
   }, style: { background: "none", border: "none", cursor: "pointer", padding: "13px 0", fontSize: 16, fontWeight: 500, color: T.grey600, textAlign: "left", borderBottom: `1px solid ${T.grey100}`, fontFamily: "'DM Sans',sans-serif", width: "100%" } }, t2.howItWorks), /* @__PURE__ */ React.createElement("button", { onClick: () => {
@@ -2852,6 +2894,51 @@ function Nav({ screen, user, lang, setLang, onNav, notifSystem, onLogout }) {
     setMenuOpen(false);
     onLogout();
   }, style: { width: "100%", justifyContent: "center", minHeight: 44, background: "none", border: `1px solid ${T.grey200}`, borderRadius: 8, cursor: "pointer", fontFamily: "'DM Sans',sans-serif", fontSize: 15, color: T.grey600 } }, "Log out")))), /* @__PURE__ */ React.createElement("style", null, `.desktop-only{display:flex}.hamburger{display:none!important} @media(max-width:768px){.desktop-only{display:none!important}.hamburger{display:flex!important}}`));
+}
+function DeleteAccountModal({ user, onClose, onDeleted, lang }) {
+  const t2 = useT(lang);
+  const [confirmText, setConfirmText] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+  const canDelete = confirmText.trim().toUpperCase() === "DELETE";
+  async function handleDelete() {
+    if (!canDelete) return;
+    setLoading(true);
+    setError("");
+    try {
+      const sess = loadSession();
+      if (!(sess && sess.token)) {
+        setError("Your session has expired. Please log in again and retry.");
+        setLoading(false);
+        return;
+      }
+      const r = await fetch("/api/delete-account", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${sess.token}` }
+      });
+      const data = await r.json().catch(() => ({}));
+      if (!r.ok) {
+        setError(data.error || "Could not delete your account. Please try again or contact contact@physioroutine.com.");
+        setLoading(false);
+        return;
+      }
+      onDeleted();
+    } catch (e) {
+      setError("Connection error. Please try again.");
+      setLoading(false);
+    }
+  }
+  return /* @__PURE__ */ React.createElement("div", { style: { position: "fixed", inset: 0, background: "rgba(0,0,0,.55)", zIndex: 9999, display: "flex", alignItems: "center", justifyContent: "center", padding: "16px", overflowY: "auto" } }, /* @__PURE__ */ React.createElement("div", { style: { background: T.white, borderRadius: 16, padding: "clamp(24px,4vw,32px)", width: "100%", maxWidth: 460, boxShadow: "0 20px 60px rgba(0,0,0,.25)", margin: "auto" } },
+    /* @__PURE__ */ React.createElement("div", { style: { fontFamily: "'Fraunces',serif", fontWeight: 600, fontSize: 22, color: T.navy, marginBottom: 10 } }, "Delete your account"),
+    /* @__PURE__ */ React.createElement("p", { style: { fontSize: 14, color: T.grey600, lineHeight: 1.65, marginBottom: 6 } }, "This permanently deletes your account, login, and all associated data \u2014 your programmes, check-in history, and any review you've submitted. This cannot be undone."),
+    /* @__PURE__ */ React.createElement("p", { style: { fontSize: 13, color: T.grey500, marginBottom: 16 } }, "Type ", /* @__PURE__ */ React.createElement("strong", { style: { color: T.navy } }, "DELETE"), " below to confirm."),
+    /* @__PURE__ */ React.createElement("input", { className: "input", value: confirmText, onChange: (e) => setConfirmText(e.target.value), placeholder: "DELETE", style: { width: "100%", marginBottom: 14, fontFamily: "'DM Mono',monospace", boxSizing: "border-box" } }),
+    error && /* @__PURE__ */ React.createElement("div", { style: { color: T.red, fontSize: 13, marginBottom: 12, padding: "8px 12px", background: T.redPale, borderRadius: 6 } }, error),
+    /* @__PURE__ */ React.createElement("div", { style: { display: "flex", gap: 10 } },
+      /* @__PURE__ */ React.createElement("button", { onClick: onClose, disabled: loading, style: { flex: 1, padding: "12px", background: "none", border: `1px solid ${T.grey200}`, borderRadius: 8, cursor: "pointer", fontSize: 14, fontFamily: "'DM Sans',sans-serif", color: T.grey600 } }, "Cancel"),
+      /* @__PURE__ */ React.createElement("button", { onClick: handleDelete, disabled: !canDelete || loading, style: { flex: 2, justifyContent: "center", padding: "12px", fontSize: 14, fontWeight: 600, borderRadius: 8, border: "none", cursor: canDelete && !loading ? "pointer" : "not-allowed", background: canDelete ? T.red : T.grey200, color: T.white, opacity: loading ? 0.7 : 1 } }, loading ? "Deleting\u2026" : "Delete my account permanently")
+    )
+  ));
 }
 function ReviewModal({ user, onClose, onSubmitted }) {
   const [rating, setRating] = useState(0);
@@ -4049,14 +4136,14 @@ function ProgrammeDashboard({ prog, onBack, onContinue, onNewPlan, lang, user, n
     );
   }), plans.length === 0 && /* @__PURE__ */ React.createElement("div", { className: "card", style: { textAlign: "center", padding: "32px" } }, /* @__PURE__ */ React.createElement("div", { style: { fontSize: 14, color: T2.grey500 } }, "No plans generated yet.")))));
 }
-function DashboardScreen({ user, onStartPlan, onLogout, plan, dayNum = 1, onViewPlan, onCheckIn, onSaveCheckin, notifSystem, lang, planHistory = [], checkinHistory = [], initialTab = "overview", programmes = [], activeProgrammeId, setActiveProgrammeId, setPlan, setDayNum, setIntake }) {
+function DashboardScreen({ user, onStartPlan, onLogout, onDeleteAccount, plan, dayNum = 1, onViewPlan, onCheckIn, onSaveCheckin, notifSystem, lang, planHistory = [], checkinHistory = [], initialTab = "overview", programmes = [], activeProgrammeId, setActiveProgrammeId, setPlan, setDayNum, setIntake }) {
   var _a2, _b2, _c, _d, _e, _f;
   const t2 = useT(lang);
   const [tab, setTab] = useState(initialTab);
   const isPhysio = (user == null ? void 0 : user.role) === "physiotherapist" || (user == null ? void 0 : user.role) === "clinic_admin";
   const allPlans = planHistory.length > 0 ? planHistory : [];
   const tabs = isPhysio ? [{ k: "overview", l: "Overview" }, { k: "patients", l: "Patients" }, { k: "plans", l: t2.planHistory }] : [{ k: "overview", l: "Overview" }, { k: "plans", l: t2.planHistory }, { k: "progress", l: t2.progressTracking }];
-  return /* @__PURE__ */ React.createElement("div", { style: { minHeight: "100vh", background: T.offwhite } }, /* @__PURE__ */ React.createElement("div", { style: { display: "flex", minHeight: "100vh", paddingTop: 62 }, className: "dash-layout" }, /* @__PURE__ */ React.createElement("aside", { className: "dash-sidebar", style: { background: T.white, borderRight: `1px solid ${T.grey100}`, flexShrink: 0, position: "sticky", top: 62, height: "calc(100vh - 62px)", overflow: "auto" } }, /* @__PURE__ */ React.createElement("div", { style: { padding: "20px 18px 16px" } }, /* @__PURE__ */ React.createElement("div", { style: { display: "flex", alignItems: "center", gap: 10 } }, /* @__PURE__ */ React.createElement("div", { style: { width: 36, height: 36, borderRadius: "50%", background: T.teal, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 15, color: T.white, fontWeight: 700, flexShrink: 0 } }, ((_b2 = (_a2 = user == null ? void 0 : user.name) == null ? void 0 : _a2[0]) == null ? void 0 : _b2.toUpperCase()) || "U"), /* @__PURE__ */ React.createElement("div", { style: { minWidth: 0 } }, /* @__PURE__ */ React.createElement("div", { style: { fontWeight: 600, fontSize: 13, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" } }, (user == null ? void 0 : user.name) || "User"), /* @__PURE__ */ React.createElement("div", { style: __spreadValues({ fontSize: 11, color: T.grey400 }, mono) }, (user == null ? void 0 : user.role) || "patient")))), /* @__PURE__ */ React.createElement("div", { className: "dash-sidebar-inner", style: { display: "flex", flexDirection: "column" } }, tabs.map((tb) => /* @__PURE__ */ React.createElement("button", { key: tb.k, className: `sidebar-btn${tab === tb.k ? " active" : ""}`, onClick: () => setTab(tb.k) }, tb.l)), /* @__PURE__ */ React.createElement("div", { style: { borderTop: `1px solid ${T.grey100}`, marginTop: 12, paddingTop: 8 } }, /* @__PURE__ */ React.createElement("button", { className: "sidebar-btn", style: { color: T.red }, onClick: onLogout }, "\u2192 ", t2.logIn && "Log out")))), /* @__PURE__ */ React.createElement("main", { style: { flex: 1, padding: "clamp(18px,3vw,36px) clamp(14px,3vw,40px)", overflow: "auto", minWidth: 0 } }, tab === "overview" && /* @__PURE__ */ React.createElement("div", { style: { animation: "fadeUp .35s ease" } }, /* @__PURE__ */ React.createElement("div", { style: { marginBottom: 24 } }, /* @__PURE__ */ React.createElement(SL, null, isPhysio ? t2.clinicDashboard : t2.patientDashboard), /* @__PURE__ */ React.createElement("h1", { style: __spreadProps(__spreadValues({}, serif), { fontWeight: 600, fontSize: "clamp(20px,3vw,29px)", letterSpacing: "-.02em" }) }, t2.welcomeBack2, " ", ((_d = (_c = user == null ? void 0 : user.name) == null ? void 0 : _c.split(" ")) == null ? void 0 : _d[0]) || "", " \u{1F44B}")), /* @__PURE__ */ React.createElement("div", { className: "grid-2", style: { marginBottom: 20 } }, (isPhysio ? [{ icon: "\u{1F465}", l: t2.activePatients, v: "3", c: T.teal }, { icon: "\u{1F4CB}", l: t2.planHistory, v: String(allPlans.length), c: T.navy }] : [{ icon: "\u{1F4CB}", l: t2.plansDone, v: String(allPlans.length), c: T.teal }, { icon: "\u{1F525}", l: t2.dayStreak, v: `Day ${dayNum}`, c: T.orange }]).map((s, i) => /* @__PURE__ */ React.createElement("div", { key: i, className: "card", style: { animation: `fadeUp .3s ease ${i * 0.06}s both` } }, /* @__PURE__ */ React.createElement("div", { style: { fontSize: 22, marginBottom: 8 } }, s.icon), /* @__PURE__ */ React.createElement("div", { style: __spreadProps(__spreadValues({}, serif), { fontSize: 26, fontWeight: 600, color: s.c, letterSpacing: "-.02em" }) }, s.v), /* @__PURE__ */ React.createElement("div", { style: __spreadValues({ fontSize: 11, color: T.grey400, marginTop: 2 }, mono) }, s.l)))), /* @__PURE__ */ React.createElement(WeeklySummaryCard, { planHistory: allPlans, dayNum, onDismiss: () => {
+  return /* @__PURE__ */ React.createElement("div", { style: { minHeight: "100vh", background: T.offwhite } }, /* @__PURE__ */ React.createElement("div", { style: { display: "flex", minHeight: "100vh", paddingTop: 62 }, className: "dash-layout" }, /* @__PURE__ */ React.createElement("aside", { className: "dash-sidebar", style: { background: T.white, borderRight: `1px solid ${T.grey100}`, flexShrink: 0, position: "sticky", top: 62, height: "calc(100vh - 62px)", overflow: "auto" } }, /* @__PURE__ */ React.createElement("div", { style: { padding: "20px 18px 16px" } }, /* @__PURE__ */ React.createElement("div", { style: { display: "flex", alignItems: "center", gap: 10 } }, /* @__PURE__ */ React.createElement("div", { style: { width: 36, height: 36, borderRadius: "50%", background: T.teal, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 15, color: T.white, fontWeight: 700, flexShrink: 0 } }, ((_b2 = (_a2 = user == null ? void 0 : user.name) == null ? void 0 : _a2[0]) == null ? void 0 : _b2.toUpperCase()) || "U"), /* @__PURE__ */ React.createElement("div", { style: { minWidth: 0 } }, /* @__PURE__ */ React.createElement("div", { style: { fontWeight: 600, fontSize: 13, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" } }, (user == null ? void 0 : user.name) || "User"), /* @__PURE__ */ React.createElement("div", { style: __spreadValues({ fontSize: 11, color: T.grey400 }, mono) }, (user == null ? void 0 : user.role) || "patient")))), /* @__PURE__ */ React.createElement("div", { className: "dash-sidebar-inner", style: { display: "flex", flexDirection: "column" } }, tabs.map((tb) => /* @__PURE__ */ React.createElement("button", { key: tb.k, className: `sidebar-btn${tab === tb.k ? " active" : ""}`, onClick: () => setTab(tb.k) }, tb.l)))), /* @__PURE__ */ React.createElement("main", { style: { flex: 1, padding: "clamp(18px,3vw,36px) clamp(14px,3vw,40px)", overflow: "auto", minWidth: 0 } }, tab === "overview" && /* @__PURE__ */ React.createElement("div", { style: { animation: "fadeUp .35s ease" } }, /* @__PURE__ */ React.createElement("div", { style: { marginBottom: 24 } }, /* @__PURE__ */ React.createElement(SL, null, isPhysio ? t2.clinicDashboard : t2.patientDashboard), /* @__PURE__ */ React.createElement("h1", { style: __spreadProps(__spreadValues({}, serif), { fontWeight: 600, fontSize: "clamp(20px,3vw,29px)", letterSpacing: "-.02em" }) }, t2.welcomeBack2, " ", ((_d = (_c = user == null ? void 0 : user.name) == null ? void 0 : _c.split(" ")) == null ? void 0 : _d[0]) || "", " \u{1F44B}")), /* @__PURE__ */ React.createElement("div", { className: "grid-2", style: { marginBottom: 20 } }, (isPhysio ? [{ icon: "\u{1F465}", l: t2.activePatients, v: "3", c: T.teal }, { icon: "\u{1F4CB}", l: t2.planHistory, v: String(allPlans.length), c: T.navy }] : [{ icon: "\u{1F4CB}", l: t2.plansDone, v: String(allPlans.length), c: T.teal }, { icon: "\u{1F525}", l: t2.dayStreak, v: `Day ${dayNum}`, c: T.orange }]).map((s, i) => /* @__PURE__ */ React.createElement("div", { key: i, className: "card", style: { animation: `fadeUp .3s ease ${i * 0.06}s both` } }, /* @__PURE__ */ React.createElement("div", { style: { fontSize: 22, marginBottom: 8 } }, s.icon), /* @__PURE__ */ React.createElement("div", { style: __spreadProps(__spreadValues({}, serif), { fontSize: 26, fontWeight: 600, color: s.c, letterSpacing: "-.02em" }) }, s.v), /* @__PURE__ */ React.createElement("div", { style: __spreadValues({ fontSize: 11, color: T.grey400, marginTop: 2 }, mono) }, s.l)))), /* @__PURE__ */ React.createElement(WeeklySummaryCard, { planHistory: allPlans, dayNum, onDismiss: () => {
   } }), plan && subscription !== "trial" && (() => {
     const todayKey = (/* @__PURE__ */ new Date()).toISOString().split("T")[0];
     const lastCheckin = localStorage.getItem("physio_last_checkin");
@@ -4367,6 +4454,7 @@ function App() {
   const [screen, setScreen] = useState("home");
   const [selectedProg, setSelectedProg] = useState(null);
   const [showReviewModal, setShowReviewModal] = useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [liveReviews, setLiveReviews] = useState([]);
   React.useEffect(() => {
     sb.getReviews().then((r) => {
@@ -5109,7 +5197,10 @@ ${checkIn ? `- Today's check-in: pain ${checkIn.pain}/10, energy ${checkIn.energ
         go("home");
       }
     }
-  ), screen === "how_it_works" && /* @__PURE__ */ React.createElement(HowItWorksScreen, { onBack: () => go("home"), onStart: () => go(user ? "subscribe" : "login"), lang, user }), screen === "pricing" && /* @__PURE__ */ React.createElement(PricingScreen, { onBack: () => go("home"), onStart: () => go(user ? "subscribe" : "login"), lang, user }), screen === "coming_soon" && /* @__PURE__ */ React.createElement(ComingSoonScreen, { onBack: () => go("home"), lang }), screen === "privacy" && /* @__PURE__ */ React.createElement(LegalScreen, { type: "privacy", onBack: () => go("home"), lang }), screen === "terms" && /* @__PURE__ */ React.createElement(LegalScreen, { type: "terms", onBack: () => go("home"), lang }), screen === "testimonials" && /* @__PURE__ */ React.createElement(TestimonialsScreen, { onBack: () => go("home"), onStart: () => go(user ? "subscribe" : "login"), lang, user, liveReviews, onReview: () => setShowReviewModal(true) }), screen === "login" && /* @__PURE__ */ React.createElement(AuthScreen, { mode: "login", onSuccess: handleAuthSuccess, lang, onNav: (s) => go(s) }), screen === "signup" && /* @__PURE__ */ React.createElement(AuthScreen, { mode: "signup", onSuccess: handleAuthSuccess, lang, onNav: (s) => go(s) }), screen === "disclaimer" && /* @__PURE__ */ React.createElement(DisclaimerScreen, { onAccept: (safety) => {
+  ), screen === "how_it_works" && /* @__PURE__ */ React.createElement(HowItWorksScreen, { onBack: () => go("home"), onStart: () => go(user ? "subscribe" : "login"), lang, user }), screen === "pricing" && /* @__PURE__ */ React.createElement(PricingScreen, { onBack: () => go("home"), onStart: () => go(user ? "subscribe" : "login"), lang, user }), screen === "coming_soon" && /* @__PURE__ */ React.createElement(ComingSoonScreen, { onBack: () => go("home"), lang }), screen === "privacy" && /* @__PURE__ */ React.createElement(LegalScreen, { type: "privacy", onBack: () => go("home"), lang }), screen === "terms" && /* @__PURE__ */ React.createElement(LegalScreen, { type: "terms", onBack: () => go("home"), lang }), screen === "profile" && user && /* @__PURE__ */ React.createElement(ProfileScreen, { user, lang, subscription: subscription2, programmes, onBack: () => go("dashboard"), onLogout: () => {
+    setUser(null);
+    go("home");
+  }, onDeleteAccount: () => setShowDeleteModal(true) }), screen === "testimonials" && /* @__PURE__ */ React.createElement(TestimonialsScreen, { onBack: () => go("home"), onStart: () => go(user ? "subscribe" : "login"), lang, user, liveReviews, onReview: () => setShowReviewModal(true) }), screen === "login" && /* @__PURE__ */ React.createElement(AuthScreen, { mode: "login", onSuccess: handleAuthSuccess, lang, onNav: (s) => go(s) }), screen === "signup" && /* @__PURE__ */ React.createElement(AuthScreen, { mode: "signup", onSuccess: handleAuthSuccess, lang, onNav: (s) => go(s) }), screen === "disclaimer" && /* @__PURE__ */ React.createElement(DisclaimerScreen, { onAccept: (safety) => {
     setSafetyData(safety);
     go("quiz");
   }, onBack: () => go("dashboard"), lang }), screen === "quiz" && /* @__PURE__ */ React.createElement(QuizScreen, { onComplete: handleIntakeComplete, lang }), screen === "subscribe" && /* @__PURE__ */ React.createElement(SubscribeScreen, { onPaid: handlePaid, user, onLogin: () => go("login"), onBack: () => go(user ? "dashboard" : "home"), lang, trialUsed: hasUsedTrial }), screen === "loading" && /* @__PURE__ */ React.createElement(LoadingScreen, { lang, dayNum }), screen === "plan" && /* @__PURE__ */ React.createElement(
@@ -5243,6 +5334,7 @@ ${checkIn ? `- Today's check-in: pain ${checkIn.pain}/10, energy ${checkIn.energ
       setPlan,
       setDayNum,
       setIntake,
+      onDeleteAccount: () => setShowDeleteModal(true),
       onSaveCheckin: (entry) => setCheckinHistory2((prev) => {
         const f = prev.filter((p) => p.day !== entry.day);
         return [...f, entry].sort((a, b) => a.day - b.day);
@@ -5310,6 +5402,37 @@ ${checkIn ? `- Today's check-in: pain ${checkIn.pain}/10, energy ${checkIn.energ
           if (Array.isArray(r)) setLiveReviews(r);
         }).catch(() => {
         });
+      }
+    }
+  ), showDeleteModal && user && /* @__PURE__ */ React.createElement(
+    DeleteAccountModal,
+    {
+      user,
+      lang,
+      onClose: () => setShowDeleteModal(false),
+      onDeleted: () => {
+        try {
+          const sess = loadSession();
+          if (sess && sess.token) sb.signOut(sess.token).catch(() => {});
+        } catch (e) {}
+        clearSession();
+        setShowDeleteModal(false);
+        setUser(null);
+        setIntake(null);
+        setPlan(null);
+        setDayNum(1);
+        setSubscription(null);
+        setTrialUsed(false);
+        setPlanHistory([]);
+        setCheckinHistory2([]);
+        setProgrammes([]);
+        setActiveProgrammeId(null);
+        setSelectedProg(null);
+        try {
+          Object.keys(localStorage).filter((k) => k.startsWith("physio")).forEach((k) => localStorage.removeItem(k));
+        } catch (e) {}
+        go("home");
+        setTimeout(() => setError("Your account has been deleted."), 300);
       }
     }
   ), error && /* @__PURE__ */ React.createElement("div", { style: { position: "fixed", bottom: 20, right: 20, left: 20, maxWidth: 380, margin: "0 auto", background: T.redPale, border: `1px solid ${T.red}28`, borderRadius: 10, padding: "13px 16px", fontSize: 14, color: T.red, zIndex: 999, boxShadow: "0 4px 20px rgba(0,0,0,.1)", display: "flex", gap: 10, alignItems: "flex-start", animation: "scaleIn .3s ease" } }, /* @__PURE__ */ React.createElement("span", { style: { flex: 1, lineHeight: 1.5 } }, error), /* @__PURE__ */ React.createElement("button", { onClick: () => setError(""), style: { background: "none", border: "none", cursor: "pointer", color: T.red, fontWeight: 700, fontSize: 16, padding: 0, flexShrink: 0 } }, "\u2715")), toastNotif && /* @__PURE__ */ React.createElement(NotifToast, { notif: toastNotif, onDismiss: () => setToastNotif(null) }));
