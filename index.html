@@ -4751,15 +4751,24 @@ ${checkIn ? `- Today's check-in: pain ${checkIn.pain}/10, energy ${checkIn.energ
               messages: [{ role: "user", content: userPrompt }]
             })
           });
-          if (res.status < 500) break;
-          lastErr = `HTTP ${res.status}`;
+          if (res.status < 500) {
+            const cloned = res.clone();
+            const preview = await cloned.json().catch(() => ({}));
+            const isOverloaded = (preview.error && (preview.error.type === "overloaded_error" || (preview.error.message || "").includes("overloaded")));
+            if (!isOverloaded) break;
+            lastErr = "overloaded";
+            res = null;
+          } else {
+            lastErr = `HTTP ${res.status}`;
+            res = null;
+          }
         } catch (fetchErr) {
           lastErr = fetchErr.message;
           res = null;
         }
         if (attempt < 3) {
-          const delay = attempt * 4e3;
-          setError(`Server busy \u2014 retrying in ${delay / 1e3}s... (attempt ${attempt}/3)`);
+          const delay = attempt * 10e3;
+          setError(`The AI service is busy \u2014 retrying in ${delay / 1e3}s... (attempt ${attempt}/3)`);
           await new Promise((r) => setTimeout(r, delay));
           setError("");
         }
@@ -4865,7 +4874,7 @@ ${checkIn ? `- Today's check-in: pain ${checkIn.pain}/10, energy ${checkIn.energ
       go("plan");
       notifSystem.addInApp("new_plan", `${parsed.title || "Plan"} \u2014 Day ${dayNum}`, { screen: "plan" });
     } catch (e) {
-      setError(`Could not generate plan: ${e.message}. Please try again.`);
+      setError(e.message === "overloaded" ? "The AI service is temporarily busy. Please wait 30 seconds and try again." : `Could not generate plan: ${e.message}. Please try again.`);
       go("programmes");
     }
   }
