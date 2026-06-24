@@ -3815,7 +3815,24 @@ function PlanScreen({ plan, dayNum = 1, subscription: subscription2 = "standard"
     ex.reps && `${ex.reps}`,
     ex.rest && `${ex.rest} ${t2.rest || "rest"}`
   ].filter(Boolean).map((line, i2) => /* @__PURE__ */ React.createElement("div", { key: i2, style: { display: "flex", alignItems: "flex-start", gap: 7 } }, /* @__PURE__ */ React.createElement("span", { style: { color: T.teal, fontWeight: 700, fontSize: 13, flexShrink: 0, lineHeight: 1.5 } }, "\u2022"), /* @__PURE__ */ React.createElement("span", { style: __spreadProps(__spreadValues({ fontSize: 12 }, mono), { color: T.grey600, lineHeight: 1.5 }) }, line))))), /* @__PURE__ */ React.createElement("span", { style: { color: T.grey300, fontSize: 13, transition: "transform .2s", transform: expanded === i ? "rotate(180deg)" : "none", display: "inline-block", flexShrink: 0 } }, "\u25BE")), expanded === i && /* @__PURE__ */ React.createElement("div", { style: { padding: "0 16px 18px 16px", borderTop: `1px solid ${T.grey100}` } }, (() => {
-    const imgKey = ex.exerciseKey || (ex.name ? ex.name.toLowerCase().replace(/[^a-z0-9]+/g, "_").replace(/^_|_$/g, "") : null);
+    const rawKey = ex.exerciseKey || (ex.name ? ex.name.toLowerCase().replace(/[^a-z0-9]+/g, "_").replace(/^_|_$/g, "") : null);
+    const validKeys = new Set(["achilles_stretch","adductor_squeeze","ankle_alphabet","ankle_circles","back_extension_bench","band_pull_apart","bird_dog","box_squat","calf_stretch_bent","calf_stretch_straight","cat_cow","cervical_rotation_stretch","childs_pose","chin_tuck","chin_tuck_with_extension","clam_with_band","cross_body_stretch","dead_bug","diaphragmatic_breathing","doorway_stretch","double_knee_to_chest","eccentric_wrist_curl","elbow_extension","elbow_flexion","empty_can","external_rotation","face_pull","figure_4_stretch","finger_extension_band","fire_hydrant","foam_roller_thoracic","foot_doming","forearm_plank","forearm_rotation","front_raise","full_can","glute_bridge","glute_kickback","golfers_elbow_stretch","grip_strengthening","hamstring_curl","heel_raise","heel_slide","heel_walk","hip_90_90_rotation","hip_abduction","hip_adduction","hip_flexor_stretch","hip_hike","internal_rotation","isometric_neck_extension","isometric_neck_flexion","isometric_neck_side","it_band_stretch","knee_flexion_stretch","knee_to_chest","lat_pulldown","lateral_ankle_hops","lateral_band_walk","lateral_lunge","lateral_raise","levator_scapulae_stretch","lower_trap_exercise","mcgill_curl_up","mckenzie_extension","middle_trap_exercise","mini_squat","monster_walk","neck_flexion_stretch","neck_rotation","neck_side_bend","nordic_hamstring_curl","open_book_rotation","overhead_press","pallof_press","pallof_press_rotation","pec_minor_stretch","pelvic_tilt","pendulum_swing","pigeon_stretch","plank","plantar_fascia_stretch","pronator_stretch","prone_cobra","prone_hip_extension","prone_press_up","prone_t_raise","prone_w_raise","prone_y_raise","quad_sets","radial_deviation","resistance_band_row","reverse_lunge","rhomboid_stretch","rib_grab_stretch","rotator_cuff_side_lying","scalene_stretch","scapular_retraction","seated_hip_abduction","seated_lumbar_rotation","seated_piriformis_stretch","seated_row","serratus_punch","short_arc_quad","shoulder_circles","shoulder_horizontal_abduction","shoulder_shrug","side_lying_abduction","side_plank","single_leg_balance","single_leg_deadlift","single_leg_heel_raise","sleeper_stretch","standing_back_extension","star_excursion_balance","step_down","step_up","straight_leg_raise","superman","supinator_stretch","t_spine_rotation","tennis_elbow_stretch","terminal_knee_extension","thoracic_extension","thoracic_rotation_stretch","tibialis_raise","toe_walk","towel_scrunch","transverse_abdominis_activation","ulnar_deviation","upper_trap_stretch","vastus_medialis_squeeze","wall_angel","wall_crawl","wall_push_up","wall_sit","wall_slide","wrist_extension","wrist_flexion"]);
+    const resolveKey = (k) => {
+      if (!k) return null;
+      if (validKeys.has(k)) return k;
+      const suffixes = ["_with_band","_with_resistance","_with_weight","_standing","_seated","_lying","_supine","_prone","_bilateral","_unilateral","_advanced","_basic","_modified"];
+      let attempt = k;
+      for (const s of suffixes) {
+        if (attempt.endsWith(s)) { attempt = attempt.slice(0, -s.length); if (validKeys.has(attempt)) return attempt; }
+      }
+      const parts = k.split("_");
+      for (let i = parts.length - 1; i >= 2; i--) {
+        const shorter = parts.slice(0, i).join("_");
+        if (validKeys.has(shorter)) return shorter;
+      }
+      return k;
+    };
+    const imgKey = resolveKey(rawKey);
     return imgKey ? /* @__PURE__ */ React.createElement(
       "img",
       {
@@ -4704,6 +4721,7 @@ ELBOW/WRIST: wrist_flexion, wrist_extension, forearm_rotation, eccentric_wrist_c
 CORE: plank, forearm_plank, dead_bug, pallof_press_rotation, single_leg_deadlift, glute_kickback, fire_hydrant, transverse_abdominis_activation, diaphragmatic_breathing
 
 RULES:
+- exerciseKey MUST be copied EXACTLY from the list above — never add suffixes like _with_band or _standing, never invent new keys
 - Match exercises to body area only
 - Equipment: home_none=bodyweight, home_basic=bands/foam roller, home_full=dumbbells/bench, gym=machines
 - Safety: surgery=gentle ROM only, cardiac=low intensity, pregnancy=safe modifications, osteoporosis=no spinal flexion
