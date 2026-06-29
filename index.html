@@ -2773,76 +2773,77 @@ function LegalScreen({ type, onBack, lang }) {
 }
 function ProfileScreen({ user, lang, subscription, programmes = [], onBack, onLogout, onDeleteAccount }) {
   const t2 = useT(lang);
-  const mono = { fontFamily: "'DM Mono',monospace" };
-  const serif = { fontFamily: "'Fraunces',serif" };
+  const mono2 = { fontFamily: "'DM Mono',monospace" };
+  const serif2 = { fontFamily: "'Fraunces',serif" };
   const totalPurchased = programmes.length;
-  const activeProgrammes = programmes.filter((p) => p.status === "active" && p.subscription !== "trial").length;
-  const completedProgrammes = programmes.filter((p) => p.status === "completed" || p.subscription === "trial").length;
+  const activeProgrammes = programmes.filter((p) => p.status === "active" && p.subscription !== "trial");
+  const completedCount = programmes.filter((p) => p.status === "completed" || p.subscription === "trial").length;
   const roleLabel = user && user.role === "physiotherapist" ? t2.physiotherapist : user && user.role === "clinic_admin" ? t2.clinicAdmin : t2.patient;
   const tierLabel = subscription === "premium" ? t2.plan3name : subscription === "standard" ? t2.plan2name : subscription === "trial" ? t2.plan1name : "\u2014";
   const tierColor = subscription === "premium" ? T.orange : subscription === "standard" ? T.teal : T.grey400;
-  const tierBg = subscription === "premium" ? T.orangePale : subscription === "standard" ? T.tealPale : T.grey50;
   const initial = (user && user.name && user.name[0] && user.name[0].toUpperCase()) || "U";
-  const stats = [
-    { label: "Total Programmes", value: totalPurchased, icon: "\u{1F4CB}" },
-    { label: "Active", value: activeProgrammes, icon: "\u25B6\uFE0F" },
-    { label: "Completed", value: completedProgrammes, icon: "\u2713" },
-  ];
   return /* @__PURE__ */ React.createElement("div", { style: { minHeight: "100vh", background: T.offwhite, fontFamily: "'DM Sans',sans-serif" } },
-    /* @__PURE__ */ React.createElement("div", { style: { background: `linear-gradient(135deg,${T.navy} 0%,${T.teal} 100%)`, padding: "clamp(20px,4vw,40px) clamp(16px,4vw,40px) 0", position: "relative" } },
-      /* @__PURE__ */ React.createElement("button", { onClick: onBack, style: { background: "none", border: "none", cursor: "pointer", color: "rgba(255,255,255,.7)", fontSize: 14, display: "flex", alignItems: "center", gap: 6, marginBottom: 28, fontFamily: "'DM Sans',sans-serif" } }, "\u2190 Back"),
-      /* @__PURE__ */ React.createElement("div", { style: { maxWidth: 680, margin: "0 auto" } },
-        /* @__PURE__ */ React.createElement("div", { style: { display: "flex", alignItems: "flex-end", gap: 20, marginBottom: 28, flexWrap: "wrap" } },
-          /* @__PURE__ */ React.createElement("div", { style: { width: 84, height: 84, borderRadius: "50%", background: "rgba(255,255,255,.15)", border: "3px solid rgba(255,255,255,.4)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 36, color: T.white, fontWeight: 700, flexShrink: 0, backdropFilter: "blur(8px)" } }, initial),
-          /* @__PURE__ */ React.createElement("div", { style: { flex: 1, minWidth: 0 } },
-            /* @__PURE__ */ React.createElement("div", { style: __spreadProps(__spreadValues({}, serif), { fontWeight: 600, fontSize: "clamp(22px,3vw,32px)", color: T.white, lineHeight: 1.15, marginBottom: 4 }) }, (user && user.name) || "\u2014"),
-            /* @__PURE__ */ React.createElement("div", { style: { fontSize: 14, color: "rgba(255,255,255,.65)", marginBottom: 10 } }, (user && user.email) || "\u2014"),
-            /* @__PURE__ */ React.createElement("div", { style: { display: "flex", gap: 8, flexWrap: "wrap" } },
-              /* @__PURE__ */ React.createElement("span", { style: __spreadProps(__spreadValues({}, mono), { fontSize: 11, fontWeight: 700, background: "rgba(255,255,255,.15)", color: T.white, borderRadius: 20, padding: "4px 12px", letterSpacing: ".06em" }) }, roleLabel.toUpperCase()),
-              /* @__PURE__ */ React.createElement("span", { style: __spreadProps(__spreadValues({}, mono), { fontSize: 11, fontWeight: 700, background: tierBg, color: tierColor, borderRadius: 20, padding: "4px 12px", letterSpacing: ".06em" }) }, tierLabel.toUpperCase())
-            )
-          )
-        ),
-        /* @__PURE__ */ React.createElement("div", { style: { display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 1, background: "rgba(255,255,255,.1)", borderRadius: "12px 12px 0 0", overflow: "hidden" } },
-          stats.map((s, i) => /* @__PURE__ */ React.createElement("div", { key: i, style: { background: "rgba(255,255,255,.08)", padding: "16px 12px", textAlign: "center" } },
-            /* @__PURE__ */ React.createElement("div", { style: { fontSize: 22, marginBottom: 4 } }, s.icon),
-            /* @__PURE__ */ React.createElement("div", { style: { fontSize: 24, fontWeight: 700, color: T.white, lineHeight: 1 } }, s.value),
-            /* @__PURE__ */ React.createElement("div", { style: __spreadProps(__spreadValues({}, mono), { fontSize: 10, color: "rgba(255,255,255,.55)", marginTop: 4, textTransform: "uppercase", letterSpacing: ".08em" }) }, s.label)
-          ))
-        )
-      )
+    /* @__PURE__ */ React.createElement("div", { style: { background: T.white, borderBottom: `1px solid ${T.grey100}`, padding: "16px clamp(16px,4vw,32px)", display: "flex", alignItems: "center", justifyContent: "space-between", position: "sticky", top: 0, zIndex: 100 } },
+      /* @__PURE__ */ React.createElement("button", { onClick: onBack, style: { background: "none", border: "none", cursor: "pointer", display: "flex", alignItems: "center", gap: 6, fontSize: 14, color: T.grey600, fontFamily: "'DM Sans',sans-serif" } }, "\u2190 Back"),
+      /* @__PURE__ */ React.createElement("div", { style: __spreadProps(__spreadValues({}, mono2), { fontSize: 11, color: T.grey400, textTransform: "uppercase", letterSpacing: ".14em" }) }, "Account")
     ),
-    /* @__PURE__ */ React.createElement("div", { style: { maxWidth: 680, margin: "0 auto", padding: "28px clamp(16px,4vw,40px) 80px" } },
-      /* @__PURE__ */ React.createElement("div", { style: { background: T.white, border: `1px solid ${T.grey100}`, borderRadius: 14, overflow: "hidden", marginBottom: 16 } },
-        /* @__PURE__ */ React.createElement("div", { style: __spreadProps(__spreadValues({}, mono), { fontSize: 10, color: T.grey400, textTransform: "uppercase", letterSpacing: ".12em", padding: "14px 20px 10px", borderBottom: `1px solid ${T.grey50}` }) }, "Account details"),
-        [
-          { icon: "\u{1F464}", label: "Full name", value: (user && user.name) || "\u2014" },
-          { icon: "\u2709\uFE0F", label: "Email address", value: (user && user.email) || "\u2014" },
-          { icon: "\u{1F3F7}\uFE0F", label: "Account type", value: roleLabel },
-          { icon: "\u{1F4C5}", label: "Language", value: (lang || "en").toUpperCase() },
-        ].map((row, i, arr) => /* @__PURE__ */ React.createElement("div", { key: i, style: { display: "flex", alignItems: "center", gap: 14, padding: "14px 20px", borderBottom: i < arr.length - 1 ? `1px solid ${T.grey50}` : "none" } },
-          /* @__PURE__ */ React.createElement("div", { style: { fontSize: 18, width: 28, textAlign: "center", flexShrink: 0 } }, row.icon),
-          /* @__PURE__ */ React.createElement("div", { style: { flex: 1 } },
-            /* @__PURE__ */ React.createElement("div", { style: __spreadProps(__spreadValues({}, mono), { fontSize: 10, color: T.grey400, textTransform: "uppercase", letterSpacing: ".08em", marginBottom: 2 }) }, row.label),
-            /* @__PURE__ */ React.createElement("div", { style: { fontSize: 14, color: T.navy, fontWeight: 500 } }, row.value)
+    /* @__PURE__ */ React.createElement("div", { style: { maxWidth: 680, margin: "0 auto", padding: "32px clamp(16px,4vw,32px) 80px" } },
+      /* @__PURE__ */ React.createElement("div", { style: { display: "flex", alignItems: "center", gap: 20, marginBottom: 32, paddingBottom: 32, borderBottom: `1px solid ${T.grey100}` } },
+        /* @__PURE__ */ React.createElement("div", { style: { width: 72, height: 72, borderRadius: "50%", background: T.navy, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 28, color: T.white, fontWeight: 700, flexShrink: 0 } }, initial),
+        /* @__PURE__ */ React.createElement("div", { style: { flex: 1, minWidth: 0 } },
+          /* @__PURE__ */ React.createElement("div", { style: __spreadProps(__spreadValues({}, serif2), { fontWeight: 600, fontSize: "clamp(20px,3vw,26px)", color: T.navy, marginBottom: 3 }) }, (user && user.name) || "\u2014"),
+          /* @__PURE__ */ React.createElement("div", { style: { fontSize: 14, color: T.grey500, marginBottom: 10 } }, (user && user.email) || "\u2014"),
+          /* @__PURE__ */ React.createElement("div", { style: { display: "flex", gap: 6, flexWrap: "wrap" } },
+            /* @__PURE__ */ React.createElement("span", { style: __spreadProps(__spreadValues({}, mono2), { fontSize: 10, fontWeight: 600, background: T.grey50, color: T.grey500, borderRadius: 4, padding: "3px 8px", letterSpacing: ".08em", textTransform: "uppercase" }) }, roleLabel),
+            /* @__PURE__ */ React.createElement("span", { style: __spreadProps(__spreadValues({}, mono2), { fontSize: 10, fontWeight: 600, background: subscription === "premium" ? T.orangePale : T.tealPale, color: tierColor, borderRadius: 4, padding: "3px 8px", letterSpacing: ".08em", textTransform: "uppercase" }) }, tierLabel)
           )
+        )
+      ),
+      /* @__PURE__ */ React.createElement("div", { style: { display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 12, marginBottom: 28 } },
+        [
+          { label: "Total", value: totalPurchased },
+          { label: "Active", value: activeProgrammes.length },
+          { label: "Completed", value: completedCount },
+        ].map((s, i) => /* @__PURE__ */ React.createElement("div", { key: i, style: { background: T.white, border: `1px solid ${T.grey100}`, borderRadius: 12, padding: "18px 16px", textAlign: "center" } },
+          /* @__PURE__ */ React.createElement("div", { style: { fontSize: 28, fontWeight: 700, color: T.navy, lineHeight: 1, marginBottom: 6 } }, s.value),
+          /* @__PURE__ */ React.createElement("div", { style: __spreadProps(__spreadValues({}, mono2), { fontSize: 10, color: T.grey400, textTransform: "uppercase", letterSpacing: ".1em" }) }, s.label)
         ))
       ),
-      /* @__PURE__ */ React.createElement("div", { style: { background: T.white, border: `1px solid ${T.grey100}`, borderRadius: 14, overflow: "hidden" } },
-        /* @__PURE__ */ React.createElement("div", { style: __spreadProps(__spreadValues({}, mono), { fontSize: 10, color: T.grey400, textTransform: "uppercase", letterSpacing: ".12em", padding: "14px 20px 10px", borderBottom: `1px solid ${T.grey50}` }) }, "Actions"),
-        /* @__PURE__ */ React.createElement("button", { onClick: onLogout, style: { width: "100%", textAlign: "left", padding: "16px 20px", background: "none", border: "none", borderBottom: `1px solid ${T.grey50}`, cursor: "pointer", display: "flex", alignItems: "center", gap: 14, fontFamily: "'DM Sans',sans-serif" } },
-          /* @__PURE__ */ React.createElement("div", { style: { fontSize: 18, width: 28, textAlign: "center", flexShrink: 0 } }, "\u{1F6AA}"),
-          /* @__PURE__ */ React.createElement("div", null,
-            /* @__PURE__ */ React.createElement("div", { style: { fontSize: 14, color: T.grey700 || T.grey600, fontWeight: 500 } }, "Log out"),
-            /* @__PURE__ */ React.createElement("div", { style: { fontSize: 12, color: T.grey400, marginTop: 1 } }, "Sign out of your account")
-          )
+      activeProgrammes.length > 0 && /* @__PURE__ */ React.createElement("div", { style: { marginBottom: 28 } },
+        /* @__PURE__ */ React.createElement("div", { style: __spreadProps(__spreadValues({}, mono2), { fontSize: 11, color: T.grey500, textTransform: "uppercase", letterSpacing: ".12em", marginBottom: 12 }) }, "Active Programmes"),
+        /* @__PURE__ */ React.createElement("div", { style: { background: T.white, border: `1px solid ${T.grey100}`, borderRadius: 12, overflow: "hidden" } },
+          activeProgrammes.map((prog, i) => /* @__PURE__ */ React.createElement("div", { key: prog.programmeId, style: { display: "flex", alignItems: "center", justifyContent: "space-between", padding: "14px 18px", borderBottom: i < activeProgrammes.length - 1 ? `1px solid ${T.grey50}` : "none" } },
+            /* @__PURE__ */ React.createElement("div", null,
+              /* @__PURE__ */ React.createElement("div", { style: { fontSize: 14, fontWeight: 600, color: T.navy, marginBottom: 2 } }, formatRegion(prog.region) || prog.title),
+              /* @__PURE__ */ React.createElement("div", { style: __spreadProps(__spreadValues({}, mono2), { fontSize: 11, color: T.grey400 }) }, "Day ", prog.currentDay, " \xB7 ", prog.subscription === "premium" ? "Premium" : "Standard")
+            ),
+            /* @__PURE__ */ React.createElement("button", { onClick: onBack, style: { background: T.teal, color: T.white, border: "none", borderRadius: 8, padding: "7px 14px", fontSize: 13, fontWeight: 600, cursor: "pointer", fontFamily: "'DM Sans',sans-serif", whiteSpace: "nowrap" } }, "Go to Plan \u2192")
+          ))
+        )
+      ),
+      /* @__PURE__ */ React.createElement("div", { style: { background: T.white, border: `1px solid ${T.grey100}`, borderRadius: 12, overflow: "hidden", marginBottom: 28 } },
+        /* @__PURE__ */ React.createElement("div", { style: __spreadProps(__spreadValues({}, mono2), { fontSize: 11, color: T.grey500, textTransform: "uppercase", letterSpacing: ".12em", padding: "14px 18px 12px", borderBottom: `1px solid ${T.grey50}` }) }, "Account details"),
+        [
+          { label: "Full name", value: (user && user.name) || "\u2014" },
+          { label: "Email address", value: (user && user.email) || "\u2014" },
+          { label: "Account type", value: roleLabel },
+          { label: "Language", value: (lang || "en").toUpperCase() },
+        ].map((row, i, arr) => /* @__PURE__ */ React.createElement("div", { key: i, style: { display: "flex", justifyContent: "space-between", alignItems: "center", padding: "13px 18px", borderBottom: i < arr.length - 1 ? `1px solid ${T.grey50}` : "none" } },
+          /* @__PURE__ */ React.createElement("div", { style: __spreadProps(__spreadValues({}, mono2), { fontSize: 11, color: T.grey400, textTransform: "uppercase", letterSpacing: ".08em" }) }, row.label),
+          /* @__PURE__ */ React.createElement("div", { style: { fontSize: 14, color: T.navy, fontWeight: 500, textAlign: "right" } }, row.value)
+        ))
+      ),
+      /* @__PURE__ */ React.createElement("div", { style: { background: T.white, border: `1px solid ${T.grey100}`, borderRadius: 12, overflow: "hidden" } },
+        /* @__PURE__ */ React.createElement("button", { onClick: onLogout, style: { width: "100%", display: "flex", justifyContent: "space-between", alignItems: "center", padding: "15px 18px", background: "none", border: "none", borderBottom: `1px solid ${T.grey50}`, cursor: "pointer", fontFamily: "'DM Sans',sans-serif" } },
+          /* @__PURE__ */ React.createElement("span", { style: { fontSize: 14, color: T.grey700 || T.grey600, fontWeight: 500 } }, "Log out"),
+          /* @__PURE__ */ React.createElement("span", { style: { color: T.grey400, fontSize: 16 } }, "\u2192")
         ),
-        /* @__PURE__ */ React.createElement("button", { onClick: onDeleteAccount, style: { width: "100%", textAlign: "left", padding: "16px 20px", background: "none", border: "none", cursor: "pointer", display: "flex", alignItems: "center", gap: 14, fontFamily: "'DM Sans',sans-serif" } },
-          /* @__PURE__ */ React.createElement("div", { style: { fontSize: 18, width: 28, textAlign: "center", flexShrink: 0 } }, "\u{1F5D1}\uFE0F"),
+        /* @__PURE__ */ React.createElement("button", { onClick: onDeleteAccount, style: { width: "100%", display: "flex", justifyContent: "space-between", alignItems: "center", padding: "15px 18px", background: "none", border: "none", cursor: "pointer", fontFamily: "'DM Sans',sans-serif" } },
           /* @__PURE__ */ React.createElement("div", null,
             /* @__PURE__ */ React.createElement("div", { style: { fontSize: 14, color: T.red, fontWeight: 500 } }, "Delete account"),
-            /* @__PURE__ */ React.createElement("div", { style: { fontSize: 12, color: T.grey400, marginTop: 1 } }, "Permanently remove your account and all data")
-          )
+            /* @__PURE__ */ React.createElement("div", { style: { fontSize: 12, color: T.grey400, marginTop: 1 } }, "Permanently removes your account and all data")
+          ),
+          /* @__PURE__ */ React.createElement("span", { style: { color: T.grey300, fontSize: 16 } }, "\u2192")
         )
       )
     )
