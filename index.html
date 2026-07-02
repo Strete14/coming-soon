@@ -170,6 +170,27 @@ const sb = {
     if (!r.ok) return [];
     return r.json();
   },
+  async getSummary(token, programmeId) {
+    const r = await fetch(`${SUPABASE_URL}/rest/v1/programme_summaries?programme_id=eq.${programmeId}&select=summary_text,generated_at`, {
+      headers: { apikey: SUPABASE_ANON, Authorization: `Bearer ${token}` }
+    });
+    if (!r.ok) return null;
+    const rows = await r.json();
+    return rows && rows[0] ? rows[0] : null;
+  },
+  async saveSummary(token, userId, programmeId, summaryText) {
+    const r = await fetch(`${SUPABASE_URL}/rest/v1/programme_summaries`, {
+      method: "POST",
+      headers: {
+        apikey: SUPABASE_ANON,
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+        Prefer: "resolution=merge-duplicates,return=minimal"
+      },
+      body: JSON.stringify({ user_id: userId, programme_id: programmeId, summary_text: summaryText })
+    });
+    return r.ok;
+  },
   async deletePlans(token, userId) {
     await fetch(`${SUPABASE_URL}/rest/v1/plans?user_id=eq.${userId}`, {
       method: "DELETE",
@@ -2853,6 +2874,122 @@ function ProfileScreen({ user, lang, subscription, programmes = [], onBack, onLo
   );
 }
 
+function ProgrammeSummaryScreen({ prog, planHistory, checkinHistory, summaryText, onBack, lang }) {
+  const mono2 = { fontFamily: "'DM Mono',monospace" };
+  const serif2 = { fontFamily: "'Fraunces',serif" };
+  const progPlans = [...planHistory.filter((p) => (p.programme_id || p.programmeId) === prog.programmeId)].sort((a, b) => a.day - b.day);
+  const progCheckins = [...checkinHistory.filter((c) => c.programmeId === prog.programmeId)].sort((a, b) => a.day - b.day);
+  const progLength = prog.subscription === "premium" ? 14 : 7;
+  const firstPain = progCheckins[0] ? progCheckins[0].pain : null;
+  const lastPain = progCheckins[progCheckins.length - 1] ? progCheckins[progCheckins.length - 1].pain : null;
+  const painDrop = firstPain !== null && lastPain !== null ? firstPain - lastPain : null;
+  const pct = painDrop !== null && firstPain > 0 ? Math.round(painDrop / firstPain * 100) : null;
+  const chartW = 560;
+  const chartH = 120;
+  const maxPain = 10;
+  const pts = progCheckins.map((c, i) => {
+    const x = progCheckins.length > 1 ? Math.round(i / (progCheckins.length - 1) * (chartW - 40)) + 20 : chartW / 2;
+    const y = Math.round((1 - c.pain / maxPain) * (chartH - 24)) + 12;
+    return { x, y, pain: c.pain, day: c.day };
+  });
+  const polyline = pts.map((p) => p.x + "," + p.y).join(" ");
+  const polygon = pts.length > 1 ? (pts.map((p) => p.x + "," + p.y).join(" ") + " " + pts[pts.length - 1].x + "," + chartH + " " + pts[0].x + "," + chartH) : "";
+  function handlePrint() {
+    window.print();
+  }
+  const sections = summaryText ? summaryText.split(/\n(?=\d+\.|OVERVIEW|PAIN|KEY|RECOMMEND)/i).filter(Boolean) : [];
+  return React.createElement("div", { style: { minHeight: "100vh", background: T.offwhite, fontFamily: "'DM Sans',sans-serif" } },
+    React.createElement("style", null, "@media print { .no-print { display: none !important; } body { background: white; } .print-page { box-shadow: none !important; } }"),
+    React.createElement("div", { className: "no-print", style: { background: T.white, borderBottom: "1px solid " + T.grey100, padding: "16px clamp(16px,4vw,32px)", display: "flex", alignItems: "center", justifyContent: "space-between", position: "sticky", top: 0, zIndex: 100 } },
+      React.createElement("button", { onClick: onBack, style: { background: "none", border: "none", cursor: "pointer", fontSize: 14, color: T.grey600, fontFamily: "'DM Sans',sans-serif", display: "flex", alignItems: "center", gap: 6 } }, "\u2190 Back"),
+      React.createElement("button", { onClick: handlePrint, style: { background: T.teal, color: T.white, border: "none", borderRadius: 8, padding: "8px 16px", fontSize: 13, fontWeight: 600, cursor: "pointer", fontFamily: "'DM Sans',sans-serif", display: "flex", alignItems: "center", gap: 6 } }, "\u2913 Download / Print")
+    ),
+    React.createElement("div", { className: "print-page", style: { maxWidth: 720, margin: "0 auto", padding: "32px clamp(16px,4vw,32px) 80px" } },
+      React.createElement("div", { style: { marginBottom: 32 } },
+        React.createElement("div", Object.assign({}, mono2, { style: Object.assign({}, mono2, { fontSize: 11, color: T.teal, textTransform: "uppercase", letterSpacing: ".14em", marginBottom: 8 }) }), "Programme Summary"),
+        React.createElement("h1", { style: Object.assign({}, serif2, { fontWeight: 600, fontSize: "clamp(22px,4vw,34px)", color: T.navy, marginBottom: 6, lineHeight: 1.1 }) }, formatRegion(prog.region) || prog.title),
+        React.createElement("div", { style: { fontSize: 14, color: T.grey500 } }, prog.subscription === "premium" ? "Premium \u00B7 14 days" : "Standard \u00B7 7 days", prog.startDate ? " \u00B7 Started " + prog.startDate : "")
+      ),
+      React.createElement("div", { style: { display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 12, marginBottom: 28 } },
+        [
+          { label: "Starting Pain", value: firstPain !== null ? firstPain + "/10" : "\u2014", color: T.orange },
+          { label: "Final Pain", value: lastPain !== null ? lastPain + "/10" : "\u2014", color: T.teal },
+          { label: "Improvement", value: pct !== null ? pct + "%" : "\u2014", color: T.green || T.teal },
+        ].map((s, i) => React.createElement("div", { key: i, style: { background: T.white, border: "1px solid " + T.grey100, borderRadius: 12, padding: "18px 16px", textAlign: "center" } },
+          React.createElement("div", { style: { fontSize: 26, fontWeight: 700, color: s.color, lineHeight: 1, marginBottom: 4 } }, s.value),
+          React.createElement("div", Object.assign({}, mono2, { style: Object.assign({}, mono2, { fontSize: 10, color: T.grey400, textTransform: "uppercase", letterSpacing: ".1em" }) }), s.label)
+        ))
+      ),
+      progCheckins.length >= 2 && React.createElement("div", { style: { background: T.white, border: "1px solid " + T.grey100, borderRadius: 12, padding: "20px 20px 16px", marginBottom: 28 } },
+        React.createElement("div", { style: { display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 14 } },
+          React.createElement("div", Object.assign({}, serif2, { style: Object.assign({}, serif2, { fontWeight: 600, fontSize: 16, color: T.navy }) }), "Pain Trend"),
+          React.createElement("div", { style: { fontSize: 12, color: T.grey400 } }, "Lower is better \u00B7 Scale 0\u201310")
+        ),
+        React.createElement("svg", { viewBox: "0 0 " + chartW + " " + chartH, style: { width: "100%", height: "auto", display: "block" } },
+          React.createElement("defs", null,
+            React.createElement("linearGradient", { id: "sumFill", x1: "0", y1: "0", x2: "0", y2: "1" },
+              React.createElement("stop", { offset: "0%", stopColor: T.teal, stopOpacity: 0.18 }),
+              React.createElement("stop", { offset: "100%", stopColor: T.teal, stopOpacity: 0 })
+            )
+          ),
+          pts.length > 1 && React.createElement("polygon", { points: polygon, fill: "url(#sumFill)" }),
+          pts.length > 1 && React.createElement("polyline", { points: polyline, fill: "none", stroke: T.teal, strokeWidth: "2", strokeLinecap: "round", strokeLinejoin: "round" }),
+          pts.map((p, i) => React.createElement("circle", { key: i, cx: p.x, cy: p.y, r: "4", fill: p.pain > 6 ? T.orange : p.pain > 3 ? "#f59e0b" : T.teal }))
+        ),
+        React.createElement("div", { style: { display: "flex", justifyContent: "space-between", marginTop: 8 } },
+          React.createElement("div", Object.assign({}, mono2, { style: Object.assign({}, mono2, { fontSize: 11, color: T.grey400 }) }), "Day 1"),
+          React.createElement("div", Object.assign({}, mono2, { style: Object.assign({}, mono2, { fontSize: 11, color: T.grey400 }) }), "Day " + progLength)
+        )
+      ),
+      summaryText && React.createElement("div", { style: { background: T.white, border: "1px solid " + T.grey100, borderRadius: 12, padding: "24px 24px", marginBottom: 28 } },
+        React.createElement("div", Object.assign({}, serif2, { style: Object.assign({}, serif2, { fontWeight: 600, fontSize: 16, color: T.navy, marginBottom: 16 }) }), "Progress Summary"),
+        sections.length > 0 ? sections.map((s, i) => React.createElement("div", { key: i, style: { marginBottom: 14 } },
+          React.createElement("p", { style: { fontSize: 14, color: T.grey600, lineHeight: 1.75, whiteSpace: "pre-wrap", margin: 0 } }, s.trim())
+        )) : React.createElement("p", { style: { fontSize: 14, color: T.grey600, lineHeight: 1.75, whiteSpace: "pre-wrap" } }, summaryText)
+      ),
+      React.createElement("div", { style: { marginBottom: 28 } },
+        React.createElement("div", Object.assign({}, serif2, { style: Object.assign({}, serif2, { fontWeight: 600, fontSize: 18, color: T.navy, marginBottom: 16 }) }), "Day-by-Day Breakdown"),
+        progPlans.map((p, di) => {
+          const exs = (p.plan && p.plan.exercises) || [];
+          const electro = (p.plan && p.plan.electrotherapy) || [];
+          const meals = (p.plan && p.plan.nutrition && p.plan.nutrition.meals) || [];
+          const nutSummary = p.plan && p.plan.nutrition && p.plan.nutrition.summary;
+          const ci = progCheckins.find((c) => c.day === p.day);
+          return React.createElement("div", { key: di, style: { background: T.white, border: "1px solid " + T.grey100, borderRadius: 12, padding: "18px 20px", marginBottom: 12 } },
+            React.createElement("div", { style: { display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 14 } },
+              React.createElement("div", Object.assign({}, serif2, { style: Object.assign({}, serif2, { fontWeight: 600, fontSize: 15, color: T.navy }) }), "Day " + p.day),
+              ci && React.createElement("div", { style: { display: "flex", gap: 12 } },
+                React.createElement("span", Object.assign({}, mono2, { style: Object.assign({}, mono2, { fontSize: 11, color: T.orange }) }), "Pain " + ci.pain + "/10"),
+                React.createElement("span", Object.assign({}, mono2, { style: Object.assign({}, mono2, { fontSize: 11, color: T.teal }) }), "Energy " + ci.energy + "/10")
+              )
+            ),
+            exs.length > 0 && React.createElement("div", { style: { marginBottom: 12 } },
+              React.createElement("div", Object.assign({}, mono2, { style: Object.assign({}, mono2, { fontSize: 10, color: T.grey400, textTransform: "uppercase", letterSpacing: ".1em", marginBottom: 6 }) }), "Exercises"),
+              React.createElement("div", { style: { display: "flex", flexDirection: "column", gap: 4 } },
+                exs.map((e, ei) => React.createElement("div", { key: ei, style: { fontSize: 13, color: T.grey600, display: "flex", justifyContent: "space-between" } },
+                  React.createElement("span", null, e.name),
+                  React.createElement("span", Object.assign({}, mono2, { style: Object.assign({}, mono2, { fontSize: 12, color: T.grey400 }) }), e.sets && e.reps ? e.sets + " \xD7 " + e.reps : e.duration || "")
+                ))
+              )
+            ),
+            electro.length > 0 && React.createElement("div", { style: { marginBottom: 12 } },
+              React.createElement("div", Object.assign({}, mono2, { style: Object.assign({}, mono2, { fontSize: 10, color: T.grey400, textTransform: "uppercase", letterSpacing: ".1em", marginBottom: 6 }) }), "Electrotherapy"),
+              electro.map((e, ei) => React.createElement("div", { key: ei, style: { fontSize: 13, color: T.grey600 } }, (e.name || e.type || "") + (e.duration ? " \u00B7 " + e.duration : "") + (e.frequency ? " \u00B7 " + e.frequency : "")))
+            ),
+            (meals.length > 0 || nutSummary) && React.createElement("div", null,
+              React.createElement("div", Object.assign({}, mono2, { style: Object.assign({}, mono2, { fontSize: 10, color: T.grey400, textTransform: "uppercase", letterSpacing: ".1em", marginBottom: 6 }) }), "Nutrition"),
+              nutSummary && React.createElement("div", { style: { fontSize: 13, color: T.grey600, marginBottom: 6 } }, nutSummary),
+              meals.map((m, mi) => React.createElement("div", { key: mi, style: { marginBottom: 4 } },
+                React.createElement("span", Object.assign({}, mono2, { style: Object.assign({}, mono2, { fontSize: 11, color: T.teal, marginRight: 6 }) }), m.name),
+                React.createElement("span", { style: { fontSize: 13, color: T.grey600 } }, (m.items || []).join(", ") || m.description || "")
+              ))
+            )
+          );
+        })
+      )
+    )
+  );
+}
 function ComingSoonScreen({ onBack, lang }) {
   const t2 = useT(lang);
   const [email, setEmail] = useState("");
@@ -4160,7 +4297,7 @@ function OnboardingTour({ onDone, lang }) {
   const s = steps[step];
   return /* @__PURE__ */ React.createElement("div", { style: { position: "fixed", inset: 0, zIndex: 1e3, background: "rgba(15,31,61,.7)", display: "flex", alignItems: "center", justifyContent: "center", padding: 16, animation: "fadeIn .3s ease" } }, /* @__PURE__ */ React.createElement("div", { style: { background: T.white, borderRadius: 18, padding: "clamp(28px,5vw,40px)", maxWidth: 400, width: "100%", boxShadow: "0 24px 80px rgba(0,0,0,.25)", animation: "scaleIn .35s ease", textAlign: "center" } }, /* @__PURE__ */ React.createElement("div", { style: { width: 72, height: 72, borderRadius: "50%", background: T.tealPale, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 34, margin: "0 auto 18px" } }, s.icon), /* @__PURE__ */ React.createElement("div", { style: __spreadProps(__spreadValues({}, mono), { fontSize: 11, color: T.teal, textTransform: "uppercase", letterSpacing: ".14em", marginBottom: 8 }) }, "Step ", step + 1, " of ", steps.length), /* @__PURE__ */ React.createElement("h2", { style: { fontFamily: "'Fraunces',serif", fontWeight: 600, fontSize: 22, color: T.navy, marginBottom: 12 } }, s.title), /* @__PURE__ */ React.createElement("p", { style: { fontSize: 14, color: T.grey500, lineHeight: 1.75, marginBottom: 28 } }, s.body), /* @__PURE__ */ React.createElement("div", { style: { display: "flex", gap: 8, justifyContent: "center", marginBottom: 20 } }, steps.map((_, i) => /* @__PURE__ */ React.createElement("div", { key: i, style: { width: i === step ? 20 : 6, height: 6, borderRadius: 3, background: i === step ? T.teal : T.grey200, transition: "all .25s" } }))), /* @__PURE__ */ React.createElement("div", { style: { display: "flex", gap: 10 } }, step > 0 && /* @__PURE__ */ React.createElement("button", { onClick: () => setStep((s2) => s2 - 1), style: { flex: 1, padding: "12px", borderRadius: 9, border: `1px solid ${T.grey200}`, background: "transparent", cursor: "pointer", fontFamily: "'DM Sans',sans-serif", fontSize: 14, color: T.grey600 } }, "\u2190 Back"), /* @__PURE__ */ React.createElement("button", { onClick: () => step < steps.length - 1 ? setStep((s2) => s2 + 1) : onDone(), style: { flex: 2, padding: "12px", borderRadius: 9, border: "none", background: T.teal, color: "#fff", cursor: "pointer", fontFamily: "'DM Sans',sans-serif", fontWeight: 700, fontSize: 14 } }, step < steps.length - 1 ? "Next \u2192" : "Got it \u2014 let's go! \u{1F680}")), /* @__PURE__ */ React.createElement("button", { onClick: onDone, style: { marginTop: 12, background: "none", border: "none", cursor: "pointer", fontSize: 12, color: T.grey400, fontFamily: "'DM Sans',sans-serif" } }, t2.tourSkip)));
 }
-function ProgrammeListScreen({ programmes, onSelect, onNewPlan, onReview, user, lang, onLogout, notifSystem, hasUsedTrial = false, onNav }) {
+function ProgrammeListScreen({ programmes, onSelect, onNewPlan, onReview, user, lang, onLogout, notifSystem, hasUsedTrial = false, onNav, summaries = {}, checkinHistory = [], onViewSummary }) {
   const t2 = useT(lang);
   const T2 = T;
   const active = programmes.filter((p) => p.status === "active" && p.subscription !== "trial");
@@ -4184,17 +4321,29 @@ function ProgrammeListScreen({ programmes, onSelect, onNewPlan, onReview, user, 
       /* @__PURE__ */ React.createElement("div", { style: { display: "flex", alignItems: "center", gap: 8, marginBottom: 14 } }, /* @__PURE__ */ React.createElement("div", { style: { flex: 1, height: 4, borderRadius: 2, background: "rgba(255,255,255,.15)" } }, /* @__PURE__ */ React.createElement("div", { style: { width: `${pct}%`, height: "100%", borderRadius: 2, background: T2.teal, transition: "width .5s ease" } })), /* @__PURE__ */ React.createElement("span", { style: __spreadProps(__spreadValues({}, mono), { fontSize: 10, color: "rgba(255,255,255,.5)" }) }, isTrial ? "TRIAL COMPLETE" : pct + "%")),
       /* @__PURE__ */ React.createElement("div", { style: { display: "flex", alignItems: "center", justifyContent: "space-between" } }, /* @__PURE__ */ React.createElement("div", { style: { fontSize: 12, color: "rgba(255,255,255,.4)" } }, "Started ", prog.startDate), /* @__PURE__ */ React.createElement("div", { style: __spreadProps(__spreadValues({}, mono), { fontSize: 12, color: T2.teal, fontWeight: 600 }) }, "Continue \u2192"))
     );
-  })), completed.length > 0 && /* @__PURE__ */ React.createElement("div", { style: { marginBottom: 24 } }, /* @__PURE__ */ React.createElement("div", { style: __spreadProps(__spreadValues({}, mono), { fontSize: 11, color: T2.grey500, textTransform: "uppercase", letterSpacing: ".12em", marginBottom: 12 }) }, "Completed"), completed.map((prog) => /* @__PURE__ */ React.createElement(
-    "div",
-    {
-      key: prog.programmeId,
-      onClick: () => onSelect(prog),
-      style: { background: T2.white, border: `1px solid ${T2.grey100}`, borderRadius: 16, padding: "clamp(16px,3vw,20px)", marginBottom: 10, cursor: "pointer", opacity: 0.75 }
-    },
-    /* @__PURE__ */ React.createElement("div", { style: { display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 6 } }, /* @__PURE__ */ React.createElement("div", { style: __spreadProps(__spreadValues({}, serif), { fontWeight: 600, fontSize: 16, color: T2.navy }) }, prog.title), /* @__PURE__ */ React.createElement("div", { style: __spreadProps(__spreadValues({}, mono), { background: T2.tealPale, color: T2.teal, borderRadius: 6, padding: "3px 10px", fontSize: 11 }) }, "\u2713 Done")),
-    /* @__PURE__ */ React.createElement("div", { style: { fontSize: 12, color: T2.grey500, marginBottom: 8 } }, formatRegion(prog.region)),
-    /* @__PURE__ */ React.createElement("div", { style: { height: 4, borderRadius: 2, background: T2.grey100 } }, /* @__PURE__ */ React.createElement("div", { style: { width: "100%", height: "100%", borderRadius: 2, background: T2.teal } }))
-  ))), programmes.length === 0 && /* @__PURE__ */ React.createElement("div", { className: "card", style: { textAlign: "center", padding: "48px 24px" } }, /* @__PURE__ */ React.createElement("div", { style: __spreadProps(__spreadValues({}, serif), { fontWeight: 600, fontSize: 18, color: T2.navy, marginBottom: 8 }) }, "No programmes yet"), /* @__PURE__ */ React.createElement("div", { style: { fontSize: 14, color: T2.grey500, marginBottom: 20 } }, "Start your first rehabilitation programme above."))));
+  })), completed.length > 0 && /* @__PURE__ */ React.createElement("div", { style: { marginBottom: 24 } }, /* @__PURE__ */ React.createElement("div", { style: __spreadProps(__spreadValues({}, mono), { fontSize: 11, color: T2.grey500, textTransform: "uppercase", letterSpacing: ".12em", marginBottom: 12 }) }, "Completed"), completed.map((prog) => {
+    const progLength = prog.subscription === "premium" ? 14 : 7;
+    const progCheckins = checkinHistory.filter((c) => c.programmeId === prog.programmeId);
+    const hasAllCheckins = progCheckins.length >= progLength;
+    const hasSummary = !!summaries[prog.programmeId];
+    const isTrial = prog.subscription === "trial";
+    return /* @__PURE__ */ React.createElement(
+      "div",
+      {
+        key: prog.programmeId,
+        style: { background: T2.white, border: `1px solid ${T2.grey100}`, borderRadius: 16, padding: "clamp(16px,3vw,20px)", marginBottom: 10, opacity: 0.85 }
+      },
+      /* @__PURE__ */ React.createElement("div", { onClick: () => onSelect(prog), style: { cursor: "pointer" } },
+        /* @__PURE__ */ React.createElement("div", { style: { display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 6 } }, /* @__PURE__ */ React.createElement("div", { style: __spreadProps(__spreadValues({}, serif), { fontWeight: 600, fontSize: 16, color: T2.navy }) }, prog.title), /* @__PURE__ */ React.createElement("div", { style: __spreadProps(__spreadValues({}, mono), { background: T2.tealPale, color: T2.teal, borderRadius: 6, padding: "3px 10px", fontSize: 11 }) }, "\u2713 Done")),
+        /* @__PURE__ */ React.createElement("div", { style: { fontSize: 12, color: T2.grey500, marginBottom: 8 } }, formatRegion(prog.region)),
+        /* @__PURE__ */ React.createElement("div", { style: { height: 4, borderRadius: 2, background: T2.grey100, marginBottom: hasAllCheckins && !isTrial ? 14 : 0 } }, /* @__PURE__ */ React.createElement("div", { style: { width: "100%", height: "100%", borderRadius: 2, background: T2.teal } }))
+      ),
+      hasAllCheckins && !isTrial && /* @__PURE__ */ React.createElement("button", {
+        onClick: (e) => { e.stopPropagation(); onViewSummary && onViewSummary(prog); },
+        style: { width: "100%", background: hasSummary ? T2.tealPale : T2.navy, color: hasSummary ? T2.teal : T2.white, border: "none", borderRadius: 8, padding: "10px", fontSize: 13, fontWeight: 600, cursor: "pointer", fontFamily: "'DM Sans',sans-serif" }
+      }, hasSummary ? "\u{1F4CB} View Programme Summary" : "\u{1F4CB} Generate Programme Summary")
+    );
+  })), programmes.length === 0 && /* @__PURE__ */ React.createElement("div", { className: "card", style: { textAlign: "center", padding: "48px 24px" } }, /* @__PURE__ */ React.createElement("div", { style: __spreadProps(__spreadValues({}, serif), { fontWeight: 600, fontSize: 18, color: T2.navy, marginBottom: 8 }) }, "No programmes yet"), /* @__PURE__ */ React.createElement("div", { style: { fontSize: 14, color: T2.grey500, marginBottom: 20 } }, "Start your first rehabilitation programme above."))));
 }
 function ProgrammeDashboard({ prog, onBack, onContinue, onNewPlan, lang, user, notifSystem, onLogout, onNav }) {
   const t2 = useT(lang);
@@ -4555,6 +4704,8 @@ function App() {
   const [selectedProg, setSelectedProg] = useState(null);
   const [showReviewModal, setShowReviewModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [summaries, setSummaries] = useState({});
+  const [viewSummaryProg, setViewSummaryProg] = useState(null);
   const [liveReviews, setLiveReviews] = useState([]);
   React.useEffect(() => {
     sb.getReviews().then((r) => {
@@ -4976,6 +5127,51 @@ ${checkIn ? `- Today's check-in: pain ${checkIn.pain}/10, energy ${checkIn.energ
       go("programmes");
     }
   }
+  async function generateAndStoreSummary(prog, progCheckins, progPlans) {
+    try {
+      const sess = loadSession();
+      if (!sess || !sess.token) return;
+      const existing = await sb.getSummary(sess.token, prog.programmeId);
+      if (existing) {
+        setSummaries((prev) => Object.assign({}, prev, { [prog.programmeId]: existing.summary_text }));
+        return;
+      }
+      const progLength = prog.subscription === "premium" ? 14 : 7;
+      const sortedCheckins = [...progCheckins].sort((a, b) => a.day - b.day);
+      const firstCheckin = sortedCheckins[0];
+      const lastCheckin = sortedCheckins[sortedCheckins.length - 1];
+      const initialPain = firstCheckin ? firstCheckin.pain : null;
+      const finalPain = lastCheckin ? lastCheckin.pain : null;
+      const painDrop = typeof initialPain === "number" && typeof finalPain === "number" ? initialPain - finalPain : null;
+      const checkinSummary = sortedCheckins.map((c) => "Day " + c.day + ": pain " + c.pain + "/10, energy " + c.energy + "/10").join(", ");
+      const daysSummary = [...progPlans].sort((a, b) => a.day - b.day).map((p) => {
+        const exs = ((p.plan && p.plan.exercises) || []).map((e) => e.name + " (" + (e.sets || "") + " sets x " + (e.reps || "") + ")").join("; ");
+        const electro = ((p.plan && p.plan.electrotherapy) || []).map((e) => e.name || e.type || "").filter(Boolean).join("; ");
+        const nut = p.plan && p.plan.nutrition ? (p.plan.nutrition.summary || (p.plan.nutrition.meals && p.plan.nutrition.meals.map((m) => m.name + ": " + (m.items || []).join(", ")).join("; ")) || "") : "";
+        return "Day " + p.day + ": Exercises: " + (exs || "none") + ". Electrotherapy: " + (electro || "none") + ". Nutrition: " + (nut || "none") + ".";
+      }).join("\n");
+      const painLine = painDrop !== null ? " Pain reduction: " + painDrop + " points (" + Math.round(painDrop / initialPain * 100) + "%)." : "";
+      const prompt = "You are a physiotherapy rehabilitation specialist. Write a professional programme completion summary for a patient who finished a " + progLength + "-day " + formatRegion(prog.region) + " rehabilitation programme.\n\nPatient check-in history: " + checkinSummary + "\nInitial pain: " + initialPain + "/10. Final pain: " + finalPain + "/10." + painLine + "\n\nProgramme details:\n" + daysSummary + "\n\nWrite a summary with these exact sections:\n1. OVERVIEW: 2-3 sentences congratulating the patient and summarising their journey.\n2. PAIN EVOLUTION: Specific description of pain improvement using actual numbers.\n3. KEY ACHIEVEMENTS: 3-4 bullet points of specific achievements.\n4. RECOMMENDATIONS: 2-3 sentences on what to do next.\n\nBe specific, use actual exercise names and numbers. Professional but encouraging tone. 200-300 words total.";
+      const res = await fetch("/api/generate", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          model: "claude-sonnet-4-6",
+          max_tokens: 1000,
+          system: "You are a professional physiotherapy report writer. Write clear, specific, encouraging patient summaries.",
+          messages: [{ role: "user", content: prompt }]
+        })
+      });
+      if (!res.ok) return;
+      const data = await res.json();
+      const summaryText = (data.content && data.content[0] && data.content[0].text) || "";
+      if (!summaryText) return;
+      await sb.saveSummary(sess.token, sess.userId, prog.programmeId, summaryText);
+      setSummaries((prev) => Object.assign({}, prev, { [prog.programmeId]: summaryText }));
+    } catch (e) {
+      console.warn("Summary generation failed:", e);
+    }
+  }
   function handleIntakeComplete(intakeData) {
     const fullIntake = __spreadValues(__spreadValues({}, intakeData), safetyData || {});
     setIntake(fullIntake);
@@ -5059,6 +5255,11 @@ ${checkIn ? `- Today's check-in: pain ${checkIn.pain}/10, energy ${checkIn.energ
           (a, b) => (b.startDate || "") > (a.startDate || "") ? 1 : -1
         );
         setProgrammes(progs);
+        progs.filter((p) => p.status === "completed" && p.subscription !== "trial").forEach((p) => {
+          sb.getSummary(sess.token, p.programmeId).then((s) => {
+            if (s && s.summary_text) setSummaries((prev) => Object.assign({}, prev, { [p.programmeId]: s.summary_text }));
+          }).catch(() => {});
+        });
         sb.getCheckins(sess.token, u.id).then((ckins) => {
           if (Array.isArray(ckins) && ckins.length > 0) {
             const mapped = ckins.map((ck) => ({
@@ -5127,9 +5328,15 @@ ${checkIn ? `- Today's check-in: pain ${checkIn.pain}/10, energy ${checkIn.energ
       return;
     }
     if (progDay >= (subscription2 === "premium" ? 14 : 7)) {
+      const completedProg = programmes.find((p) => p.programmeId === activeProgrammeId);
       setProgrammes((prev) => prev.map(
         (p) => p.programmeId === activeProgrammeId ? __spreadProps(__spreadValues({}, p), { status: "completed" }) : p
       ));
+      if (completedProg) {
+        const progCheckins = checkinHistory.filter((c) => c.programmeId === activeProgrammeId);
+        const progPlans = planHistory.filter((p) => p.programme_id === activeProgrammeId || p.programmeId === activeProgrammeId);
+        generateAndStoreSummary(completedProg, progCheckins, progPlans);
+      }
       go("programmes");
       return;
     }
@@ -5310,7 +5517,7 @@ ${checkIn ? `- Today's check-in: pain ${checkIn.pain}/10, energy ${checkIn.energ
         go("home");
       }
     }
-  ), screen === "how_it_works" && /* @__PURE__ */ React.createElement(HowItWorksScreen, { onBack: () => go("home"), onStart: () => go(user ? "subscribe" : "login"), lang, user }), screen === "pricing" && /* @__PURE__ */ React.createElement(PricingScreen, { onBack: () => go("home"), onStart: () => go(user ? "subscribe" : "login"), lang, user }), screen === "coming_soon" && /* @__PURE__ */ React.createElement(ComingSoonScreen, { onBack: () => go("home"), lang }), screen === "privacy" && /* @__PURE__ */ React.createElement(LegalScreen, { type: "privacy", onBack: () => go("home"), lang }), screen === "terms" && /* @__PURE__ */ React.createElement(LegalScreen, { type: "terms", onBack: () => go("home"), lang }), screen === "profile" && user && /* @__PURE__ */ React.createElement(ProfileScreen, { user, lang, subscription: subscription2, programmes, onBack: () => go("programmes"), onLogout: () => {
+  ), screen === "how_it_works" && /* @__PURE__ */ React.createElement(HowItWorksScreen, { onBack: () => go("home"), onStart: () => go(user ? "subscribe" : "login"), lang, user }), screen === "pricing" && /* @__PURE__ */ React.createElement(PricingScreen, { onBack: () => go("home"), onStart: () => go(user ? "subscribe" : "login"), lang, user }), screen === "coming_soon" && /* @__PURE__ */ React.createElement(ComingSoonScreen, { onBack: () => go("home"), lang }), screen === "privacy" && /* @__PURE__ */ React.createElement(LegalScreen, { type: "privacy", onBack: () => go("home"), lang }), screen === "terms" && /* @__PURE__ */ React.createElement(LegalScreen, { type: "terms", onBack: () => go("home"), lang }), screen === "summary" && user && viewSummaryProg && /* @__PURE__ */ React.createElement(ProgrammeSummaryScreen, { prog: viewSummaryProg, planHistory, checkinHistory, summaryText: summaries[viewSummaryProg.programmeId] || "", onBack: () => { setViewSummaryProg(null); go("programmes"); }, lang }), screen === "profile" && user && /* @__PURE__ */ React.createElement(ProfileScreen, { user, lang, subscription: subscription2, programmes, onBack: () => go("programmes"), onLogout: () => {
     setUser(null);
     go("home");
   }, onDeleteAccount: () => setShowDeleteModal(true) }), screen === "testimonials" && /* @__PURE__ */ React.createElement(TestimonialsScreen, { onBack: () => go("home"), onStart: () => go(user ? "subscribe" : "login"), lang, user, liveReviews, onReview: () => setShowReviewModal(true) }), screen === "login" && /* @__PURE__ */ React.createElement(AuthScreen, { mode: "login", onSuccess: handleAuthSuccess, lang, onNav: (s) => go(s) }), screen === "signup" && /* @__PURE__ */ React.createElement(AuthScreen, { mode: "signup", onSuccess: handleAuthSuccess, lang, onNav: (s) => go(s) }), screen === "disclaimer" && /* @__PURE__ */ React.createElement(DisclaimerScreen, { onAccept: (safety) => {
@@ -5349,7 +5556,10 @@ ${checkIn ? `- Today's check-in: pain ${checkIn.pain}/10, energy ${checkIn.energ
       user,
       lang,
       notifSystem,
+      summaries,
+      checkinHistory,
       onNav: (s) => go(s),
+      onViewSummary: (prog) => { setViewSummaryProg(prog); go("summary"); },
       onSelect: goToProgramme,
       onReview: () => setShowReviewModal(true),
       onNewPlan: () => {
