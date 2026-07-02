@@ -2878,7 +2878,8 @@ function ProgrammeSummaryScreen({ prog, planHistory, checkinHistory, summaryText
   const mono2 = { fontFamily: "'DM Mono',monospace" };
   const serif2 = { fontFamily: "'Fraunces',serif" };
   const progPlans = [...planHistory.filter((p) => (p.programme_id || p.programmeId) === prog.programmeId)].sort((a, b) => a.day - b.day);
-  const progCheckins = [...checkinHistory.filter((c) => c.programmeId === prog.programmeId)].sort((a, b) => a.day - b.day);
+  const rawCheckins = [...checkinHistory.filter((c) => c.programmeId === prog.programmeId)].sort((a, b) => a.day - b.day);
+  const progCheckins = rawCheckins.length > 0 ? rawCheckins : progPlans.map((p) => ({ day: p.day, pain: p.pain || 0, energy: 5, programmeId: prog.programmeId }));
   const progLength = prog.subscription === "premium" ? 14 : 7;
   const firstPain = progCheckins[0] ? progCheckins[0].pain : null;
   const lastPain = progCheckins[progCheckins.length - 1] ? progCheckins[progCheckins.length - 1].pain : null;
@@ -2941,7 +2942,7 @@ function ProgrammeSummaryScreen({ prog, planHistory, checkinHistory, summaryText
           React.createElement("div", Object.assign({}, mono2, { style: Object.assign({}, mono2, { fontSize: 11, color: T.grey400 }) }), "Day " + progLength)
         )
       ),
-      summaryText && React.createElement("div", { style: { background: T.white, border: "1px solid " + T.grey100, borderRadius: 12, padding: "24px 24px", marginBottom: 28 } },
+      React.createElement("div", { style: { background: T.white, border: "1px solid " + T.grey100, borderRadius: 12, padding: "24px 24px", marginBottom: 28 } }, !summaryText ? React.createElement("div", { style: { textAlign: "center", padding: "20px 0", fontFamily: "DM Sans,sans-serif" } }, React.createElement("div", { style: { fontSize: 32, marginBottom: 12 } }, "..."), React.createElement("div", { style: { fontSize: 14, color: T.grey500 } }, "Generating your AI summary. This may take up to 30 seconds.")) :
         React.createElement("div", Object.assign({}, serif2, { style: Object.assign({}, serif2, { fontWeight: 600, fontSize: 16, color: T.navy, marginBottom: 16 }) }), "Progress Summary"),
         sections.length > 0 ? sections.map((s, i) => React.createElement("div", { key: i, style: { marginBottom: 14 } },
           React.createElement("p", { style: { fontSize: 14, color: T.grey600, lineHeight: 1.75, whiteSpace: "pre-wrap", margin: 0 } }, s.trim())
@@ -5139,12 +5140,14 @@ ${checkIn ? `- Today's check-in: pain ${checkIn.pain}/10, energy ${checkIn.energ
       }
       const progLength = prog.subscription === "premium" ? 14 : 7;
       const sortedCheckins = [...progCheckins].sort((a, b) => a.day - b.day);
-      const firstCheckin = sortedCheckins[0];
-      const lastCheckin = sortedCheckins[sortedCheckins.length - 1];
+      const sortedPlans = [...progPlans].sort((a, b) => a.day - b.day);
+      const painSource = sortedCheckins.length > 0 ? sortedCheckins : sortedPlans.map((p) => ({ day: p.day, pain: p.pain || 0, energy: 5 }));
+      const firstCheckin = painSource[0];
+      const lastCheckin = painSource[painSource.length - 1];
       const initialPain = firstCheckin ? firstCheckin.pain : null;
       const finalPain = lastCheckin ? lastCheckin.pain : null;
       const painDrop = typeof initialPain === "number" && typeof finalPain === "number" ? initialPain - finalPain : null;
-      const checkinSummary = sortedCheckins.map((c) => "Day " + c.day + ": pain " + c.pain + "/10, energy " + c.energy + "/10").join(", ");
+      const checkinSummary = painSource.map((c) => "Day " + c.day + ": pain " + c.pain + "/10" + (c.energy !== undefined ? ", energy " + c.energy + "/10" : "")).join(", ");
       const daysSummary = [...progPlans].sort((a, b) => a.day - b.day).map((p) => {
         const exs = ((p.plan && p.plan.exercises) || []).map((e) => e.name + " (" + (e.sets || "") + " sets x " + (e.reps || "") + ")").join("; ");
         const electro = ((p.plan && p.plan.electrotherapy) || []).map((e) => e.name || e.type || "").filter(Boolean).join("; ");
@@ -5560,7 +5563,15 @@ ${checkIn ? `- Today's check-in: pain ${checkIn.pain}/10, energy ${checkIn.energ
       summaries,
       checkinHistory,
       onNav: (s) => go(s),
-      onViewSummary: (prog) => { setViewSummaryProg(prog); go("summary"); },
+      onViewSummary: (prog) => {
+        setViewSummaryProg(prog);
+        go("summary");
+        if (!summaries[prog.programmeId]) {
+          const progCheckins = checkinHistory.filter((c) => c.programmeId === prog.programmeId);
+          const progPlans = planHistory.filter((p) => (p.programme_id || p.programmeId) === prog.programmeId);
+          generateAndStoreSummary(prog, progCheckins, progPlans);
+        }
+      },
       onSelect: goToProgramme,
       onReview: () => setShowReviewModal(true),
       onNewPlan: () => {
