@@ -4324,7 +4324,8 @@ function ProgrammeListScreen({ programmes, onSelect, onNewPlan, onReview, user, 
   })), completed.length > 0 && /* @__PURE__ */ React.createElement("div", { style: { marginBottom: 24 } }, /* @__PURE__ */ React.createElement("div", { style: __spreadProps(__spreadValues({}, mono), { fontSize: 11, color: T2.grey500, textTransform: "uppercase", letterSpacing: ".12em", marginBottom: 12 }) }, "Completed"), completed.map((prog) => {
     const progLength = prog.subscription === "premium" ? 14 : 7;
     const progCheckins = checkinHistory.filter((c) => c.programmeId === prog.programmeId);
-    const hasAllCheckins = progCheckins.length >= progLength;
+    const progDaysCount = (prog.plans || []).length;
+    const hasAllCheckins = progCheckins.length >= progLength || progDaysCount >= progLength;
     const hasSummary = !!summaries[prog.programmeId];
     const isTrial = prog.subscription === "trial";
     return /* @__PURE__ */ React.createElement(
