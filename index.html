@@ -2885,105 +2885,138 @@ function ProgrammeSummaryScreen({ prog, planHistory, checkinHistory, summaryText
   const lastPain = progCheckins[progCheckins.length - 1] ? progCheckins[progCheckins.length - 1].pain : null;
   const painDrop = firstPain !== null && lastPain !== null ? firstPain - lastPain : null;
   const pct = painDrop !== null && firstPain > 0 ? Math.round(painDrop / firstPain * 100) : null;
-  const chartW = 560;
-  const chartH = 120;
-  const maxPain = 10;
+  const chartW = 560; const chartH = 100;
   const pts = progCheckins.map((c, i) => {
     const x = progCheckins.length > 1 ? Math.round(i / (progCheckins.length - 1) * (chartW - 40)) + 20 : chartW / 2;
-    const y = Math.round((1 - c.pain / maxPain) * (chartH - 24)) + 12;
+    const y = Math.round((1 - c.pain / 10) * (chartH - 20)) + 10;
     return { x, y, pain: c.pain, day: c.day };
   });
   const polyline = pts.map((p) => p.x + "," + p.y).join(" ");
-  const polygon = pts.length > 1 ? (pts.map((p) => p.x + "," + p.y).join(" ") + " " + pts[pts.length - 1].x + "," + chartH + " " + pts[0].x + "," + chartH) : "";
-  function handlePrint() {
-    window.print();
-  }
-  const sections = summaryText ? summaryText.split(/\n(?=\d+\.|OVERVIEW|PAIN|KEY|RECOMMEND)/i).filter(Boolean) : [];
-  return React.createElement("div", { style: { minHeight: "100vh", background: T.offwhite, fontFamily: "'DM Sans',sans-serif" } },
-    React.createElement("style", null, "@media print { .no-print { display: none !important; } body { background: white; } .print-page { box-shadow: none !important; } }"),
-    React.createElement("div", { className: "no-print", style: { background: T.white, borderBottom: "1px solid " + T.grey100, padding: "16px clamp(16px,4vw,32px)", display: "flex", alignItems: "center", justifyContent: "space-between", position: "sticky", top: 0, zIndex: 100 } },
-      React.createElement("button", { onClick: onBack, style: { background: "none", border: "none", cursor: "pointer", fontSize: 14, color: T.grey600, fontFamily: "'DM Sans',sans-serif", display: "flex", alignItems: "center", gap: 6 } }, "\u2190 Back"),
-      React.createElement("button", { onClick: handlePrint, style: { background: T.teal, color: T.white, border: "none", borderRadius: 8, padding: "8px 16px", fontSize: 13, fontWeight: 600, cursor: "pointer", fontFamily: "'DM Sans',sans-serif", display: "flex", alignItems: "center", gap: 6 } }, "\u2913 Download / Print")
+  const polygon = pts.length > 1 ? pts.map((p) => p.x + "," + p.y).join(" ") + " " + pts[pts.length-1].x + "," + chartH + " " + pts[0].x + "," + chartH : "";
+  const generatedDate = new Date().toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" });
+  return React.createElement("div", { style: { minHeight: "100vh", background: "#f8f9fb", fontFamily: "'DM Sans',sans-serif" } },
+    React.createElement("style", null, "@media print { .no-print { display:none!important; } .print-wrap { padding: 0!important; } body { background: white; } }"),
+    React.createElement("div", { className: "no-print", style: { background: T.white, borderBottom: "1px solid " + T.grey100, padding: "14px clamp(16px,4vw,40px)", display: "flex", alignItems: "center", justifyContent: "space-between", position: "sticky", top: 0, zIndex: 100 } },
+      React.createElement("button", { onClick: onBack, style: { background: "none", border: "none", cursor: "pointer", fontSize: 14, color: T.grey500, fontFamily: "'DM Sans',sans-serif", display: "flex", alignItems: "center", gap: 6 } }, "\u2190 Back"),
+      React.createElement("button", { onClick: () => window.print(), style: { background: T.navy, color: T.white, border: "none", borderRadius: 8, padding: "9px 18px", fontSize: 13, fontWeight: 600, cursor: "pointer", fontFamily: "'DM Sans',sans-serif", display: "flex", alignItems: "center", gap: 8 } }, "\u2913 Save / Print")
     ),
-    React.createElement("div", { className: "print-page", style: { maxWidth: 720, margin: "0 auto", padding: "32px clamp(16px,4vw,32px) 80px" } },
-      React.createElement("div", { style: { marginBottom: 32 } },
-        React.createElement("div", Object.assign({}, mono2, { style: Object.assign({}, mono2, { fontSize: 11, color: T.teal, textTransform: "uppercase", letterSpacing: ".14em", marginBottom: 8 }) }), "Programme Summary"),
-        React.createElement("h1", { style: Object.assign({}, serif2, { fontWeight: 600, fontSize: "clamp(22px,4vw,34px)", color: T.navy, marginBottom: 6, lineHeight: 1.1 }) }, formatRegion(prog.region) || prog.title),
-        React.createElement("div", { style: { fontSize: 14, color: T.grey500 } }, prog.subscription === "premium" ? "Premium \u00B7 14 days" : "Standard \u00B7 7 days", prog.startDate ? " \u00B7 Started " + prog.startDate : "")
-      ),
-      React.createElement("div", { style: { display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 12, marginBottom: 28 } },
-        [
-          { label: "Starting Pain", value: firstPain !== null ? firstPain + "/10" : "\u2014", color: T.orange },
-          { label: "Final Pain", value: lastPain !== null ? lastPain + "/10" : "\u2014", color: T.teal },
-          { label: "Improvement", value: pct !== null ? pct + "%" : "\u2014", color: T.green || T.teal },
-        ].map((s, i) => React.createElement("div", { key: i, style: { background: T.white, border: "1px solid " + T.grey100, borderRadius: 12, padding: "18px 16px", textAlign: "center" } },
-          React.createElement("div", { style: { fontSize: 26, fontWeight: 700, color: s.color, lineHeight: 1, marginBottom: 4 } }, s.value),
-          React.createElement("div", Object.assign({}, mono2, { style: Object.assign({}, mono2, { fontSize: 10, color: T.grey400, textTransform: "uppercase", letterSpacing: ".1em" }) }), s.label)
-        ))
-      ),
-      progCheckins.length >= 2 && React.createElement("div", { style: { background: T.white, border: "1px solid " + T.grey100, borderRadius: 12, padding: "20px 20px 16px", marginBottom: 28 } },
-        React.createElement("div", { style: { display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 14 } },
-          React.createElement("div", Object.assign({}, serif2, { style: Object.assign({}, serif2, { fontWeight: 600, fontSize: 16, color: T.navy }) }), "Pain Trend"),
-          React.createElement("div", { style: { fontSize: 12, color: T.grey400 } }, "Lower is better \u00B7 Scale 0\u201310")
+    React.createElement("div", { className: "print-wrap", style: { maxWidth: 780, margin: "0 auto", padding: "40px clamp(16px,4vw,40px) 100px" } },
+      React.createElement("div", { style: { background: T.navy, borderRadius: 16, padding: "36px 40px", marginBottom: 28, position: "relative", overflow: "hidden" } },
+        React.createElement("div", { style: { position: "absolute", top: 0, right: 0, width: 220, height: "100%", background: "linear-gradient(135deg,transparent,rgba(10,126,110,.25))", pointerEvents: "none" } }),
+        React.createElement("div", Object.assign({}, mono2, { style: Object.assign({}, mono2, { fontSize: 10, color: "rgba(255,255,255,.45)", textTransform: "uppercase", letterSpacing: ".18em", marginBottom: 20 }) }), "PhysioRoutine \u00B7 Programme Summary"),
+        React.createElement("h1", { style: Object.assign({}, serif2, { fontWeight: 600, fontSize: "clamp(24px,4vw,36px)", color: T.white, lineHeight: 1.1, marginBottom: 8 }) }, formatRegion(prog.region) || prog.title),
+        React.createElement("div", { style: { fontSize: 14, color: "rgba(255,255,255,.55)", marginBottom: 28 } },
+          (prog.subscription === "premium" ? "Premium Plan \u00B7 14-Day Programme" : "Standard Plan \u00B7 7-Day Programme"),
+          prog.startDate ? " \u00B7 " + prog.startDate : "",
+          " \u00B7 Generated " + generatedDate
         ),
-        React.createElement("svg", { viewBox: "0 0 " + chartW + " " + chartH, style: { width: "100%", height: "auto", display: "block" } },
+        React.createElement("div", { style: { display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 12 } },
+          [
+            { label: "Starting Pain", value: firstPain !== null ? firstPain + "/10" : "\u2014", sub: "Day 1" },
+            { label: "Final Pain", value: lastPain !== null ? lastPain + "/10" : "\u2014", sub: "Day " + progLength },
+            { label: "Improvement", value: pct !== null ? pct + "%" : "\u2014", sub: painDrop !== null ? "\u2212" + painDrop + " pts" : "recovery" },
+          ].map((s, i) => React.createElement("div", { key: i, style: { background: "rgba(255,255,255,.08)", borderRadius: 10, padding: "16px 18px", border: "1px solid rgba(255,255,255,.1)" } },
+            React.createElement("div", Object.assign({}, mono2, { style: Object.assign({}, mono2, { fontSize: 10, color: "rgba(255,255,255,.45)", textTransform: "uppercase", letterSpacing: ".1em", marginBottom: 6 }) }), s.label),
+            React.createElement("div", { style: Object.assign({}, serif2, { fontSize: 28, fontWeight: 700, color: T.white, lineHeight: 1, marginBottom: 3 }) }, s.value),
+            React.createElement("div", { style: { fontSize: 11, color: "rgba(255,255,255,.35)" } }, s.sub)
+          ))
+        )
+      ),
+      progCheckins.length >= 2 && React.createElement("div", { style: { background: T.white, borderRadius: 14, padding: "24px 28px", marginBottom: 20, border: "1px solid " + T.grey100 } },
+        React.createElement("div", { style: { display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: 20 } },
+          React.createElement("div", Object.assign({}, serif2, { style: Object.assign({}, serif2, { fontWeight: 600, fontSize: 17, color: T.navy }) }), "Pain Trend"),
+          React.createElement("div", Object.assign({}, mono2, { style: Object.assign({}, mono2, { fontSize: 11, color: T.grey400 }) }), "Scale 0\u201310 \u00B7 lower is better")
+        ),
+        React.createElement("svg", { viewBox: "0 0 " + chartW + " " + chartH, style: { width: "100%", height: "auto", display: "block", marginBottom: 8 } },
           React.createElement("defs", null,
-            React.createElement("linearGradient", { id: "sumFill", x1: "0", y1: "0", x2: "0", y2: "1" },
-              React.createElement("stop", { offset: "0%", stopColor: T.teal, stopOpacity: 0.18 }),
+            React.createElement("linearGradient", { id: "psFill", x1: "0", y1: "0", x2: "0", y2: "1" },
+              React.createElement("stop", { offset: "0%", stopColor: T.teal, stopOpacity: 0.15 }),
               React.createElement("stop", { offset: "100%", stopColor: T.teal, stopOpacity: 0 })
             )
           ),
-          pts.length > 1 && React.createElement("polygon", { points: polygon, fill: "url(#sumFill)" }),
-          pts.length > 1 && React.createElement("polyline", { points: polyline, fill: "none", stroke: T.teal, strokeWidth: "2", strokeLinecap: "round", strokeLinejoin: "round" }),
-          pts.map((p, i) => React.createElement("circle", { key: i, cx: p.x, cy: p.y, r: "4", fill: p.pain > 6 ? T.orange : p.pain > 3 ? "#f59e0b" : T.teal }))
+          [2, 4, 6, 8].map((v) => {
+            const y = Math.round((1 - v / 10) * (chartH - 20)) + 10;
+            return React.createElement("line", { key: v, x1: "20", y1: y, x2: chartW - 20, y2: y, stroke: T.grey100, strokeWidth: "1" });
+          }),
+          pts.length > 1 && React.createElement("polygon", { points: polygon, fill: "url(#psFill)" }),
+          pts.length > 1 && React.createElement("polyline", { points: polyline, fill: "none", stroke: T.teal, strokeWidth: "2.5", strokeLinecap: "round", strokeLinejoin: "round" }),
+          pts.map((p, i) => React.createElement("circle", { key: i, cx: p.x, cy: p.y, r: "5", fill: T.white, stroke: p.pain > 6 ? T.orange : p.pain > 3 ? "#f59e0b" : T.teal, strokeWidth: "2.5" }))
         ),
-        React.createElement("div", { style: { display: "flex", justifyContent: "space-between", marginTop: 8 } },
+        React.createElement("div", { style: { display: "flex", justifyContent: "space-between" } },
           React.createElement("div", Object.assign({}, mono2, { style: Object.assign({}, mono2, { fontSize: 11, color: T.grey400 }) }), "Day 1"),
           React.createElement("div", Object.assign({}, mono2, { style: Object.assign({}, mono2, { fontSize: 11, color: T.grey400 }) }), "Day " + progLength)
         )
       ),
-      React.createElement("div", { style: { background: T.white, border: "1px solid " + T.grey100, borderRadius: 12, padding: "24px 24px", marginBottom: 28 } }, !summaryText ? React.createElement("div", { style: { textAlign: "center", padding: "20px 0", fontFamily: "DM Sans,sans-serif" } }, React.createElement("div", { style: { fontSize: 32, marginBottom: 12 } }, "..."), React.createElement("div", { style: { fontSize: 14, color: T.grey500 } }, "Generating your AI summary. This may take up to 30 seconds.")) :
-        React.createElement("div", Object.assign({}, serif2, { style: Object.assign({}, serif2, { fontWeight: 600, fontSize: 16, color: T.navy, marginBottom: 16 }) }), "Progress Summary"),
-        sections.length > 0 ? sections.map((s, i) => React.createElement("div", { key: i, style: { marginBottom: 14 } },
-          React.createElement("p", { style: { fontSize: 14, color: T.grey600, lineHeight: 1.75, whiteSpace: "pre-wrap", margin: 0 } }, s.trim())
-        )) : React.createElement("p", { style: { fontSize: 14, color: T.grey600, lineHeight: 1.75, whiteSpace: "pre-wrap" } }, summaryText)
+      React.createElement("div", { style: { background: T.white, borderRadius: 14, padding: "24px 28px", marginBottom: 20, border: "1px solid " + T.grey100 } },
+        React.createElement("div", Object.assign({}, serif2, { style: Object.assign({}, serif2, { fontWeight: 600, fontSize: 17, color: T.navy, marginBottom: 20 }) }), "AI Progress Summary"),
+        !summaryText ? React.createElement("div", { style: { display: "flex", alignItems: "center", gap: 14, padding: "16px 0", color: T.grey500 } },
+          React.createElement("div", { style: { width: 20, height: 20, borderRadius: "50%", border: "2px solid " + T.teal, borderTopColor: "transparent", animation: "spin 1s linear infinite" } }),
+          React.createElement("div", { style: { fontSize: 14 } }, "Generating your AI summary\u2026 this may take up to 30 seconds.")
+        ) : React.createElement("div", { style: { fontSize: 14, color: T.grey600, lineHeight: 1.9, whiteSpace: "pre-wrap" } }, summaryText)
       ),
-      React.createElement("div", { style: { marginBottom: 28 } },
-        React.createElement("div", Object.assign({}, serif2, { style: Object.assign({}, serif2, { fontWeight: 600, fontSize: 18, color: T.navy, marginBottom: 16 }) }), "Day-by-Day Breakdown"),
+      React.createElement("div", { style: { marginBottom: 8 } },
+        React.createElement("div", Object.assign({}, serif2, { style: Object.assign({}, serif2, { fontWeight: 600, fontSize: 20, color: T.navy, marginBottom: 20 }) }), "Day-by-Day Programme"),
         progPlans.map((p, di) => {
           const exs = (p.plan && p.plan.exercises) || [];
           const electro = (p.plan && p.plan.electrotherapy) || [];
-          const meals = (p.plan && p.plan.nutrition && p.plan.nutrition.meals) || [];
-          const nutSummary = p.plan && p.plan.nutrition && p.plan.nutrition.summary;
+          const nut = p.plan && p.plan.nutrition;
           const ci = progCheckins.find((c) => c.day === p.day);
-          return React.createElement("div", { key: di, style: { background: T.white, border: "1px solid " + T.grey100, borderRadius: 12, padding: "18px 20px", marginBottom: 12 } },
-            React.createElement("div", { style: { display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 14 } },
-              React.createElement("div", Object.assign({}, serif2, { style: Object.assign({}, serif2, { fontWeight: 600, fontSize: 15, color: T.navy }) }), "Day " + p.day),
-              ci && React.createElement("div", { style: { display: "flex", gap: 12 } },
-                React.createElement("span", Object.assign({}, mono2, { style: Object.assign({}, mono2, { fontSize: 11, color: T.orange }) }), "Pain " + ci.pain + "/10"),
-                React.createElement("span", Object.assign({}, mono2, { style: Object.assign({}, mono2, { fontSize: 11, color: T.teal }) }), "Energy " + ci.energy + "/10")
+          return React.createElement("div", { key: di, style: { background: T.white, border: "1px solid " + T.grey100, borderRadius: 14, marginBottom: 16, overflow: "hidden" } },
+            React.createElement("div", { style: { background: T.navy, padding: "14px 22px", display: "flex", justifyContent: "space-between", alignItems: "center" } },
+              React.createElement("div", { style: { display: "flex", alignItems: "center", gap: 12 } },
+                React.createElement("div", Object.assign({}, mono2, { style: Object.assign({}, mono2, { fontSize: 11, color: "rgba(255,255,255,.5)", textTransform: "uppercase", letterSpacing: ".1em" }) }), "Day " + p.day),
+                p.title && React.createElement("div", { style: { fontSize: 14, fontWeight: 600, color: T.white } }, p.title)
+              ),
+              ci && React.createElement("div", { style: { display: "flex", gap: 16 } },
+                React.createElement("div", { style: { textAlign: "right" } },
+                  React.createElement("div", Object.assign({}, mono2, { style: Object.assign({}, mono2, { fontSize: 10, color: "rgba(255,255,255,.4)" }) }), "Pain"),
+                  React.createElement("div", { style: { fontSize: 16, fontWeight: 700, color: ci.pain > 6 ? T.orange : ci.pain > 3 ? "#f59e0b" : T.tealLight } }, ci.pain + "/10")
+                ),
+                React.createElement("div", { style: { textAlign: "right" } },
+                  React.createElement("div", Object.assign({}, mono2, { style: Object.assign({}, mono2, { fontSize: 10, color: "rgba(255,255,255,.4)" }) }), "Energy"),
+                  React.createElement("div", { style: { fontSize: 16, fontWeight: 700, color: T.white } }, ci.energy + "/10")
+                )
               )
             ),
-            exs.length > 0 && React.createElement("div", { style: { marginBottom: 12 } },
-              React.createElement("div", Object.assign({}, mono2, { style: Object.assign({}, mono2, { fontSize: 10, color: T.grey400, textTransform: "uppercase", letterSpacing: ".1em", marginBottom: 6 }) }), "Exercises"),
-              React.createElement("div", { style: { display: "flex", flexDirection: "column", gap: 4 } },
-                exs.map((e, ei) => React.createElement("div", { key: ei, style: { fontSize: 13, color: T.grey600, display: "flex", justifyContent: "space-between" } },
-                  React.createElement("span", null, e.name),
-                  React.createElement("span", Object.assign({}, mono2, { style: Object.assign({}, mono2, { fontSize: 12, color: T.grey400 }) }), e.sets && e.reps ? e.sets + " \xD7 " + e.reps : e.duration || "")
-                ))
+            React.createElement("div", { style: { padding: "20px 22px" } },
+              exs.length > 0 && React.createElement("div", { style: { marginBottom: nut || electro.length > 0 ? 20 : 0 } },
+                React.createElement("div", Object.assign({}, mono2, { style: Object.assign({}, mono2, { fontSize: 10, color: T.teal, textTransform: "uppercase", letterSpacing: ".12em", marginBottom: 10 }) }), "Exercises"),
+                React.createElement("div", { style: { display: "flex", flexDirection: "column", gap: 6 } },
+                  exs.map((e, ei) => React.createElement("div", { key: ei, style: { display: "flex", justifyContent: "space-between", alignItems: "center", padding: "8px 12px", background: T.offwhite, borderRadius: 8 } },
+                    React.createElement("span", { style: { fontSize: 13, color: T.navy, fontWeight: 500 } }, e.name),
+                    React.createElement("span", Object.assign({}, mono2, { style: Object.assign({}, mono2, { fontSize: 12, color: T.grey500 }) }), e.sets && e.reps ? e.sets + " \xD7 " + e.reps : e.duration || "")
+                  ))
+                )
+              ),
+              electro.length > 0 && React.createElement("div", { style: { marginBottom: nut ? 20 : 0 } },
+                React.createElement("div", Object.assign({}, mono2, { style: Object.assign({}, mono2, { fontSize: 10, color: T.orange, textTransform: "uppercase", letterSpacing: ".12em", marginBottom: 10 }) }), "Electrotherapy"),
+                React.createElement("div", { style: { display: "flex", flexDirection: "column", gap: 6 } },
+                  electro.map((e, ei) => React.createElement("div", { key: ei, style: { display: "flex", justifyContent: "space-between", alignItems: "center", padding: "8px 12px", background: "#fffbeb", borderRadius: 8 } },
+                    React.createElement("span", { style: { fontSize: 13, color: T.navy, fontWeight: 500 } }, e.name || e.type || ""),
+                    React.createElement("span", Object.assign({}, mono2, { style: Object.assign({}, mono2, { fontSize: 12, color: T.grey500 }) }), [e.duration, e.frequency].filter(Boolean).join(" \u00B7 "))
+                  ))
+                )
+              ),
+              nut && React.createElement("div", null,
+                React.createElement("div", Object.assign({}, mono2, { style: Object.assign({}, mono2, { fontSize: 10, color: "#166534", textTransform: "uppercase", letterSpacing: ".12em", marginBottom: 10 }) }), "Nutrition"),
+                nut.dailySummary && React.createElement("div", { style: { fontSize: 13, color: T.grey600, marginBottom: 12, padding: "10px 12px", background: "#f0fdf4", borderRadius: 8, fontStyle: "italic" } }, nut.dailySummary),
+                React.createElement("div", { style: { display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(180px,1fr))", gap: 8 } },
+                  ["breakfast", "morningSnack", "lunch", "afternoonSnack", "dinner"].filter((k) => nut[k] && nut[k].meal).map((k, ki) => {
+                    const meal = nut[k];
+                    const label = k === "morningSnack" ? "Morning Snack" : k === "afternoonSnack" ? "Afternoon Snack" : k.charAt(0).toUpperCase() + k.slice(1);
+                    return React.createElement("div", { key: ki, style: { padding: "10px 12px", background: "#f0fdf4", borderRadius: 8 } },
+                      React.createElement("div", Object.assign({}, mono2, { style: Object.assign({}, mono2, { fontSize: 10, color: "#166534", marginBottom: 4 }) }), label),
+                      React.createElement("div", { style: { fontSize: 13, color: T.navy, fontWeight: 500, marginBottom: 4 } }, meal.meal),
+                      React.createElement("div", Object.assign({}, mono2, { style: Object.assign({}, mono2, { fontSize: 11, color: T.grey500 }) }), meal.calories ? meal.calories + " kcal" : "", meal.protein ? " \u00B7 P:" + meal.protein + "g" : "", meal.carbs ? " \u00B7 C:" + meal.carbs + "g" : "", meal.fat ? " \u00B7 F:" + meal.fat + "g" : "")
+                    );
+                  })
+                ),
+                (nut.antiInflammatoryTip || nut.hydration || nut.foodsToAvoid) && React.createElement("div", { style: { marginTop: 10, display: "flex", flexDirection: "column", gap: 6 } },
+                  nut.antiInflammatoryTip && React.createElement("div", { style: { fontSize: 12, color: T.grey600, padding: "8px 12px", background: T.offwhite, borderRadius: 8 } }, React.createElement("span", { style: { fontWeight: 600, color: "#166534" } }, "Anti-inflammatory: "), nut.antiInflammatoryTip),
+                  nut.hydration && React.createElement("div", { style: { fontSize: 12, color: T.grey600, padding: "8px 12px", background: T.offwhite, borderRadius: 8 } }, React.createElement("span", { style: { fontWeight: 600, color: T.teal } }, "Hydration: "), nut.hydration),
+                  nut.foodsToAvoid && React.createElement("div", { style: { fontSize: 12, color: T.grey600, padding: "8px 12px", background: T.offwhite, borderRadius: 8 } }, React.createElement("span", { style: { fontWeight: 600, color: T.orange } }, "Avoid: "), nut.foodsToAvoid)
+                )
               )
-            ),
-            electro.length > 0 && React.createElement("div", { style: { marginBottom: 12 } },
-              React.createElement("div", Object.assign({}, mono2, { style: Object.assign({}, mono2, { fontSize: 10, color: T.grey400, textTransform: "uppercase", letterSpacing: ".1em", marginBottom: 6 }) }), "Electrotherapy"),
-              electro.map((e, ei) => React.createElement("div", { key: ei, style: { fontSize: 13, color: T.grey600 } }, (e.name || e.type || "") + (e.duration ? " \u00B7 " + e.duration : "") + (e.frequency ? " \u00B7 " + e.frequency : "")))
-            ),
-            (meals.length > 0 || nutSummary) && React.createElement("div", null,
-              React.createElement("div", Object.assign({}, mono2, { style: Object.assign({}, mono2, { fontSize: 10, color: T.grey400, textTransform: "uppercase", letterSpacing: ".1em", marginBottom: 6 }) }), "Nutrition"),
-              nutSummary && React.createElement("div", { style: { fontSize: 13, color: T.grey600, marginBottom: 6 } }, nutSummary),
-              meals.map((m, mi) => React.createElement("div", { key: mi, style: { marginBottom: 4 } },
-                React.createElement("span", Object.assign({}, mono2, { style: Object.assign({}, mono2, { fontSize: 11, color: T.teal, marginRight: 6 }) }), m.name),
-                React.createElement("span", { style: { fontSize: 13, color: T.grey600 } }, (m.items || []).join(", ") || m.description || "")
-              ))
             )
           );
         })
@@ -2991,6 +3024,7 @@ function ProgrammeSummaryScreen({ prog, planHistory, checkinHistory, summaryText
     )
   );
 }
+
 function ComingSoonScreen({ onBack, lang }) {
   const t2 = useT(lang);
   const [email, setEmail] = useState("");
@@ -4833,6 +4867,11 @@ function App() {
             (a, b) => (b.startDate || "") > (a.startDate || "") ? 1 : -1
           );
           setProgrammes(progs);
+          progs.filter((p) => p.status === "completed" && p.subscription !== "trial").forEach((p) => {
+            sb.getSummary(session.token, p.programmeId).then((s) => {
+              if (s && s.summary_text) setSummaries((prev) => Object.assign({}, prev, { [p.programmeId]: s.summary_text }));
+            }).catch(() => {});
+          });
           const uid = ((_a3 = session.user) == null ? void 0 : _a3.id) || session.userId;
           if (uid) {
             sb.getCheckins(session.token, uid).then((ckins) => {
