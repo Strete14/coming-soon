@@ -2891,24 +2891,10 @@ function ProgrammeSummaryScreen({ prog, planHistory, checkinHistory, summaryText
   const mealKeys = ["breakfast", "morningSnack", "lunch", "afternoonSnack", "dinner"];
   const mealLabels = { breakfast: "Breakfast", morningSnack: "Morning Snack", lunch: "Lunch", afternoonSnack: "Afternoon Snack", dinner: "Dinner" };
   return React.createElement("div", { style: { minHeight: "100vh", background: "#f5f6f8", fontFamily: "'DM Sans',sans-serif" } },
-    React.createElement("style", null, `
-    @keyframes spin { to { transform: rotate(360deg); } }
-    @media print {
-      .no-print { display: none !important; }
-      * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; color-adjust: exact !important; }
-      body { background: white !important; margin: 0; padding: 0; font-family: 'DM Sans', sans-serif; }
-      @page { margin: 16mm 14mm; size: A4; }
-      .print-summary-wrap { padding: 0 !important; }
-      .print-day-card { page-break-inside: avoid; break-inside: avoid; margin-bottom: 16px !important; }
-      .print-section { page-break-inside: avoid; break-inside: avoid; }
-      .print-header { page-break-after: avoid; }
-      svg { max-width: 100%; height: auto; }
-      table { page-break-inside: avoid; break-inside: avoid; }
-    }
-  `),
-    React.createElement("div", { className: "no-print", style: { background: T.white, borderBottom: "1px solid " + T.grey100, padding: "14px clamp(16px,4vw,40px)", display: "flex", alignItems: "center", justifyContent: "space-between", position: "sticky", top: 0, zIndex: 100 } },
-      React.createElement("button", { onClick: onBack, style: { background: "none", border: "none", cursor: "pointer", fontSize: 14, color: T.grey500, fontFamily: "'DM Sans',sans-serif", display: "flex", alignItems: "center", gap: 6 } }, "\u2190 Back"),
-      React.createElement("button", { onClick: () => window.print(), style: { background: T.navy, color: T.white, border: "none", borderRadius: 8, padding: "9px 20px", fontSize: 13, fontWeight: 600, cursor: "pointer", fontFamily: "'DM Sans',sans-serif" } }, "\u2913 Save / Print")
+    React.createElement("style", null, "@keyframes spin{to{transform:rotate(360deg)}} @media print{.no-print{display:none!important} *{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important} body{background:white!important;margin:0;padding:0} @page{margin:16mm 14mm;size:A4} .print-day-card{page-break-inside:avoid;break-inside:avoid} .print-section{page-break-inside:avoid;break-inside:avoid} .print-header{page-break-after:avoid} svg{max-width:100%;height:auto} table{page-break-inside:avoid}}"),
+    React.createElement("div", { style: { background: T.white, borderBottom: "1px solid " + T.grey100, padding: "14px clamp(16px,4vw,40px)", display: "flex", alignItems: "center", justifyContent: "space-between", position: "sticky", top: 0, zIndex: 100 } },
+      React.createElement("button", { onClick: onBack, className: "no-print", style: { background: "none", border: "none", cursor: "pointer", fontSize: 14, color: T.grey500, fontFamily: "'DM Sans',sans-serif", display: "flex", alignItems: "center", gap: 6 } }, "\u2190 Back"),
+      React.createElement("button", { onClick: () => window.print(), className: "no-print", style: { background: T.navy, color: T.white, border: "none", borderRadius: 8, padding: "9px 20px", fontSize: 13, fontWeight: 600, cursor: "pointer", fontFamily: "'DM Sans',sans-serif" } }, "\u2913 Save / Print")
     ),
     React.createElement("div", { className: "print-summary-wrap", style: { maxWidth: 800, margin: "0 auto", padding: "40px clamp(16px,4vw,40px) 100px" } },
       React.createElement("div", { className: "print-header", style: { background: T.navy, borderRadius: 20, padding: "40px 44px", marginBottom: 28, position: "relative", overflow: "hidden" } },
