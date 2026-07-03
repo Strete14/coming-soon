@@ -2997,14 +2997,14 @@ function ProgrammeSummaryScreen({ prog, planHistory, checkinHistory, summaryText
                 });
                 if (remaining.trim()) parsed.push({ title: null, body: remaining.trim() });
                 const sections = parsed.filter((s) => s.body);
-                if (sections.length === 0) return React.createElement("div", { style: { fontSize: 15, color: T.grey600, lineHeight: 2, whiteSpace: "pre-wrap" } }, summaryText);
+                if (sections.length === 0) return React.createElement("div", { style: { fontSize: 15, color: T.grey600, lineHeight: 2 } }, summaryText.replace(/[*_#]+/g, "").replace(/^[-•]\s*/gm, "").trim());
                 return React.createElement("div", { style: { display: "flex", flexDirection: "column", gap: 0 } },
                   sections.map((s, i) => React.createElement("div", { key: i, style: { paddingBottom: 24, marginBottom: 24, borderBottom: i < sections.length - 1 ? "1px solid " + T.grey100 : "none" } },
                     s.title && React.createElement("div", { style: { display: "flex", alignItems: "center", gap: 10, marginBottom: 12 } },
                       React.createElement("div", { style: { width: 3, height: 18, borderRadius: 2, background: sectionColors[s.title] || T.teal, flexShrink: 0 } }),
                       React.createElement("div", Object.assign({}, mono2, { style: Object.assign({}, mono2, { fontSize: 10, fontWeight: 700, color: sectionColors[s.title] || T.teal, textTransform: "uppercase", letterSpacing: ".16em" }) }), s.title)
                     ),
-                    React.createElement("div", { style: { fontSize: 15, color: T.grey600, lineHeight: 1.9, paddingLeft: s.title ? 13 : 0, whiteSpace: "pre-wrap" } }, s.body)
+                    React.createElement("div", { style: { fontSize: 15, color: T.grey600, lineHeight: 1.9, paddingLeft: s.title ? 13 : 0 } }, s.body.replace(/[*_#]+/g, "").replace(/^[-•]\s*/gm, "").trim())
                   ))
                 );
               })()
@@ -3065,16 +3065,14 @@ function ProgrammeSummaryScreen({ prog, planHistory, checkinHistory, summaryText
                   React.createElement("tr", { style: { borderBottom: "1px solid " + T.grey100 } },
                     React.createElement("th", { style: Object.assign({}, mono2, { fontSize: 9, color: T.grey400, textTransform: "uppercase", letterSpacing: ".1em", padding: "0 0 10px", textAlign: "left", fontWeight: 400 }) }, "Modality"),
                     React.createElement("th", { style: Object.assign({}, mono2, { fontSize: 9, color: T.grey400, textTransform: "uppercase", letterSpacing: ".1em", padding: "0 0 10px", textAlign: "right", fontWeight: 400 }) }, "Duration"),
-                    React.createElement("th", { style: Object.assign({}, mono2, { fontSize: 9, color: T.grey400, textTransform: "uppercase", letterSpacing: ".1em", padding: "0 0 10px", textAlign: "right", fontWeight: 400 }) }, "Frequency"),
-                    React.createElement("th", { style: Object.assign({}, mono2, { fontSize: 9, color: T.grey400, textTransform: "uppercase", letterSpacing: ".1em", padding: "0 0 10px", textAlign: "right", fontWeight: 400 }) }, "Parameters")
+                    React.createElement("th", { style: Object.assign({}, mono2, { fontSize: 9, color: T.grey400, textTransform: "uppercase", letterSpacing: ".1em", padding: "0 0 10px", textAlign: "right", fontWeight: 400 }) }, "Frequency")
                   )
                 ),
                 React.createElement("tbody", null,
                   electro.map((e, ei) => React.createElement("tr", { key: ei, style: { borderBottom: "1px solid " + T.grey50 } },
                     React.createElement("td", { style: { fontSize: 14, color: T.navy, fontWeight: 500, padding: "12px 0" } }, e.name || e.type || ""),
                     React.createElement("td", { style: Object.assign({}, mono2, { fontSize: 13, color: T.grey600, textAlign: "right", padding: "12px 0" }) }, e.duration || "\u2014"),
-                    React.createElement("td", { style: Object.assign({}, mono2, { fontSize: 13, color: T.grey600, textAlign: "right", padding: "12px 0" }) }, e.frequency || "\u2014"),
-                    React.createElement("td", { style: Object.assign({}, mono2, { fontSize: 13, color: T.grey600, textAlign: "right", padding: "12px 0" }) }, e.parameters || e.protocol || "\u2014")
+                    React.createElement("td", { style: Object.assign({}, mono2, { fontSize: 13, color: T.grey600, textAlign: "right", padding: "12px 0" }) }, e.frequency || "\u2014")
                   ))
                 )
               )
@@ -5286,7 +5284,7 @@ ${checkIn ? `- Today's check-in: pain ${checkIn.pain}/10, energy ${checkIn.energ
         return "Day " + p.day + ": Exercises: " + (exs || "none") + ". Electrotherapy: " + (electro || "none") + ". Nutrition: " + (nut || "none") + ".";
       }).join("\n");
       const painLine = painDrop !== null ? " Pain reduction: " + painDrop + " points (" + Math.round(painDrop / initialPain * 100) + "%)." : "";
-      const prompt = "You are a physiotherapy rehabilitation specialist. Write a professional programme completion summary for a patient who finished a " + progLength + "-day " + formatRegion(prog.region) + " rehabilitation programme.\n\nPatient check-in history: " + checkinSummary + "\nInitial pain: " + initialPain + "/10. Final pain: " + finalPain + "/10." + painLine + "\n\nProgramme details:\n" + daysSummary + "\n\nWrite a summary with these exact sections:\n1. OVERVIEW: 2-3 sentences congratulating the patient and summarising their journey.\n2. PAIN EVOLUTION: Specific description of pain improvement using actual numbers.\n3. KEY ACHIEVEMENTS: 3-4 bullet points of specific achievements.\n4. RECOMMENDATIONS: 2-3 sentences on what to do next.\n\nBe specific, use actual exercise names and numbers. Professional but encouraging tone. 200-300 words total.";
+      const prompt = "You are a physiotherapy rehabilitation specialist. Write a professional programme completion summary for a patient who finished a " + progLength + "-day " + formatRegion(prog.region) + " rehabilitation programme.\n\nPatient check-in history: " + checkinSummary + "\nInitial pain: " + initialPain + "/10. Final pain: " + finalPain + "/10." + painLine + "\n\nProgramme details:\n" + daysSummary + "\n\nWrite a summary with these exact sections:\n1. OVERVIEW: 2-3 sentences congratulating the patient and summarising their journey.\n2. PAIN EVOLUTION: Specific description of pain improvement using actual numbers.\n3. KEY ACHIEVEMENTS: 3-4 short sentences describing specific achievements, each on its own line, without bullet points or dashes.\n4. RECOMMENDATIONS: 2-3 sentences on what to do next.\n\nIMPORTANT: Use plain text only. No markdown, no asterisks, no bullet points, no dashes, no bold formatting. Write in clean professional prose. Be specific, use actual exercise names and numbers. 200-300 words total.";
       const res = await fetch("/api/generate", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
