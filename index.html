@@ -2885,14 +2885,6 @@ function ProgrammeSummaryScreen({ prog, planHistory, checkinHistory, summaryText
   const lastPain = progCheckins[progCheckins.length - 1] ? progCheckins[progCheckins.length - 1].pain : null;
   const painDrop = firstPain !== null && lastPain !== null ? firstPain - lastPain : null;
   const pct = painDrop !== null && firstPain > 0 ? Math.round(painDrop / firstPain * 100) : null;
-  const chartW = 560; const chartH = 110;
-  const pts = progCheckins.map((c, i) => {
-    const x = progCheckins.length > 1 ? Math.round(i / (progCheckins.length - 1) * (chartW - 60)) + 30 : chartW / 2;
-    const y = Math.round((1 - c.pain / 10) * (chartH - 30)) + 15;
-    return { x, y, pain: c.pain, day: c.day };
-  });
-  const polyline = pts.map((p) => p.x + "," + p.y).join(" ");
-  const polygon = pts.length > 1 ? pts.map((p) => p.x + "," + p.y).join(" ") + " " + pts[pts.length-1].x + "," + chartH + " " + pts[0].x + "," + chartH : "";
   const generatedDate = new Date().toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" });
   const sectionStyle = { background: T.white, borderRadius: 16, padding: "32px 36px", marginBottom: 24, border: "1px solid " + T.grey100 };
   const labelStyle = Object.assign({}, mono2, { fontSize: 10, textTransform: "uppercase", letterSpacing: ".16em", marginBottom: 12 });
@@ -2928,33 +2920,38 @@ function ProgrammeSummaryScreen({ prog, planHistory, checkinHistory, summaryText
         )
       ),
       progCheckins.length >= 2 && React.createElement("div", { style: sectionStyle },
-        React.createElement("div", { style: { display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: 28 } },
+        React.createElement("div", { style: { display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: 20 } },
           React.createElement("div", { style: Object.assign({}, serif2, { fontWeight: 600, fontSize: 18, color: T.navy }) }, "Pain Evolution"),
-          React.createElement("div", Object.assign({}, mono2, { style: Object.assign({}, mono2, { fontSize: 11, color: T.grey400 }) }), "Scale 0\u201310 \u00B7 lower is better")
+          React.createElement("div", Object.assign({}, mono2, { style: Object.assign({}, mono2, { fontSize: 11, color: T.grey400 }) }), "Scale 0–10 · lower is better")
         ),
-        React.createElement("svg", { viewBox: "0 0 " + chartW + " " + chartH, style: { width: "100%", height: "auto", display: "block" } },
-          React.createElement("defs", null,
-            React.createElement("linearGradient", { id: "sumGrad", x1: "0", y1: "0", x2: "0", y2: "1" },
-              React.createElement("stop", { offset: "0%", stopColor: T.teal, stopOpacity: 0.12 }),
-              React.createElement("stop", { offset: "100%", stopColor: T.teal, stopOpacity: 0 })
-            )
+        React.createElement("div", { style: { position: "relative", paddingLeft: 28, paddingBottom: 20 } },
+          [0,2,4,6,8,10].map((v, vi) => React.createElement("div", { key: vi, style: { position: "absolute", left: 0, right: 0, top: (1-v/10)*150+"px", pointerEvents: "none" } },
+            React.createElement("span", { style: { fontFamily: "DM Mono,monospace", fontSize: 9, color: T.grey400, position: "absolute", left: 0, top: -6 } }, v),
+            React.createElement("div", { style: { marginLeft: 22, borderTop: "1px dashed "+(v===0?"transparent":T.grey100) } })
+          )),
+          React.createElement("svg", { width: "100%", height: "150", style: { display: "block", overflow: "visible" } },
+            React.createElement("defs", null,
+              React.createElement("linearGradient", { id: "sumGrad2", x1: "0", y1: "0", x2: "0", y2: "1" },
+                React.createElement("stop", { offset: "0%", stopColor: T.teal, stopOpacity: "0.22" }),
+                React.createElement("stop", { offset: "100%", stopColor: T.teal, stopOpacity: "0.02" })
+              )
+            ),
+            progCheckins.length >= 2 && React.createElement("polygon", { fill: "url(#sumGrad2)", points: progCheckins.map((p,i) => (progCheckins.length===1?50:i*(100/(progCheckins.length-1)))+"%,"+(138-p.pain/10*130)).concat(["100%,150","0%,150"]).join(" ") }),
+            progCheckins.length >= 2 && React.createElement("polyline", { fill: "none", stroke: T.teal, strokeWidth: "2.5", strokeLinecap: "round", strokeLinejoin: "round", points: progCheckins.map((p,i) => (progCheckins.length===1?50:i*(100/(progCheckins.length-1)))+"%,"+(138-p.pain/10*130)).join(" ") }),
+            progCheckins.map((p,i) => {
+              var xPct = progCheckins.length===1?50:i*(100/(progCheckins.length-1));
+              var y = 138-p.pain/10*130;
+              var col = p.pain>=7?T.red:p.pain>=4?"#f59e0b":T.teal;
+              return React.createElement("g", { key: i },
+                React.createElement("circle", { cx: xPct+"%", cy: y, r: "7", fill: T.white, stroke: col, strokeWidth: "2.5" }),
+                React.createElement("circle", { cx: xPct+"%", cy: y, r: "3.5", fill: col }),
+                React.createElement("text", { x: xPct+"%", y: y-13, textAnchor: "middle", fontSize: "12", fontWeight: "700", fill: col, fontFamily: "DM Sans,sans-serif" }, p.pain)
+              );
+            })
           ),
-          [2, 4, 6, 8].map((v) => {
-            const y = Math.round((1 - v / 10) * (chartH - 30)) + 15;
-            return React.createElement("g", { key: v },
-              React.createElement("line", { x1: "30", y1: y, x2: chartW - 30, y2: y, stroke: T.grey100, strokeWidth: "1", strokeDasharray: "4 4" }),
-              React.createElement("text", { x: "22", y: y + 4, fontSize: "9", fill: T.grey400, textAnchor: "end", fontFamily: "DM Mono,monospace" }, v)
-            );
-          }),
-          pts.length > 1 && React.createElement("polygon", { points: polygon, fill: "url(#sumGrad)" }),
-          pts.length > 1 && React.createElement("polyline", { points: polyline, fill: "none", stroke: T.teal, strokeWidth: "2.5", strokeLinecap: "round", strokeLinejoin: "round" }),
-          pts.map((p, i) => React.createElement("g", { key: i },
-            React.createElement("circle", { cx: p.x, cy: p.y, r: "6", fill: T.white, stroke: p.pain > 6 ? T.orange : p.pain > 3 ? "#f59e0b" : T.teal, strokeWidth: "2.5" }),
-            React.createElement("text", { x: p.x, y: p.y - 11, fontSize: "9", fill: T.grey500, textAnchor: "middle", fontFamily: "DM Mono,monospace" }, p.pain)
-          ))
-        ),
-        React.createElement("div", { style: { display: "flex", justifyContent: "space-between", marginTop: 8 } },
-          pts.map((p, i) => React.createElement("div", { key: i, style: Object.assign({}, mono2, { fontSize: 10, color: T.grey300, textAlign: "center" }) }, "D" + p.day))
+          React.createElement("div", { style: { display: "flex", justifyContent: progCheckins.length===1?"center":"space-between", paddingTop: 8 } },
+            progCheckins.map((p,i) => React.createElement("div", { key: i, style: { fontFamily: "DM Mono,monospace", fontSize: 10, color: T.grey400 } }, "Day ", p.day))
+          )
         )
       ),
       React.createElement("div", { style: sectionStyle },
