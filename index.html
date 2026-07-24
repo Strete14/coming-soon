@@ -4893,14 +4893,7 @@ function App() {
       setTimeout(() => setError(""), 5000);
     }
   }, []);
-  React.useEffect(() => {
-    if (pendingPaidPlan && user) {
-      const p = pendingPaidPlan;
-      setPendingPaidPlan(null);
-      try { sessionStorage.removeItem("physio_pending_paid"); } catch (e) {}
-      handlePaid(p);
-    }
-  }, [pendingPaidPlan, user]);
+
   const [lang, setLang] = useState(() => {
     try {
       return localStorage.getItem("physio_lang") || "en";
@@ -4909,6 +4902,14 @@ function App() {
     }
   });
   const [user, setUser] = useState(null);
+  React.useEffect(() => {
+    if (pendingPaidPlan && user) {
+      const p = pendingPaidPlan;
+      setPendingPaidPlan(null);
+      try { sessionStorage.removeItem("physio_pending_paid"); } catch (e) {}
+      handlePaid(p);
+    }
+  }, [pendingPaidPlan, user]);
   const [intake, setIntake] = useState(null);
   const [plan, setPlan] = useState(null);
   const [dayNum, setDayNum] = useState(1);
@@ -5404,6 +5405,9 @@ ${checkIn ? `- Today's check-in: pain ${checkIn.pain}/10, energy ${checkIn.energ
       if (Array.isArray(r)) setLiveReviews(r);
     }).catch(() => {
     });
+    let _pendAuth = null;
+    try { _pendAuth = sessionStorage.getItem("physio_pending_paid"); } catch (e) {}
+    if (_pendAuth) { go("disclaimer"); return; }
     go("programmes");
     const sess = loadSession();
     if ((sess == null ? void 0 : sess.token) && (u == null ? void 0 : u.id)) {
