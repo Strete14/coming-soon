@@ -4876,15 +4876,7 @@ function App() {
     const plan = params.get("plan");
     if (payment === "success" && (plan === "standard" || plan === "premium")) {
       window.history.replaceState({}, "", window.location.pathname);
-      const session = loadSession();
-      if (session && session.user) {
-        const userKey = (session.user.email || "").toLowerCase().replace(/[^a-z0-9]/g, "_") || "anon";
-        localStorage.setItem("physio_subscription_" + userKey, plan);
-        setSubscription(plan);
-        setError("Payment successful! Your " + (plan === "premium" ? "Premium" : "Standard") + " plan is now active.");
-        setTimeout(() => setError(""), 5000);
-        go("programmes");
-      }
+      handlePaid(plan);
     } else if (payment === "cancelled") {
       window.history.replaceState({}, "", window.location.pathname);
       setError("Payment was cancelled. You can try again whenever you're ready.");
