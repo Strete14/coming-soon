@@ -1,13 +1,9 @@
 // api/stripe-webhook.js
-// Receives Stripe webhook events after a payment completes.
-// Verifies the webhook signature, updates Supabase subscription,
-// logs the payment to the subscriptions table,
-// and triggers Oblio invoice generation.
 
 import crypto from "crypto";
 
 const STRIPE_WEBHOOK_SECRET = process.env.STRIPE_WEBHOOK_SECRET;
-const SUPABASE_URL = process.env.VITE_SUPABASE_URL || "https://kgtheattqsyelayqjueh.supabase.co";
+const SUPABASE_URL = "https://kgtheattqsyelayqjueh.supabase.co";
 const SUPABASE_SERVICE_ROLE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
 export const config = {
@@ -58,7 +54,7 @@ function verifyStripeSignature(payload, signature, secret) {
 
 async function updateSupabaseSubscription(userId, plan) {
   if (!SUPABASE_SERVICE_ROLE_KEY) {
-    console.error("SUPABASE_SERVICE_ROLE_KEY not set");
+    console.error("SUPABASE_SERVICE_ROLE_KEY is missing");
     return false;
   }
 
@@ -68,12 +64,32 @@ async function updateSupabaseSubscription(userId, plan) {
       apikey: SUPABASE_SERVICE_ROLE_KEY,
       Authorization: `Bearer ${SUPABASE_SERVICE_ROLE_KEY}`,
       "Content-Type": "application/json",
-      Prefer: "return=minimal",
+      Prefer: "return=representation",
     },
     body: JSON.stringify({ subscription: plan }),
   });
 
+  const text = await r.text();
+  console.log("Supabase update status:", r.status, "response:", text);
   return r.ok;
+}
+
+async function hasExistingPayment(stripeSessionId) {
+  if (!SUPABASE_SERVICE_ROLE_KEY) return false;
+
+  const r = await fetch(
+    `${SUPABASE_URL}/rest/v1/subscriptions?stripe_session_id=eq.${stripeSessionId}&select=id`,
+    {
+      headers: {
+        apikey: SUPABASE_SERVICE_ROLE_KEY,
+        Authorization: `Bearer ${SUPABASE_SERVICE_ROLE_KEY}`,
+      },
+    }
+  );
+
+  if (!r.ok) return false;
+  const rows = await r.json();
+  return Array.isArray(rows) && rows.length > 0;
 }
 
 async function logPaymentToSupabase(userId, userEmail, plan, stripeSessionId, amountEur) {
@@ -97,7 +113,7 @@ async function logPaymentToSupabase(userId, userEmail, plan, stripeSessionId, am
   });
 
   if (!r.ok) {
-    console.error("Failed to log payment to subscriptions table");
+    console.error("Failed to log payment:", await r.text());
   }
 }
 
@@ -163,21 +179,24 @@ export default async function handler(req, res) {
     const amountEur = amountTotal ? amountTotal / 100 : null;
 
     if (!userId || !plan) {
-      console.error("Missing metadata:", session.metadata);
+      console.error("Missing metadata - userId:", userId, "plan:", plan);
       return res.status(200).json({ received: true });
     }
 
-    // 1. Update user subscription in Supabase
-    const updated = await updateSupabaseSubscription(userId, plan);
-    if (!updated) {
-      console.error("Failed to update Supabase subscription for user:", userId);
+    // Check if this session was already processed (idempotency)
+    const alreadyProcessed = await hasExistingPayment(session.id);
+
+    // Always update subscription (idempotent - safe to run multiple times)
+    await updateSupabaseSubscription(userId, plan);
+
+    if (!alreadyProcessed) {
+      // Only log payment and send invoice once
+      await logPaymentToSupabase(userId, userEmail, plan, session.id, amountEur);
+      await triggerOblioInvoice(userId, userEmail, userName, plan, amountTotal, currency);
+      console.log("Payment processed for user:", userId, "plan:", plan);
+    } else {
+      console.log("Duplicate webhook - skipping invoice for session:", session.id);
     }
-
-    // 2. Log payment to subscriptions table
-    await logPaymentToSupabase(userId, userEmail, plan, session.id, amountEur);
-
-    // 3. Trigger Oblio invoice
-    await triggerOblioInvoice(userId, userEmail, userName, plan, amountTotal, currency);
   }
 
   return res.status(200).json({ received: true });
