@@ -4044,7 +4044,7 @@ function SubscribeScreen({ onPaid, user, onLogin, onBack, lang, trialUsed = fals
     { k: "premium", name: t2.plan3name, price: "\u20AC35", per: t2.plan3per, desc: t2.plan3f1, disabled: false }
   ];
   const [chosen, setChosen] = useState(trialUsed ? "standard" : "trial");
-  function pay() {
+  async function pay() {
     if (!user) {
       onLogin();
       return;
@@ -4054,10 +4054,29 @@ function SubscribeScreen({ onPaid, user, onLogin, onBack, lang, trialUsed = fals
       return;
     }
     setPaying(true);
-    setTimeout(() => {
+    try {
+      const sess = loadSession();
+      const r = await fetch("/api/create-checkout", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          plan: chosen,
+          userId: (sess && sess.userId) || user.id,
+          userEmail: user.email,
+          userName: user.name || ""
+        })
+      });
+      const data = await r.json();
+      if (!r.ok || !data.url) {
+        setPaying(false);
+        alert(data.error || "Could not start checkout. Please try again.");
+        return;
+      }
+      window.location.href = data.url;
+    } catch (e) {
       setPaying(false);
-      onPaid(chosen);
-    }, 1200);
+      alert("Connection error. Please try again.");
+    }
   }
   const p = PLANS.find((x) => x.k === chosen);
   return /* @__PURE__ */ React.createElement("div", { style: { minHeight: "100vh", background: `linear-gradient(155deg,${T.white} 0%,${T.tealPale} 100%)`, display: "flex", alignItems: "center", justifyContent: "center", padding: "80px 16px" } }, /* @__PURE__ */ React.createElement("div", { style: { background: T.white, border: `1px solid ${T.grey100}`, borderRadius: 16, padding: "clamp(28px,5vw,40px) clamp(20px,5vw,36px)", width: "100%", maxWidth: 460, boxShadow: "0 20px 60px rgba(10,126,110,.09)", animation: "scaleIn .4s ease" } }, onBack && /* @__PURE__ */ React.createElement("button", { onClick: onBack, style: { background: "none", border: "none", cursor: "pointer", color: T.grey400, fontSize: 13, fontFamily: "'DM Sans',sans-serif", display: "flex", alignItems: "center", gap: 4, marginBottom: 16, padding: 0 } }, "\u2190 Back"), /* @__PURE__ */ React.createElement("div", { style: { textAlign: "center", marginBottom: trialUsed ? 12 : 26 } }, /* @__PURE__ */ React.createElement("div", { style: __spreadProps(__spreadValues({}, serif), { fontWeight: 600, fontSize: 22, marginBottom: 5 }) }, t2.oneLastStep), /* @__PURE__ */ React.createElement("div", { style: { color: T.grey500, fontSize: 14 } }, t2.unlockProgramme)), trialUsed && /* @__PURE__ */ React.createElement("div", { style: { background: "#fffbeb", border: "1px solid #fde68a", borderRadius: 8, padding: "10px 14px", marginBottom: 16, fontSize: 13, color: "#92400e", display: "flex", gap: 8, alignItems: "flex-start" } }, /* @__PURE__ */ React.createElement("span", { style: { flexShrink: 0 } }, "\u2139\uFE0F"), /* @__PURE__ */ React.createElement("span", null, "Your free trial has already been used. Choose a plan below to continue your rehabilitation.")), /* @__PURE__ */ React.createElement("div", { style: { display: "flex", gap: 8, marginBottom: 20 } }, PLANS.map((pl) => /* @__PURE__ */ React.createElement(
@@ -4072,7 +4091,7 @@ function SubscribeScreen({ onPaid, user, onLogin, onBack, lang, trialUsed = fals
     /* @__PURE__ */ React.createElement("div", { style: __spreadProps(__spreadValues({}, serif), { fontSize: 20, fontWeight: 600, color: pl.disabled ? T.grey300 : chosen === pl.k ? T.navy : T.grey300 }) }, pl.price),
     /* @__PURE__ */ React.createElement("div", { style: { fontSize: 10, color: T.grey400, marginTop: 1 } }, "/ ", pl.per),
     pl.disabled && /* @__PURE__ */ React.createElement("div", { style: __spreadProps(__spreadValues({ position: "absolute", top: 4, right: 4, background: T.grey200, borderRadius: 10, padding: "1px 7px", fontSize: 9 }, mono), { color: T.grey500 }) }, "USED")
-  ))), /* @__PURE__ */ React.createElement("div", { style: { background: T.offwhite, borderRadius: 8, padding: "13px 16px", marginBottom: 18, fontSize: 14, color: T.grey600 } }, /* @__PURE__ */ React.createElement("div", { style: { display: "flex", justifyContent: "space-between", marginBottom: 5 } }, /* @__PURE__ */ React.createElement("span", null, t2.plan), /* @__PURE__ */ React.createElement("strong", { style: { color: T.navy } }, p == null ? void 0 : p.name)), /* @__PURE__ */ React.createElement("div", { style: { display: "flex", justifyContent: "space-between", marginBottom: 5 } }, /* @__PURE__ */ React.createElement("span", null, t2.access), /* @__PURE__ */ React.createElement("strong", { style: { color: T.grey700 } }, p == null ? void 0 : p.desc)), /* @__PURE__ */ React.createElement("div", { style: { display: "flex", justifyContent: "space-between", marginTop: 8, paddingTop: 8, borderTop: `1px solid ${T.grey100}` } }, /* @__PURE__ */ React.createElement("span", null, t2.totalToday), /* @__PURE__ */ React.createElement("strong", { style: { color: T.teal, fontSize: 16 } }, p == null ? void 0 : p.price))), /* @__PURE__ */ React.createElement("button", { onClick: pay, disabled: paying, style: { width: "100%", background: T.teal, color: T.white, border: "none", borderRadius: 9, padding: 15, cursor: paying ? "not-allowed" : "pointer", fontFamily: "'DM Sans',sans-serif", fontWeight: 600, fontSize: 16, opacity: paying ? 0.75 : 1, display: "flex", alignItems: "center", justifyContent: "center", gap: 9, transition: "all .18s", minHeight: 54 } }, paying && /* @__PURE__ */ React.createElement(Spinner, { size: 18, color: T.white }), paying ? "\u2026" : chosen === "trial" ? t2.startFreeTrial2 : `${t2.payAndStart} \u2014 ${p == null ? void 0 : p.price}`), /* @__PURE__ */ React.createElement("div", { style: __spreadValues({ textAlign: "center", marginTop: 10, fontSize: 11, color: T.grey400 }, mono) }, t2.secureCheckout)));
+  ))), /* @__PURE__ */ React.createElement("div", { style: { background: T.offwhite, borderRadius: 8, padding: "13px 16px", marginBottom: 18, fontSize: 14, color: T.grey600 } }, /* @__PURE__ */ React.createElement("div", { style: { display: "flex", justifyContent: "space-between", marginBottom: 5 } }, /* @__PURE__ */ React.createElement("span", null, t2.plan), /* @__PURE__ */ React.createElement("strong", { style: { color: T.navy } }, p == null ? void 0 : p.name)), /* @__PURE__ */ React.createElement("div", { style: { display: "flex", justifyContent: "space-between", marginBottom: 5 } }, /* @__PURE__ */ React.createElement("span", null, t2.access), /* @__PURE__ */ React.createElement("strong", { style: { color: T.grey700 } }, p == null ? void 0 : p.desc)), /* @__PURE__ */ React.createElement("div", { style: { display: "flex", justifyContent: "space-between", marginTop: 8, paddingTop: 8, borderTop: `1px solid ${T.grey100}` } }, /* @__PURE__ */ React.createElement("span", null, t2.totalToday), /* @__PURE__ */ React.createElement("strong", { style: { color: T.teal, fontSize: 16 } }, p == null ? void 0 : p.price))), /* @__PURE__ */ React.createElement("button", { onClick: pay, disabled: paying, style: { width: "100%", background: T.teal, color: T.white, border: "none", borderRadius: 9, padding: 15, cursor: paying ? "not-allowed" : "pointer", fontFamily: "'DM Sans',sans-serif", fontWeight: 600, fontSize: 16, opacity: paying ? 0.75 : 1, display: "flex", alignItems: "center", justifyContent: "center", gap: 9, transition: "all .18s", minHeight: 54 } }, paying && /* @__PURE__ */ React.createElement(Spinner, { size: 18, color: T.white }), paying ? "Redirecting to payment\u2026" : chosen === "trial" ? t2.startFreeTrial2 : `${t2.payAndStart} \u2014 ${p == null ? void 0 : p.price}`), /* @__PURE__ */ React.createElement("div", { style: __spreadValues({ textAlign: "center", marginTop: 10, fontSize: 11, color: T.grey400 }, mono) }, t2.secureCheckout)));
 }
 function LoadingScreen({ lang, dayNum = 1 }) {
   const t2 = useT(lang);
@@ -4850,6 +4869,27 @@ function App() {
     sb.getReviews().then((r) => {
       if (Array.isArray(r)) setLiveReviews(r);
     }).catch(() => {});
+  }, []);
+  React.useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const payment = params.get("payment");
+    const plan = params.get("plan");
+    if (payment === "success" && (plan === "standard" || plan === "premium")) {
+      window.history.replaceState({}, "", window.location.pathname);
+      const session = loadSession();
+      if (session && session.user) {
+        const userKey = (session.user.email || "").toLowerCase().replace(/[^a-z0-9]/g, "_") || "anon";
+        localStorage.setItem("physio_subscription_" + userKey, plan);
+        setSubscription(plan);
+        setError("Payment successful! Your " + (plan === "premium" ? "Premium" : "Standard") + " plan is now active.");
+        setTimeout(() => setError(""), 5000);
+        go("programmes");
+      }
+    } else if (payment === "cancelled") {
+      window.history.replaceState({}, "", window.location.pathname);
+      setError("Payment was cancelled. You can try again whenever you're ready.");
+      setTimeout(() => setError(""), 5000);
+    }
   }, []);
   const [lang, setLang] = useState(() => {
     try {
