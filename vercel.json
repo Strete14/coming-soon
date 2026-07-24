@@ -1,7 +1,9 @@
 {
+  "version": 2,
   "functions": {
     "api/stripe-webhook.js": {
-      "bodyParser": false
+      "memory": 128,
+      "maxDuration": 10
     }
   }
 }
