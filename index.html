@@ -4875,14 +4875,17 @@ function App() {
       const params = new URLSearchParams(window.location.search);
       const payment = params.get("payment");
       const plan = params.get("plan");
+      console.log("[PAY] init - payment:", payment, "plan:", plan);
       if (payment === "success" && (plan === "standard" || plan === "premium")) {
         sessionStorage.setItem("physio_pending_paid", plan);
         window.history.replaceState({}, "", window.location.pathname);
+        console.log("[PAY] set pending plan:", plan);
         return plan;
       }
       const stored = sessionStorage.getItem("physio_pending_paid");
+      console.log("[PAY] stored pending:", stored);
       if (stored === "standard" || stored === "premium") return stored;
-    } catch (e) {}
+    } catch (e) { console.log("[PAY] init error:", e); }
     return null;
   });
   React.useEffect(() => {
@@ -4903,8 +4906,10 @@ function App() {
   });
   const [user, setUser] = useState(null);
   React.useEffect(() => {
+    console.log("[PAY] trigger check - pendingPaidPlan:", pendingPaidPlan, "user:", !!user);
     if (pendingPaidPlan && user) {
       const p = pendingPaidPlan;
+      console.log("[PAY] RUNNING handlePaid with:", p);
       setPendingPaidPlan(null);
       try { sessionStorage.removeItem("physio_pending_paid"); } catch (e) {}
       handlePaid(p);
@@ -5055,10 +5060,12 @@ function App() {
         }
         let _pend = null;
         try { _pend = sessionStorage.getItem("physio_pending_paid"); } catch (e) {}
+        console.log("[PAY] session-restore nav guard, pending:", _pend);
         if (!_pend) go("programmes");
       }).catch(() => {
         let _pend = null;
         try { _pend = sessionStorage.getItem("physio_pending_paid"); } catch (e) {}
+        console.log("[PAY] session-restore catch nav guard, pending:", _pend);
         if (!_pend) go("programmes");
       });
       if (session.refresh_token) {
