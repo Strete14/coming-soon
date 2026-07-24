@@ -4870,19 +4870,37 @@ function App() {
       if (Array.isArray(r)) setLiveReviews(r);
     }).catch(() => {});
   }, []);
+  const [pendingPaidPlan, setPendingPaidPlan] = useState(() => {
+    try {
+      const params = new URLSearchParams(window.location.search);
+      const payment = params.get("payment");
+      const plan = params.get("plan");
+      if (payment === "success" && (plan === "standard" || plan === "premium")) {
+        sessionStorage.setItem("physio_pending_paid", plan);
+        window.history.replaceState({}, "", window.location.pathname);
+        return plan;
+      }
+      const stored = sessionStorage.getItem("physio_pending_paid");
+      if (stored === "standard" || stored === "premium") return stored;
+    } catch (e) {}
+    return null;
+  });
   React.useEffect(() => {
     const params = new URLSearchParams(window.location.search);
-    const payment = params.get("payment");
-    const plan = params.get("plan");
-    if (payment === "success" && (plan === "standard" || plan === "premium")) {
-      window.history.replaceState({}, "", window.location.pathname);
-      handlePaid(plan);
-    } else if (payment === "cancelled") {
+    if (params.get("payment") === "cancelled") {
       window.history.replaceState({}, "", window.location.pathname);
       setError("Payment was cancelled. You can try again whenever you're ready.");
       setTimeout(() => setError(""), 5000);
     }
   }, []);
+  React.useEffect(() => {
+    if (pendingPaidPlan && user) {
+      const p = pendingPaidPlan;
+      setPendingPaidPlan(null);
+      try { sessionStorage.removeItem("physio_pending_paid"); } catch (e) {}
+      handlePaid(p);
+    }
+  }, [pendingPaidPlan, user]);
   const [lang, setLang] = useState(() => {
     try {
       return localStorage.getItem("physio_lang") || "en";
@@ -5034,9 +5052,13 @@ function App() {
             setDayNum(activeP.currentDay);
           }
         }
-        go("programmes");
+        let _pend = null;
+        try { _pend = sessionStorage.getItem("physio_pending_paid"); } catch (e) {}
+        if (!_pend) go("programmes");
       }).catch(() => {
-        go("programmes");
+        let _pend = null;
+        try { _pend = sessionStorage.getItem("physio_pending_paid"); } catch (e) {}
+        if (!_pend) go("programmes");
       });
       if (session.refresh_token) {
         sb.refreshToken(session.refresh_token).then((r) => {
