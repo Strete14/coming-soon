@@ -1,11 +1,8 @@
 // api/stripe-webhook.js
 // Receives Stripe webhook events after a payment completes.
 // Verifies the webhook signature, updates Supabase subscription,
+// logs the payment to the subscriptions table,
 // and triggers Oblio invoice generation.
-//
-// IMPORTANT: Add to vercel.json to disable body parsing for this route:
-// { "functions": { "api/stripe-webhook.js": { "bodyParser": false } } }
-// See the vercel.json file included in this deployment.
 
 import crypto from "crypto";
 
@@ -40,7 +37,6 @@ function verifyStripeSignature(payload, signature, secret) {
 
   if (!timestamp || !receivedSig) return false;
 
-  // Reject webhooks older than 5 minutes
   const tolerance = 300;
   if (Math.abs(Date.now() / 1000 - parseInt(timestamp)) > tolerance) return false;
 
@@ -50,10 +46,14 @@ function verifyStripeSignature(payload, signature, secret) {
     .update(signedPayload)
     .digest("hex");
 
-  return crypto.timingSafeEqual(
-    Buffer.from(receivedSig, "hex"),
-    Buffer.from(expectedSig, "hex")
-  );
+  try {
+    return crypto.timingSafeEqual(
+      Buffer.from(receivedSig, "hex"),
+      Buffer.from(expectedSig, "hex")
+    );
+  } catch (e) {
+    return false;
+  }
 }
 
 async function updateSupabaseSubscription(userId, plan) {
@@ -74,6 +74,31 @@ async function updateSupabaseSubscription(userId, plan) {
   });
 
   return r.ok;
+}
+
+async function logPaymentToSupabase(userId, userEmail, plan, stripeSessionId, amountEur) {
+  if (!SUPABASE_SERVICE_ROLE_KEY) return;
+
+  const r = await fetch(`${SUPABASE_URL}/rest/v1/subscriptions`, {
+    method: "POST",
+    headers: {
+      apikey: SUPABASE_SERVICE_ROLE_KEY,
+      Authorization: `Bearer ${SUPABASE_SERVICE_ROLE_KEY}`,
+      "Content-Type": "application/json",
+      Prefer: "return=minimal",
+    },
+    body: JSON.stringify({
+      user_id: userId,
+      user_email: userEmail,
+      plan: plan,
+      stripe_session_id: stripeSessionId,
+      amount_eur: amountEur,
+    }),
+  });
+
+  if (!r.ok) {
+    console.error("Failed to log payment to subscriptions table");
+  }
 }
 
 async function triggerOblioInvoice(userId, userEmail, userName, plan, amountTotal, currency) {
@@ -125,7 +150,6 @@ export default async function handler(req, res) {
   if (event.type === "checkout.session.completed") {
     const session = event.data.object;
 
-    // Only process paid sessions
     if (session.payment_status !== "paid") {
       return res.status(200).json({ received: true });
     }
@@ -134,21 +158,25 @@ export default async function handler(req, res) {
     const userEmail = session.metadata?.userEmail || session.customer_email;
     const userName = session.metadata?.userName || "";
     const plan = session.metadata?.plan;
-    const amountTotal = session.amount_total; // in cents
+    const amountTotal = session.amount_total;
     const currency = session.currency;
+    const amountEur = amountTotal ? amountTotal / 100 : null;
 
     if (!userId || !plan) {
       console.error("Missing metadata:", session.metadata);
       return res.status(200).json({ received: true });
     }
 
-    // Update Supabase
+    // 1. Update user subscription in Supabase
     const updated = await updateSupabaseSubscription(userId, plan);
     if (!updated) {
       console.error("Failed to update Supabase subscription for user:", userId);
     }
 
-    // Trigger Oblio invoice (non-blocking - don't fail webhook if invoice fails)
+    // 2. Log payment to subscriptions table
+    await logPaymentToSupabase(userId, userEmail, plan, session.id, amountEur);
+
+    // 3. Trigger Oblio invoice
     await triggerOblioInvoice(userId, userEmail, userName, plan, amountTotal, currency);
   }
 
