@@ -112,7 +112,6 @@ const sb = {
       return [];
     }
     const data = await r.json();
-    console.log("getPlans returned:", data == null ? void 0 : data.length, "plans", data == null ? void 0 : data[0]);
     return data;
   },
   async savePlan(token, userId, entry) {
@@ -5414,7 +5413,6 @@ ${checkIn ? `- Today's check-in: pain ${checkIn.pain}/10, energy ${checkIn.energ
     const sess = loadSession();
     if ((sess == null ? void 0 : sess.token) && (u == null ? void 0 : u.id)) {
       sb.getPlans(sess.token, u.id).then((cp) => {
-        console.log("Auth load - plans from Supabase:", cp == null ? void 0 : cp.length, cp == null ? void 0 : cp[0]);
         if (!Array.isArray(cp) || cp.length === 0) {
           setProgrammes([]);
           setPlanHistory([]);
