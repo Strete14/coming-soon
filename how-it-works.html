@@ -54,7 +54,7 @@ body{background:#f7f8fa;color:#0f1f3d;font-family:'DM Sans',sans-serif;-webkit-f
 </head>
 <body>
 <div class="topnav">
-  <a class="back-link" href="/">← <span id="back-label">← Înapoi</span></a>
+  <a class="back-link" href="/">← <span id="back-label">Înapoi</span></a>
   <div class="lang-toggle">
     <button class="lang-btn" id="btn-en" onclick="setLang('en')">EN</button>
     <button class="lang-btn active" id="btn-ro" onclick="setLang('ro')">RO</button>
@@ -252,8 +252,8 @@ body{background:#f7f8fa;color:#0f1f3d;font-family:'DM Sans',sans-serif;-webkit-f
 
 <script>
 const META = {
-  ro: { title: "Cum func\u021bioneaz\u0103 PhysioRoutine | Recuperare personalizat\u0103 cu AI", desc: "Vezi cum PhysioRoutine transform\u0103 un chestionar clinic \u00eentr-un program zilnic de recuperare, adaptat automat progresului t\u0103u.", back: "\u2190 \u00cenapoi" },
-  en: { title: "How PhysioRoutine Works | AI-Personalized Recovery", desc: "See how PhysioRoutine turns a clinical questionnaire into a day-by-day recovery programme that adapts automatically to your progress.", back: "\u2190 Back" }
+  ro: { title: "Cum func\u021bioneaz\u0103 PhysioRoutine | Recuperare personalizat\u0103 cu AI", desc: "Vezi cum PhysioRoutine transform\u0103 un chestionar clinic \u00eentr-un program zilnic de recuperare, adaptat automat progresului t\u0103u.", back: "\u00cenapoi" },
+  en: { title: "How PhysioRoutine Works | AI-Personalized Recovery", desc: "See how PhysioRoutine turns a clinical questionnaire into a day-by-day recovery programme that adapts automatically to your progress.", back: "Back" }
 };
 function setLang(lang) {
   document.getElementById('block-ro').classList.toggle('active', lang === 'ro');
