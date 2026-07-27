@@ -21,7 +21,7 @@ a{color:inherit}
 .lang-toggle{display:flex;gap:6px}
 .lang-btn{padding:6px 14px;border-radius:20px;font-size:12px;font-family:'DM Mono',monospace;border:1px solid #c9cfd8;background:#ffffff;color:#6b7585;cursor:pointer}
 .lang-btn.active{border-color:#0a7e6e;background:#e8f5f3;color:#0a7e6e}
-.btn-teal{background:#0a7e6e;color:#fff;border:none;border-radius:8px;padding:13px 28px;font-weight:600;font-size:15px;text-decoration:none;display:inline-flex;align-items:center;gap:8px}
+.btn-teal{background:#0a7e6e;color:#fff;border:none;border-radius:8px;padding:13px 28px;font-weight:600;font-size:15px;text-decoration:none;display:inline-flex;align-items:center;gap:8px;cursor:pointer}
 .btn-teal:hover{background:#0d9e8b}
 .site-footer{text-align:center;padding:40px 20px;border-top:1px solid #e4e7ed;margin-top:60px}
 .site-footer .links{display:flex;justify-content:center;gap:20px;margin-bottom:14px;font-size:13px}
@@ -30,6 +30,8 @@ a{color:inherit}
 .site-footer .brand{font-size:13px;color:#8b95a5}
 .lang-block{display:none}
 .lang-block.active{display:block}
+span.lang-block{display:none}
+span.lang-block.active{display:inline}
 
 .blog-header{max-width:720px;margin:0 auto;padding:48px 20px 20px;text-align:center}
 .blog-header h1{font-family:'Fraunces',serif;font-weight:600;font-size:clamp(28px,4vw,42px);color:#0f1f3d;margin-bottom:12px}
@@ -53,18 +55,22 @@ a{color:inherit}
 </div>
 
 <div class="blog-header">
-  <div id="block-ro" class="lang-block active">
-    <h1>Blog</h1>
-    <p>Sfaturi de recuperare, scrise și verificate de un fizioterapeut licențiat.</p>
-  </div>
-  <div id="block-en" class="lang-block">
-    <h1>Blog</h1>
-    <p>Recovery advice, written and reviewed by a licensed physiotherapist.</p>
-  </div>
+  <div id="block-ro" class="lang-block active"><h1>Blog</h1><p>Sfaturi de recuperare, scrise și verificate de un fizioterapeut licențiat.</p></div>
+  <div id="block-en" class="lang-block"><h1>Blog</h1><p>Recovery advice, written and reviewed by a licensed physiotherapist.</p></div>
 </div>
 <div class="posts-list">
-  <div id="list-ro" class="lang-block active"><p style="color:#8b95a5;text-align:center;padding:40px 0">Primul articol vine în curând.</p></div>
-  <div id="list-en" class="lang-block"><p style="color:#8b95a5;text-align:center;padding:40px 0">The first post is coming soon.</p></div>
+  <div id="list-ro" class="lang-block active">
+    <a href="/blog/sciatica-vs-lower-back-pain.html" class="post-card">
+      <div class="post-card-date">2026-07-27</div>
+      <div class="post-card-title">Sciatică vs. Durere Lombară: Cum Faci Diferența</div>
+      <div class="post-card-excerpt">Pot părea asemănătoare, dar sciatica și durerea lombară generală nu sunt același lucru — iar diferența contează pentru modul de tratament.</div>
+    </a></div>
+  <div id="list-en" class="lang-block">
+    <a href="/blog/sciatica-vs-lower-back-pain.html" class="post-card">
+      <div class="post-card-date">2026-07-27</div>
+      <div class="post-card-title">Sciatica vs. Lower Back Pain: How to Tell the Difference</div>
+      <div class="post-card-excerpt">They can feel similar, but sciatica and general lower back pain aren't the same thing — and telling them apart matters for how you treat them.</div>
+    </a></div>
 </div>
 
 <footer class="site-footer">
@@ -94,6 +100,7 @@ function setLang(lang) {
   document.getElementById('page-description').setAttribute('content', META[lang].desc);
   document.documentElement.setAttribute('lang', lang);
   try { localStorage.setItem('physio_lang', lang); } catch (e) {}
+  
 }
 try {
   const saved = localStorage.getItem('physio_lang');
