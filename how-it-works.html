@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title id="page-title">Cum funcționează PhysioRoutine | Recuperare personalizată cu AI</title>
+<meta id="page-description" name="description" content="Vezi cum PhysioRoutine transformă un chestionar clinic într-un program zilnic de recuperare, adaptat automat progresului tău.">
+<link rel="canonical" href="https://physioroutine.com/how-it-works.html">
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;0,9..144,700;1,9..144,400&family=DM+Sans:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth;-webkit-text-size-adjust:100%}
+body{background:#f7f8fa;color:#0f1f3d;font-family:'DM Sans',sans-serif;-webkit-font-smoothing:antialiased;line-height:1.5}
+.topnav{display:flex;justify-content:space-between;align-items:center;padding:16px clamp(16px,5vw,40px);background:#ffffff;border-bottom:1px solid #e4e7ed}
+.back-link{color:#4a5568;text-decoration:none;font-size:14px;display:flex;align-items:center;gap:6px}
+.lang-toggle{display:flex;gap:6px}
+.lang-btn{padding:6px 14px;border-radius:20px;font-size:12px;font-family:'DM Mono',monospace;border:1px solid #c9cfd8;background:#ffffff;color:#6b7585;cursor:pointer}
+.lang-btn.active{border-color:#0a7e6e;background:#e8f5f3;color:#0a7e6e}
+.hero{background:linear-gradient(135deg,#0f1f3d 0%,#0a3d5c 100%);padding:clamp(40px,6vw,72px) clamp(16px,5vw,56px)}
+.hero-inner{max-width:760px;margin:0 auto;text-align:center}
+.eyebrow{font-family:'DM Mono',monospace;font-size:11px;color:#0a7e6e;text-transform:uppercase;letter-spacing:.18em;margin-bottom:16px}
+.hero em{color:#b2ddd8;font-style:italic}
+.hero h1{font-family:'Fraunces',serif;font-weight:600;font-size:clamp(28px,4.5vw,52px);color:#fff;line-height:1.12;margin-bottom:20px}
+.hero-sub{font-size:clamp(14px,2vw,17px);color:rgba(255,255,255,.65);line-height:1.75;max-width:540px;margin:0 auto 32px}
+.btn-teal{background:#0a7e6e;color:#fff;border:none;border-radius:8px;padding:13px 28px;font-weight:600;font-size:15px;text-decoration:none;display:inline-flex;align-items:center;gap:8px}
+.btn-teal:hover{background:#0d9e8b}
+.content{max-width:860px;margin:0 auto;padding:clamp(32px,5vw,60px) clamp(16px,5vw,40px)}
+.section-head{text-align:center;margin-bottom:40px}
+.section-head h2{font-family:'Fraunces',serif;font-weight:600;font-size:clamp(22px,3.5vw,36px);color:#0f1f3d}
+.steps{display:flex;flex-direction:column;gap:4px}
+.step-card{background:#ffffff;border:1px solid #e4e7ed;border-radius:14px;padding:clamp(20px,4vw,28px) clamp(18px,4vw,32px);display:flex;gap:24px;align-items:flex-start;flex-wrap:wrap}
+.step-icon-col{display:flex;flex-direction:column;align-items:center;gap:8px;flex-shrink:0}
+.step-icon{width:52px;height:52px;border-radius:13px;background:#0a7e6e;display:flex;align-items:center;justify-content:center;font-size:24px}
+.step-connector{width:2px;height:32px;background:#b2ddd8;border-radius:1px}
+.step-body{flex:1;min-width:200px}
+.step-label{font-family:'DM Mono',monospace;font-size:10px;color:#0a7e6e;text-transform:uppercase;letter-spacing:.12em;margin-bottom:4px}
+.step-title{font-family:'Fraunces',serif;font-weight:600;font-size:18px;color:#0f1f3d;margin-bottom:8px}
+.step-text{font-size:14px;color:#4a5568;line-height:1.7;margin-bottom:8px}
+.step-detail{font-size:13px;color:#6b7585;line-height:1.65;background:#f7f8fa;border-radius:8px;padding:10px 14px}
+.features{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:14px;margin-bottom:48px}
+.feature-card{background:#ffffff;border:1px solid #e4e7ed;border-radius:12px;padding:20px 22px}
+.feature-icon{font-size:26px;margin-bottom:10px}
+.feature-title{font-weight:600;font-size:14px;color:#0f1f3d;margin-bottom:5px}
+.feature-body{font-size:13px;color:#6b7585;line-height:1.65}
+.final-cta{background:#0f1f3d;border-radius:16px;padding:clamp(28px,5vw,44px) clamp(20px,5vw,40px);text-align:center}
+.final-title{font-family:'Fraunces',serif;font-weight:600;font-size:clamp(22px,3.5vw,36px);color:#fff;margin-bottom:12px}
+.final-sub{color:rgba(255,255,255,.6);font-size:15px;line-height:1.7;margin-bottom:28px;max-width:400px;margin-left:auto;margin-right:auto}
+.lang-block{display:none}
+.lang-block.active{display:block}
+</style>
+</head>
+<body>
+<div class="topnav">
+  <a class="back-link" href="/">← <span id="back-label">← Înapoi</span></a>
+  <div class="lang-toggle">
+    <button class="lang-btn" id="btn-en" onclick="setLang('en')">EN</button>
+    <button class="lang-btn active" id="btn-ro" onclick="setLang('ro')">RO</button>
+  </div>
+</div>
+
+<div id="block-ro" class="lang-block active">
+  <div class="hero">
+    <div class="hero-inner">
+      <div class="eyebrow">Cum funcționează PhysioRoutine</div>
+      <h1>Programul tău personal de fizioterapie,<br><em>construit în jurul tău.</em></h1>
+      <p class="hero-sub">PhysioRoutine folosește evaluare clinică și inteligență artificială pentru a genera programe de recuperare personalizate, zi de zi — aceeași abordare folosită de fizioterapeuți profesioniști, disponibilă pentru oricine.</p>
+      <div class="hero-actions">
+        <a class="btn-teal" href="/">Începe Perioada Gratuită →</a>
+      </div>
+    </div>
+  </div>
+  <div class="content">
+    <div class="section-head">
+      <div class="eyebrow">Procesul</div>
+      <h2>De la evaluare la program în 3 minute</h2>
+    </div>
+    <div class="steps">
+        <div class="step-card">
+          <div class="step-icon-col">
+            <div class="step-icon">📋</div>
+            <div class="step-connector"></div>
+          </div>
+          <div class="step-body">
+            <div class="step-label">Pasul 01</div>
+            <div class="step-title">Evaluare Clinică</div>
+            <div class="step-text">Întrebări țintite despre localizarea durerii, debut, severitate și tipare de mișcare.</div>
+            <div class="step-detail">Răspunzi la un chestionar clinic structurat despre localizarea durerii, severitate, debut, factori declanșatori și istoricul de recuperare. Durează sub 3 minute.</div>
+          </div>
+        </div>
+        <div class="step-card">
+          <div class="step-icon-col">
+            <div class="step-icon">🧠</div>
+            <div class="step-connector"></div>
+          </div>
+          <div class="step-body">
+            <div class="step-label">Pasul 02</div>
+            <div class="step-title">Analiză Inteligentă</div>
+            <div class="step-text">Răspunsurile sunt potrivite cu protocoale de fizioterapie bazate pe dovezi.</div>
+            <div class="step-detail">AI-ul nostru — bazat pe principii de recuperare susținute de dovezi — analizează profilul tău și selectează exercițiile, parametrii de încărcare și protocoalele de electroterapie potrivite.</div>
+          </div>
+        </div>
+        <div class="step-card">
+          <div class="step-icon-col">
+            <div class="step-icon">🩹</div>
+            <div class="step-connector"></div>
+          </div>
+          <div class="step-body">
+            <div class="step-label">Pasul 03</div>
+            <div class="step-title">Program Zilnic</div>
+            <div class="step-text">Exerciții structurate cu ghiduri vizuale, protocoale de electroterapie, recomandări nutriționale personalizate și etape de progresie.</div>
+            <div class="step-detail">Primești un program complet: exerciții țintite cu instrucțiuni ilustrate, proceduri de electroterapie și un plan de recuperare pe etape, adaptat afecțiunii tale.</div>
+          </div>
+        </div>
+        <div class="step-card">
+          <div class="step-icon-col">
+            <div class="step-icon">📊</div>
+            
+          </div>
+          <div class="step-body">
+            <div class="step-label">Pasul 04</div>
+            <div class="step-title">Check-in Adaptiv</div>
+            <div class="step-text">În fiecare zi raportezi progresul. Planul se adaptează automat — nicio zi nu este identică.</div>
+            <div class="step-detail">În fiecare dimineață notezi nivelul de durere și rigiditate. Planul se ajustează pentru ziua respectivă — mai intens în zilele bune, mai blând în cele grele. Nicio sesiune nu e identică.</div>
+          </div>
+        </div>
+    </div>
+    <div class="section-head" style="margin-top:56px">
+      <div class="eyebrow">Tot ce este inclus</div>
+      <h2>Construit pentru recuperare reală</h2>
+    </div>
+    <div class="features">
+        <div class="feature-card">
+          <div class="feature-icon">🌍</div>
+          <div class="feature-title">6 Limbi</div>
+          <div class="feature-body">Disponibil în română, engleză, germană, franceză, italiană și spaniolă.</div>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">⚡</div>
+          <div class="feature-title">Protocoale de Electroterapie</div>
+          <div class="feature-body">TENS, ultrasunete, laser, unde de șoc și altele — cu instrucțiuni precise de plasare anatomică.</div>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">🔒</div>
+          <div class="feature-title">Privat și Sigur</div>
+          <div class="feature-body">Datele tale de sănătate sunt criptate și nu sunt partajate niciodată fără consimțământul tău.</div>
+        </div>
+    </div>
+    <div class="final-cta">
+      <h2 class="final-title">Ești pregătit să îți începi recuperarea?</h2>
+      <p class="final-sub">Perioadă gratuită. Nu necesită card. Planul tău personalizat în sub 3 minute.</p>
+      <a class="btn-teal" href="/">Începe Perioada Gratuită →</a>
+    </div>
+  </div>
+</div>
+<div id="block-en" class="lang-block">
+  <div class="hero">
+    <div class="hero-inner">
+      <div class="eyebrow">How PhysioRoutine works</div>
+      <h1>Your personal physiotherapy programme,<br><em>built around you.</em></h1>
+      <p class="hero-sub">PhysioRoutine uses clinical assessment and AI to generate personalised, day-by-day rehabilitation programmes — the same approach used by professional physiotherapists, available to everyone.</p>
+      <div class="hero-actions">
+        <a class="btn-teal" href="/">Start Free Trial →</a>
+      </div>
+    </div>
+  </div>
+  <div class="content">
+    <div class="section-head">
+      <div class="eyebrow">The process</div>
+      <h2>From assessment to programme in 3 minutes</h2>
+    </div>
+    <div class="steps">
+        <div class="step-card">
+          <div class="step-icon-col">
+            <div class="step-icon">📋</div>
+            <div class="step-connector"></div>
+          </div>
+          <div class="step-body">
+            <div class="step-label">Step 01</div>
+            <div class="step-title">Clinical Assessment</div>
+            <div class="step-text">Targeted questions about your pain location, onset, severity, and movement patterns.</div>
+            <div class="step-detail">Answer a structured clinical questionnaire covering your pain location, severity, onset, triggers, and rehabilitation history. Takes under 3 minutes.</div>
+          </div>
+        </div>
+        <div class="step-card">
+          <div class="step-icon-col">
+            <div class="step-icon">🧠</div>
+            <div class="step-connector"></div>
+          </div>
+          <div class="step-body">
+            <div class="step-label">Step 02</div>
+            <div class="step-title">Smart Analysis</div>
+            <div class="step-text">Your answers are matched against evidence-based physiotherapy rehabilitation protocols.</div>
+            <div class="step-detail">Our AI — built on evidence-based rehabilitation principles — analyses your profile and selects appropriate exercises, loading parameters and electrotherapy protocols.</div>
+          </div>
+        </div>
+        <div class="step-card">
+          <div class="step-icon-col">
+            <div class="step-icon">🩹</div>
+            <div class="step-connector"></div>
+          </div>
+          <div class="step-body">
+            <div class="step-label">Step 03</div>
+            <div class="step-title">Daily Programme</div>
+            <div class="step-text">Structured exercises with visual guides, electrotherapy protocols, tailored nutrition guidance, and progression milestones.</div>
+            <div class="step-detail">Receive a complete programme: targeted exercises with illustrated instructions, electrotherapy procedures, and a phased recovery timeline tailored to your condition.</div>
+          </div>
+        </div>
+        <div class="step-card">
+          <div class="step-icon-col">
+            <div class="step-icon">📊</div>
+            
+          </div>
+          <div class="step-body">
+            <div class="step-label">Step 04</div>
+            <div class="step-title">Adaptive Check-ins</div>
+            <div class="step-text">Each day you report progress. Your plan adapts accordingly — no two days are identical.</div>
+            <div class="step-detail">Each morning you log your pain and stiffness levels. The plan adjusts for the day — harder on good days, gentler on bad days. No two sessions are identical.</div>
+          </div>
+        </div>
+    </div>
+    <div class="section-head" style="margin-top:56px">
+      <div class="eyebrow">Everything included</div>
+      <h2>Built for real rehabilitation</h2>
+    </div>
+    <div class="features">
+        <div class="feature-card">
+          <div class="feature-icon">🌍</div>
+          <div class="feature-title">6 Languages</div>
+          <div class="feature-body">Available in English, Romanian, German, French, Italian and Spanish.</div>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">⚡</div>
+          <div class="feature-title">Electrotherapy Protocols</div>
+          <div class="feature-body">TENS, ultrasound, laser, shockwave and more — with precise anatomical placement instructions.</div>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">🔒</div>
+          <div class="feature-title">Private &amp; Secure</div>
+          <div class="feature-body">Your health data is encrypted and never shared without your consent.</div>
+        </div>
+    </div>
+    <div class="final-cta">
+      <h2 class="final-title">Ready to start your recovery?</h2>
+      <p class="final-sub">Free trial. No credit card needed. Your personalised plan in under 3 minutes.</p>
+      <a class="btn-teal" href="/">Start Free Trial →</a>
+    </div>
+  </div>
+</div>
+
+<script>
+const META = {
+  ro: { title: "Cum func\u021bioneaz\u0103 PhysioRoutine | Recuperare personalizat\u0103 cu AI", desc: "Vezi cum PhysioRoutine transform\u0103 un chestionar clinic \u00eentr-un program zilnic de recuperare, adaptat automat progresului t\u0103u.", back: "\u2190 \u00cenapoi" },
+  en: { title: "How PhysioRoutine Works | AI-Personalized Recovery", desc: "See how PhysioRoutine turns a clinical questionnaire into a day-by-day recovery programme that adapts automatically to your progress.", back: "\u2190 Back" }
+};
+function setLang(lang) {
+  document.getElementById('block-ro').classList.toggle('active', lang === 'ro');
+  document.getElementById('block-en').classList.toggle('active', lang === 'en');
+  document.getElementById('btn-ro').classList.toggle('active', lang === 'ro');
+  document.getElementById('btn-en').classList.toggle('active', lang === 'en');
+  document.getElementById('page-title').textContent = META[lang].title;
+  document.getElementById('page-description').setAttribute('content', META[lang].desc);
+  document.getElementById('back-label').textContent = META[lang].back;
+  document.documentElement.setAttribute('lang', lang);
+  try { localStorage.setItem('physio_lang', lang); } catch (e) {}
+}
+try {
+  const saved = localStorage.getItem('physio_lang');
+  if (saved === 'en') setLang('en');
+} catch (e) {}
+</script>
+</body>
+</html>
