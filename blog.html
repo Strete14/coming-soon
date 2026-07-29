@@ -121,8 +121,13 @@ const META = {
 };
 function setLang(lang) {
   document.querySelectorAll('.lang-block').forEach(el => {
-    if (el.id.endsWith('-ro')) el.classList.toggle('active', lang === 'ro');
-    if (el.id.endsWith('-en')) el.classList.toggle('active', lang === 'en');
+    if (el.dataset.lang) {
+      el.classList.toggle('active', el.dataset.lang === lang);
+    } else if (el.id.endsWith('-ro')) {
+      el.classList.toggle('active', lang === 'ro');
+    } else if (el.id.endsWith('-en')) {
+      el.classList.toggle('active', lang === 'en');
+    }
   });
   document.getElementById('btn-ro').classList.toggle('active', lang === 'ro');
   document.getElementById('btn-en').classList.toggle('active', lang === 'en');
