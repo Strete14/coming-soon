@@ -201,24 +201,24 @@ span.lang-block.active{display:inline}
   <div class="stretch-gallery">
       <div class="stretch-card">
         <img src="/blog/images/pendulum-stretch.jpg" alt="Pendulum Stretch" class="stretch-photo" loading="lazy">
-        <div class="stretch-name-ro lang-block active">Pendulum Stretch</div>
-        <div class="stretch-name-en lang-block">Pendulum Stretch</div>
-        <div class="stretch-caption-ro lang-block active">Lean forward slightly, let the arm hang loose, and gently swing it in small circles.</div>
-        <div class="stretch-caption-en lang-block">Lean forward slightly, let the arm hang loose, and gently swing it in small circles.</div>
+        <div class="stretch-name-ro lang-block active" data-lang="ro">Pendulum Stretch</div>
+        <div class="stretch-name-en lang-block" data-lang="en">Pendulum Stretch</div>
+        <div class="stretch-caption-ro lang-block active" data-lang="ro">Lean forward slightly, let the arm hang loose, and gently swing it in small circles.</div>
+        <div class="stretch-caption-en lang-block" data-lang="en">Lean forward slightly, let the arm hang loose, and gently swing it in small circles.</div>
       </div>
       <div class="stretch-card">
         <img src="/blog/images/cross-body-stretch.jpg" alt="Cross-Body Stretch" class="stretch-photo" loading="lazy">
-        <div class="stretch-name-ro lang-block active">Cross-Body Stretch</div>
-        <div class="stretch-name-en lang-block">Cross-Body Stretch</div>
-        <div class="stretch-caption-ro lang-block active">Bring one arm across your chest, using the other arm to gently press it closer.</div>
-        <div class="stretch-caption-en lang-block">Bring one arm across your chest, using the other arm to gently press it closer.</div>
+        <div class="stretch-name-ro lang-block active" data-lang="ro">Cross-Body Stretch</div>
+        <div class="stretch-name-en lang-block" data-lang="en">Cross-Body Stretch</div>
+        <div class="stretch-caption-ro lang-block active" data-lang="ro">Bring one arm across your chest, using the other arm to gently press it closer.</div>
+        <div class="stretch-caption-en lang-block" data-lang="en">Bring one arm across your chest, using the other arm to gently press it closer.</div>
       </div>
       <div class="stretch-card">
         <img src="/blog/images/sleeper-stretch.jpg" alt="Sleeper Stretch" class="stretch-photo" loading="lazy">
-        <div class="stretch-name-ro lang-block active">Sleeper Stretch</div>
-        <div class="stretch-name-en lang-block">Sleeper Stretch</div>
-        <div class="stretch-caption-ro lang-block active">Lying on the affected side, gently press the forearm down toward the bed.</div>
-        <div class="stretch-caption-en lang-block">Lying on the affected side, gently press the forearm down toward the bed.</div>
+        <div class="stretch-name-ro lang-block active" data-lang="ro">Sleeper Stretch</div>
+        <div class="stretch-name-en lang-block" data-lang="en">Sleeper Stretch</div>
+        <div class="stretch-caption-ro lang-block active" data-lang="ro">Lying on the affected side, gently press the forearm down toward the bed.</div>
+        <div class="stretch-caption-en lang-block" data-lang="en">Lying on the affected side, gently press the forearm down toward the bed.</div>
       </div></div>
 
   <div id="block3-ro" class="lang-block active">
@@ -260,8 +260,13 @@ const META = {
 };
 function setLang(lang) {
   document.querySelectorAll('.lang-block').forEach(el => {
-    if (el.id.endsWith('-ro')) el.classList.toggle('active', lang === 'ro');
-    if (el.id.endsWith('-en')) el.classList.toggle('active', lang === 'en');
+    if (el.dataset.lang) {
+      el.classList.toggle('active', el.dataset.lang === lang);
+    } else if (el.id.endsWith('-ro')) {
+      el.classList.toggle('active', lang === 'ro');
+    } else if (el.id.endsWith('-en')) {
+      el.classList.toggle('active', lang === 'en');
+    }
   });
   document.getElementById('btn-ro').classList.toggle('active', lang === 'ro');
   document.getElementById('btn-en').classList.toggle('active', lang === 'en');

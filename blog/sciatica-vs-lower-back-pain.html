@@ -252,24 +252,24 @@ span.lang-block.active{display:inline}
   <div class="stretch-gallery">
       <div class="stretch-card">
         <img src="/blog/images/knee-to-chest.jpg" alt="Knee-to-Chest Stretch" class="stretch-photo" loading="lazy">
-        <div class="stretch-name-ro lang-block active">Stretch Genunchi la Piept</div>
-        <div class="stretch-name-en lang-block">Knee-to-Chest Stretch</div>
-        <div class="stretch-caption-ro lang-block active">Stai întins pe spate, trage ușor un genunchi spre piept, menține poziția, apoi eliberează. Alternează picioarele.</div>
-        <div class="stretch-caption-en lang-block">Lie on your back, gently pull one knee toward your chest, hold, release. Alternate legs.</div>
+        <div class="stretch-name-ro lang-block active" data-lang="ro">Stretch Genunchi la Piept</div>
+        <div class="stretch-name-en lang-block" data-lang="en">Knee-to-Chest Stretch</div>
+        <div class="stretch-caption-ro lang-block active" data-lang="ro">Stai întins pe spate, trage ușor un genunchi spre piept, menține poziția, apoi eliberează. Alternează picioarele.</div>
+        <div class="stretch-caption-en lang-block" data-lang="en">Lie on your back, gently pull one knee toward your chest, hold, release. Alternate legs.</div>
       </div>
       <div class="stretch-card">
         <img src="/blog/images/piriformis-stretch.jpg" alt="Piriformis Stretch" class="stretch-photo" loading="lazy">
-        <div class="stretch-name-ro lang-block active">Stretch pentru Piriform</div>
-        <div class="stretch-name-en lang-block">Piriformis Stretch</div>
-        <div class="stretch-caption-ro lang-block active">Încrucișează o gleznă peste genunchiul opus, trage ușor coapsa de sprijin spre tine.</div>
-        <div class="stretch-caption-en lang-block">Cross one ankle over the opposite knee, gently pull the supporting thigh toward you.</div>
+        <div class="stretch-name-ro lang-block active" data-lang="ro">Stretch pentru Piriform</div>
+        <div class="stretch-name-en lang-block" data-lang="en">Piriformis Stretch</div>
+        <div class="stretch-caption-ro lang-block active" data-lang="ro">Încrucișează o gleznă peste genunchiul opus, trage ușor coapsa de sprijin spre tine.</div>
+        <div class="stretch-caption-en lang-block" data-lang="en">Cross one ankle over the opposite knee, gently pull the supporting thigh toward you.</div>
       </div>
       <div class="stretch-card">
         <img src="/blog/images/cat-cow.jpg" alt="Cat-Cow Stretch" class="stretch-photo" loading="lazy">
-        <div class="stretch-name-ro lang-block active">Stretch Cat-Cow (Pisică-Cămilă)</div>
-        <div class="stretch-name-en lang-block">Cat-Cow Stretch</div>
-        <div class="stretch-caption-ro lang-block active">În sprijin pe mâini și genunchi, alternează lent între arcuirea și rotunjirea spatelui.</div>
-        <div class="stretch-caption-en lang-block">On hands and knees, alternate slowly between arching and rounding your back.</div>
+        <div class="stretch-name-ro lang-block active" data-lang="ro">Stretch Cat-Cow (Pisică-Cămilă)</div>
+        <div class="stretch-name-en lang-block" data-lang="en">Cat-Cow Stretch</div>
+        <div class="stretch-caption-ro lang-block active" data-lang="ro">În sprijin pe mâini și genunchi, alternează lent între arcuirea și rotunjirea spatelui.</div>
+        <div class="stretch-caption-en lang-block" data-lang="en">On hands and knees, alternate slowly between arching and rounding your back.</div>
       </div></div>
 
   <div id="block3-ro" class="lang-block active">
@@ -311,8 +311,13 @@ const META = {
 };
 function setLang(lang) {
   document.querySelectorAll('.lang-block').forEach(el => {
-    if (el.id.endsWith('-ro')) el.classList.toggle('active', lang === 'ro');
-    if (el.id.endsWith('-en')) el.classList.toggle('active', lang === 'en');
+    if (el.dataset.lang) {
+      el.classList.toggle('active', el.dataset.lang === lang);
+    } else if (el.id.endsWith('-ro')) {
+      el.classList.toggle('active', lang === 'ro');
+    } else if (el.id.endsWith('-en')) {
+      el.classList.toggle('active', lang === 'en');
+    }
   });
   document.getElementById('btn-ro').classList.toggle('active', lang === 'ro');
   document.getElementById('btn-en').classList.toggle('active', lang === 'en');
