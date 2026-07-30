@@ -36,12 +36,14 @@ span.lang-block.active{display:inline}
 .blog-header{max-width:720px;margin:0 auto;padding:48px 20px 20px;text-align:center}
 .blog-header h1{font-family:'Fraunces',serif;font-weight:600;font-size:clamp(28px,4vw,42px);color:#0f1f3d;margin-bottom:12px}
 .blog-header p{color:#6b7585;font-size:15px}
-.posts-list{max-width:720px;margin:0 auto;padding:20px 20px 60px;display:flex;flex-direction:column;gap:16px}
-.post-card{display:block;background:#ffffff;border:1px solid #e4e7ed;border-radius:14px;padding:22px 26px;text-decoration:none;transition:border-color .18s,transform .18s}
-.post-card:hover{border-color:#b2ddd8;transform:translateY(-2px)}
-.post-card-date{font-family:'DM Mono',monospace;font-size:11px;color:#0a7e6e;text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px}
-.post-card-title{font-family:'Fraunces',serif;font-weight:600;font-size:19px;color:#0f1f3d;margin-bottom:8px}
-.post-card-excerpt{font-size:14px;color:#6b7585;line-height:1.6}
+.posts-list{max-width:720px;margin:0 auto;padding:20px 20px 60px;display:flex;flex-direction:column;gap:22px}
+.post-card{display:block;position:relative;background:#ffffff;border:1px solid #e4e7ed;border-radius:16px;padding:26px 28px 26px 32px;text-decoration:none;transition:all .2s ease;box-shadow:0 1px 3px rgba(15,31,61,0.05)}
+.post-card::before{content:"";position:absolute;left:0;top:18px;bottom:18px;width:4px;border-radius:4px;background:#0a7e6e}
+.post-card:hover{border-color:#b2ddd8;transform:translateY(-3px);box-shadow:0 10px 24px rgba(15,31,61,0.10)}
+.post-card-date{display:inline-block;font-family:'DM Mono',monospace;font-size:11px;color:#0a7e6e;background:#e8f5f3;padding:4px 12px;border-radius:20px;text-transform:uppercase;letter-spacing:.06em;margin-bottom:14px}
+.post-card-title{font-family:'Fraunces',serif;font-weight:600;font-size:20px;color:#0f1f3d;margin-bottom:10px;line-height:1.32}
+.post-card-excerpt{font-size:14px;color:#6b7585;line-height:1.65;margin-bottom:16px}
+.post-card-cta{font-size:13px;color:#0a7e6e;font-weight:600}
 </style>
 </head>
 <body>
@@ -62,54 +64,64 @@ span.lang-block.active{display:inline}
   <div id="list-ro" class="lang-block active">
     <a href="/blog/tennis-elbow-pain.html" class="post-card">
       <div class="post-card-date">2026-07-30</div>
-      <div class="post-card-title">Tennis Elbow: De Ce Te Doare Cotul (Chiar Dacă Nu Joci Tenis)</div>
-      <div class="post-card-excerpt">N-ai atins niciodată o rachetă de tenis? Poți avea totuși tennis elbow — iată de ce numele este înșelător și ce ajută cu adevărat.</div>
+      <div class="post-card-title">Cotul Tenismenului: De Ce Te Doare Cotul (Chiar Dacă Nu Joci Tenis)</div>
+      <div class="post-card-excerpt">N-ai atins niciodată o rachetă de tenis? Poți avea totuși cotul tennismenului — iată de ce numele este înșelător și ce ajută cu adevărat.</div>
+      <div class="post-card-cta">Citește articolul →</div>
     </a>
     <a href="/blog/plantar-fasciitis-morning-heel-pain.html" class="post-card">
       <div class="post-card-date">2026-07-29</div>
       <div class="post-card-title">Fasceită Plantară: De Ce Te Doare Călcâiul Cel Mai Tare Dimineața</div>
       <div class="post-card-excerpt">Durerea ascuțită de călcâi la primii pași din pat? Este unul dintre cele mai recunoscute tipare în fizioterapie — iată ce înseamnă.</div>
+      <div class="post-card-cta">Citește articolul →</div>
     </a>
     <a href="/blog/tech-neck-pain.html" class="post-card">
       <div class="post-card-date">2026-07-28</div>
       <div class="post-card-title">Tech Neck: De Ce Te Doare Gâtul După Ecran (și Cum Rezolvi)</div>
       <div class="post-card-excerpt">Te doare gâtul după o zi de scroll — și nu-ți imaginezi. Iată fizica simplă din spatele tech neck-ului și ce ajută cu adevărat.</div>
+      <div class="post-card-cta">Citește articolul →</div>
     </a>
     <a href="/blog/shoulder-pain-after-sleeping.html" class="post-card">
       <div class="post-card-date">2026-07-27</div>
       <div class="post-card-title">Durere de Umăr După Somn: De Ce Apare și Cum o Rezolvi</div>
       <div class="post-card-excerpt">Te trezești cu durere de umăr care nu era prezentă înainte? Ține adesea de modul în care ai dormit — iată de ce și ce ajută cu adevărat.</div>
+      <div class="post-card-cta">Citește articolul →</div>
     </a>
     <a href="/blog/sciatica-vs-lower-back-pain.html" class="post-card">
       <div class="post-card-date">2026-07-27</div>
       <div class="post-card-title">Sciatică vs. Durere Lombară: Cum Faci Diferența</div>
       <div class="post-card-excerpt">Pot părea asemănătoare, dar sciatica și durerea lombară generală nu sunt același lucru — iar diferența contează pentru modul de tratament.</div>
+      <div class="post-card-cta">Citește articolul →</div>
     </a></div>
   <div id="list-en" class="lang-block">
     <a href="/blog/tennis-elbow-pain.html" class="post-card">
       <div class="post-card-date">2026-07-30</div>
       <div class="post-card-title">Tennis Elbow: Why Your Elbow Hurts (Even If You Don't Play Tennis)</div>
       <div class="post-card-excerpt">Never touched a tennis racquet in your life? You can still get tennis elbow — here's why the name is misleading, and what actually helps.</div>
+      <div class="post-card-cta">Read article →</div>
     </a>
     <a href="/blog/plantar-fasciitis-morning-heel-pain.html" class="post-card">
       <div class="post-card-date">2026-07-29</div>
       <div class="post-card-title">Plantar Fasciitis: Why Your Heel Hurts Most in the Morning</div>
       <div class="post-card-excerpt">That sharp heel pain with your very first steps out of bed? It's one of the most recognizable patterns in physiotherapy — here's what it means.</div>
+      <div class="post-card-cta">Read article →</div>
     </a>
     <a href="/blog/tech-neck-pain.html" class="post-card">
       <div class="post-card-date">2026-07-28</div>
       <div class="post-card-title">Tech Neck: Why Your Neck Hurts After Screen Time (and How to Fix It)</div>
       <div class="post-card-excerpt">Your neck hurts after a day of scrolling — and it's not your imagination. Here's the simple physics behind tech neck, and what actually helps.</div>
+      <div class="post-card-cta">Read article →</div>
     </a>
     <a href="/blog/shoulder-pain-after-sleeping.html" class="post-card">
       <div class="post-card-date">2026-07-27</div>
       <div class="post-card-title">Shoulder Pain After Sleeping: Why It Happens and How to Fix It</div>
       <div class="post-card-excerpt">Waking up with shoulder pain that wasn't there before? It's often about how you slept — here's why, and what actually helps.</div>
+      <div class="post-card-cta">Read article →</div>
     </a>
     <a href="/blog/sciatica-vs-lower-back-pain.html" class="post-card">
       <div class="post-card-date">2026-07-27</div>
       <div class="post-card-title">Sciatica vs. Lower Back Pain: How to Tell the Difference</div>
       <div class="post-card-excerpt">They can feel similar, but sciatica and general lower back pain aren't the same thing — and telling them apart matters for how you treat them.</div>
+      <div class="post-card-cta">Read article →</div>
     </a></div>
 </div>
 
